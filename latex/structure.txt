@@ -1,0 +1,74 @@
+Introduction
+  Motivation
+    what problems need to be addressed
+  Aims
+    what I wanna do to address the problems
+  Contributions
+    what exactly I did
+  Overview
+    structure of the report
+
+Background
+  Definitions
+    LID, identification vs verification
+    acoustic (MFCC, SDC) vs prosodic (intonation, stress, rhythm) LID
+    other definitions added later as needed
+
+  Related work
+    Standard approach -- GMMs and i-vectors
+    State of the art -- x-vectors
+
+Data
+  Intro: Popular datasets
+  GlobalPhone
+  Data partitioning
+    explanation of the use of training/enrollment/evaluation/testing data
+  Data preprocessing
+    SHN to WAV
+    splitting long utterances into shorter ones
+
+Implementation
+  The Kaldi toolkit
+  Adapted implementations
+    Snyder et al.'s LID x-vector paper
+    GlobalPhone recipe
+    SRE16 recipe
+  Description of x-vector+GP architecture (highlighting own contributions)
+    how the whole pipeline works: go into much more detail than in the Related work section
+    mention possibility of direct classification with TDNN and that I focus on using independent classifier because it provides extra flexibility
+  Hyperparameters
+    decided: TDNN layers, activation function, learning algorithm (TO-DO: understand shrinking), log-regression parameters
+    empirically established: number of TDNN training epochs
+
+Features used for language identification
+  Intro: I will compare acoustic and prosodic features, leaving formants and BNF for later.
+  Acoustic
+    MFCCs (vanilla and with delta terms)
+    SDCs
+  Prosodic
+    F0 (intonation), and KaldiPitch
+    Energy (stress)
+    Duration (rhythm)
+
+Experiments
+  Baseline
+    vanilla MFCCs (expand on MFCC configuration)
+    30s enrollment segments, 10s eval/test segments
+  SDC vectors (wanna compare with MFCCs)
+  KaldiPitch+Energy vectors
+  MFCC/SDC + KaldiPitch+Energy vectors (concatenated), wanna see if they are complementary
+  Possibly fusion of MFCC/SDC and KaldiPitch+Energy scores (using evaluation data for training the fusion logistic regression)
+  Evaluation metric
+    C_primary, also a score for every language separately
+
+Results  
+  Reported: overall C_primary, language-specific score
+  Focus on Slavic languages (Czech, Croatian, Polish, Russian)
+
+Discussion
+
+Future work
+  Plans for Part 2 of the MInf project
+  Other future ideas
+
+Conclusions

@@ -1,0 +1,9 @@
+To what extent should I stick to the original topic?
+
+Related: How should I motivate the use of GlobalPhone rather than a different corpus? It was prescribed in the problem statement.
+
+2 of us working on the thing: How to write about it? How clearly to say what bits were created by whom?
+
+Can I assume people read my references as well? For instance, when describing the X-vector DNN, shall I refer the reader to the paper, of repeat the architecture description?
+
+Should I include extensive definitions of MFCCs, SDCs, of Kaldi pitch extractor? Or just a brief definition and a reference for a curious reader?

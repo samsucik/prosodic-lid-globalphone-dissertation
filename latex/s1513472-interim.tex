@@ -1,6 +1,7 @@
 \documentclass[bsc,frontabs,twoside,singlespacing,parskip,deptreport]{infthesis}
 
 \usepackage[round]{natbib}
+\usepackage[hidelinks]{hyperref}
 
 \begin{document}
 
@@ -27,8 +28,9 @@
 
 \maketitle
 
+% Add acknowledgements if necessary.
 \section*{Acknowledgements}{
-  Acknowledgements go here.
+  Thanks to Paul Moore for productive collaboration while building the baseline system, to Steve Renals for his guidance, feedback and optimism, and to David Snyder for his advice.
 }
 
 \tableofcontents
@@ -38,69 +40,33 @@
 
 \chapter{Introduction}{
 
-  The document structure should include:
-  \begin{itemize}
-  \item
-  The title page  in the format used above.
-  \item
-  An optional acknowledgements page.
-  \item
-  The table of contents.
-  \item
-  The report text divided into chapters as appropriate.
-  \item
-  The bibliography.
-  \end{itemize}
-
-  Commands for generating the title page appear in the skeleton file and
-  are self explanatory.
-  The file also includes commands to choose your report type (project
-  report, thesis or dissertation) and degree.
-  These will be placed in the appropriate place in the title page. 
-
-  The default behaviour of the documentclass is to produce documents typeset in
-  12 point.  Regardless of the formatting system you use, 
-  it is recommended that you submit your thesis printed (or copied) 
-  double sided.
-
-  The report should be printed single-spaced.
-  It should be 30 to 60 pages long, and preferably no shorter than 20 pages.
-  Appendices are in addition to this and you should place detail
-  here which may be too much or not strictly necessary when reading the relevant section.
-
-  \section{Using Sections}{
-    Divide your chapters into sub-parts as appropriate.
-  }
-
-  \section{Citations}{
-    Note that citations 
-    (like \cite{P1} or \cite{P2})
-    can be generated using {\tt BibTeX} or by using the
-    {\tt thebibliography} environment. This makes sure that the
-    table of contents includes an entry for the bibliography.
-    Of course you may use any other method as well.
-  }
-
-  \section{Options}{
-    There are various documentclass options, see the documentation.  Here we are
-    using an option ({\tt bsc} or {\tt minf}) to choose the degree type, plus:
-    \begin{itemize}
-    \item {\tt frontabs} (recommended) to put the abstract on the front page;
-    \item {\tt twoside} (recommended) to format for two-sided printing, with
-      each chapter starting on a right-hand page;
-    \item {\tt singlespacing} (required) for single-spaced formating; and
-    \item {\tt parskip} (a matter of taste) which alters the paragraph formatting so that
-    paragraphs are separated by a vertical space, and there is no
-    indentation at the start of each paragraph.
-    \end{itemize}
-  }
-}
-\chapter{The Real Thing}{
-  Of course
-  you may want to use several chapters and much more text than here.
 }
 
-\chapter{Prosody for LID}{
+\chapter{Building the System}{
+  System was built in Kaldi \citep{Povey_et_al_2011}.
+  Reproducing the architecture described by Snyder et al. in LID setting \citep{Snyder_et_al_2018}. The authors adapted the architecture from the speaker recognition setting \citep{Snyder_et_al_2018b}, which is accessible as the SRE16 recipe in Kaldi. We used that recipe and the GlobalPhone Kaldi recipe.
+  
+  \section{Choice of classifier}{
+    The SRE16 recipe uses PLDA because it does not do identification, but verification. For our purposes, we needed a proper classifier. Current popular and well-performing classifiers are various flavours of GMM and logistic regression, with no clear winner. \cite{Snyder_et_al_2018}, for instance, used GMM trained using MMI -- based on \cite{McCree_2014}. We decided to re-use a model which is already implemented in the LRE07/v2 recipe -- logistic regression. Our decision was also consulted with \cite{Snyder_2018_kaldi-help}.
+  }
+  
+  \section{Setting Hyperparameters}{
+    \begin{enumerate}
+    \item MFCC extraction parameters
+    \item DNN architecture: Layers, activation functions, choice of extraction layer, ...
+    \item DNN training: Learning algorithm and its parameters, number of epochs, ...
+    \item 
+    \end{enumerate}
+  }
+}
+
+\chapter{Features for LID}{
+  \section{Acoustic Features}{
+
+  }
+  \section{Prosodic Features}{
+
+  }
   \section{Features used in literature}{
     Various features used in the past in LID experiments:
     \begin{enumerate}
@@ -113,14 +79,15 @@
     \end{enumerate}
   }
   \section{Experiments with Prosodic Features}{
-    MFCC fed into DNN
-    SDC fed into DNN
+    MFCC vs SDC fed into DNN: SDCs are traditionally preferred because they capture more long-range phenomena whereas MFCCs only capture frame-level stuff. However, with a TDNN that does aggregation over time automatically, it's not so clear whether SDC provide more value. I will compare them with vanilla MFCCs (without any $\Delta$ terms) to see how powerful the TDNN is in terms of context aggregation.
+
     MFCC/SDC and KaldiPitch concatenatedfed and fed into X-vector DNN
     Two X-vector DNNs trained separately on MFCC/SDC and KaldiPitch
     - evaluated separately
     - the two X-vectors concatenated and classified and evaluated as a whole
   }
 }
+
 
 % use the following and \cite{} as above if you use BibTeX
 % otherwise generate bibtem entries
