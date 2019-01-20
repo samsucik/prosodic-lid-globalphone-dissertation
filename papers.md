@@ -8,6 +8,9 @@ X-vectors applied to LID.
 ### [X-vectors: Robust DNN Embeddings for <abbr title="Speaker Recognition">SRE</abbr> (Snyder et al., 2018b)](papers/Snyder_et_al_2018-1.pdf)
 X-vectors applied to SRE, playing with data augmentation. Has corresponding [Kaldi recipe](https://github.com/kaldi-asr/kaldi/tree/master/egs/sre16/v2).
 
+### [Language Recognition using Time Delay Deep Neural Network (Sarma et al., 2018)](papers/Sarma_et_al_2018.pdf)
+LID: TDNN trained on mono-lingual ASR used to produce i-vectors, then classified using log-regression. The LRE07/v2 Kaldi recipe.
+
 ### [<abbr title="Deep Neural Network">DNN</abbr> Embeddings for Text-Independent <abbr title="Speaker Verification">SV</abbr> (Snyder et al., 2017)](papers/Snyder_et_al_2017.pdf)
 X-vectors applied to SV; scoring **pairs** of speakers. Embeddings from 2 different DNN layers.
 
@@ -32,6 +35,11 @@ Improving GMM-UBM performance: Choosing data smartly to decrease training time.
 ### [Front-End Factor Analysis for <abbr title="Speaker Verification">SV</abbr> (Dehak et al., 2010)](papers/Dehak_et_al_2010.pdf)
 Uses JFA in low-D space, introduces i-vectors. SV.
 
+### [Support vector machines for speaker and language recognition (Campbell et al., 2006)](papers/Campbell_et_al_2006.pdf)
+Defines SDCs.
+
+### [Revising Perceptual Linear Prediction (PLP) (Hoenig et al., 2005)](papers/Hoenig_et_al_2005.pdf)
+Defines PLPs. Compares MFCC with PLP and creates a new feature by mixing the two, with slightly better WER on an ASR task.
 
 ## Prosody-specific
 
@@ -42,6 +50,7 @@ Kaldi pitch extractor that works even for unvoiced frames.
 Brief description of LPC, PLP, MFCC and other acoustic features.
 
 ### [Prosodic Features and Formant Modeling for an I-vector-based <abbr title="Language Recognition">LRE</abbr> System (Martinez et al., 2013)](papers/Martinez_et_al_2013.pdf)
+LID: For voiced frames, pitch contour and formant contours (all parametrised by Legendre polynomials), duration and energy are used as features for an i-Vector system. The system performs quite well on its own, and significantly improves an acoustic system (using SDCs) when fused together.
 
 ### [I-vector-based Prosodic System for <abbr title="Language Identification">LID</abbr> (Martinez et al., 2012)](papers/Martinez_et_al_2012.pdf)
 

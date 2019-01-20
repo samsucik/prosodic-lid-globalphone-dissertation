@@ -100,15 +100,26 @@
   you may want to use several chapters and much more text than here.
 }
 
-\chapter{Features}{
-  Various features used in the past in LID experiments:
-  \begin{enumerate}
-  \item{Shifted delta cepstra (SDC) by \cite{Ferrer_et_al_2016}}
-  \item{39D MFCC vectors combined with 4D pitch features \citep{Song_et_al_2013}}
-  \item{39 PLP features (including $\Delta$ and $\Delta\Delta$) \citep{Lopez-Moreno_et_al_2014}}
-  \item{\cite{Lin_et_al_2005} do LID just from the pitch contour parametrised by Legendre polynomials}
-  \item{\cite{Ghahremani_et_al_2014} show ASR improvements with a pitch-tracking algorithm that calculates pitch even for unvoiced frames}
-  \end{enumerate}
+\chapter{Prosody for LID}{
+  \section{Features used in literature}{
+    Various features used in the past in LID experiments:
+    \begin{enumerate}
+    \item{Shifted delta cepstra (SDC) by \cite{Ferrer_et_al_2016} and \cite{Sarma_et_al_2018} (7D MFCC + 7-1-3-7 SDCs = 56D) and by \cite{Torres-Carrasquillo_et_al_2002} (10-1-3-3), }
+    \item{19 MFCCs + energy + 20 $\Delta$ + 20 $\Delta\Delta$ = 60D by \cite{Sarma_et_al_2018} -- outperformed by SDCs, but note that they trained an ASR TDNN for generating i-vectors}
+    \item{39D MFCC vectors combined with 4D pitch features \citep{Song_et_al_2013}}
+    \item{39 PLP features (including $\Delta$ and $\Delta\Delta$) \citep{Lopez-Moreno_et_al_2014}}
+    \item{\cite{Lin_et_al_2005} do LID just from the pitch contour parametrised by Legendre polynomials}
+    \item{\cite{Ghahremani_et_al_2014} show ASR improvements with a pitch-tracking algorithm that calculates pitch even for unvoiced frames}
+    \end{enumerate}
+  }
+  \section{Experiments with Prosodic Features}{
+    MFCC fed into DNN
+    SDC fed into DNN
+    MFCC/SDC and KaldiPitch concatenatedfed and fed into X-vector DNN
+    Two X-vector DNNs trained separately on MFCC/SDC and KaldiPitch
+    - evaluated separately
+    - the two X-vectors concatenated and classified and evaluated as a whole
+  }
 }
 
 % use the following and \cite{} as above if you use BibTeX
