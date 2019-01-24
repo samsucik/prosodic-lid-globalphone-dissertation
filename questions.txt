@@ -1,9 +1,25 @@
 To what extent should I stick to the original topic?
+- don't bother; particularly if you go further than the original topic
 
 Related: How should I motivate the use of GlobalPhone rather than a different corpus? It was prescribed in the problem statement.
+- just explain why GP is sensible, maybe discuss why it's too easy or hard compared with other corpora
 
 2 of us working on the thing: How to write about it? How clearly to say what bits were created by whom?
+- will check with Don; mention who's done what briefly. focus on own contributions.
 
 Can I assume people read my references as well? For instance, when describing the X-vector DNN, shall I refer the reader to the paper, of repeat the architecture description?
+- yes, people read references. BUT: include some explanation so that a reader can read the work for the first time and understand it all at a high level, without having to read references
 
 Should I include extensive definitions of MFCCs, SDCs, of Kaldi pitch extractor? Or just a brief definition and a reference for a curious reader?
+- mfcc = textbook stuff = keep very brief
+- more specific (x-vector, pitch) = elaborate more
+- explain in terms of contrast, comparison
+- explain where relevant for the work
+
+ideas
+- list out key papers
+- sketch plan for experiments
+- imagine reader's done ASR
+- aim for 40 pages of content
+- maybe split Tamil on breaks intially
+- further work: splitting long utterances intelligently (on pauses, phrase breaks, etc), not uniformly

@@ -5,7 +5,7 @@
 
 \begin{document}
 
-\title{Language Identification from Speech}
+\title{Prosodic features in state-of-the-art spoken language identification}
 
 \author{Sam Sucik}
 
@@ -15,22 +15,14 @@
 \date{\today}
 
 \abstract{
-  This is an example of {\tt infthesis} style.
-  The file {\tt skeleton.tex} generates this document and can be 
-  used to get a ``skeleton'' for your thesis.
-  The abstract should summarise your report and fit in the space on the 
-  first page.
-  %
-  You may, of course, use any other software to write your report,
-  as long as you follow the same style. That means: producing a title
-  page as given here, and including a table of contents and bibliography.
+  TO-DO
 }
 
 \maketitle
 
 % Add acknowledgements if necessary.
 \section*{Acknowledgements}{
-  Thanks to Paul Moore for productive collaboration while building the baseline system, to Steve Renals for his guidance, feedback and optimism, and to David Snyder for his advice.
+  Thanks to Paul Moore for productive collaboration while building the baseline system, to Steve Renals for his supervision and optimism, and to David Snyder for his advice.
 }
 
 \tableofcontents
@@ -39,55 +31,133 @@
 
 
 \chapter{Introduction}{
-
+  \section{Motivation}{
+    LID is useful in ASR, in voice assistants, emergency call routing, etc.
+    Traditionally, acoustic features are used (influence of ASR on LID and SID). Prosodic LID is much rarer, although results show that prosodic information can help identify language \citep{Lin_et_al_2005}, and that both LID and ASR can benefit from using acoustic \textit{and} prosodic features \citep{Martinez_et_al_2013,Ghahremani_et_al_2014}.
+    Just last year, a novel architecture for LID was proposed by \cite{Snyder_et_al_2018}, dramatically improving the state-of-the-art results. Although the authors find that using bottleneck features from an ASR DNN yields better results than using the standard acoustic MFCC features, even the ASR DNN was trained just using MFCCs. Thus the work ignores the potential of speech information other than that captured by MFCCs.
+  }
+  \section{Aims}{
+    In this work, I aim to reproduce the state-of-the-art LID system and explore the use of prosodic features in addition to acoustic ones. Because the system uses a relatively novel architecture, in which a TDNN aggregates information across a speech segment, I also compare two types of acoustic features, one which has such aggregation over time encoded (SDC) and one that only containes information about single frames (vanilla MFCC).
+  }
+  \section{Contributions}{
+    what exactly I did
+    adapted SRE implementation for LID
+    researched literature concerning prosodic LID
+    built a system that has the potential to become open source as part of the Kaldi toolkit, to be used by a wider community
+  }
+  \section{Overview}{
+    structure of the report
+  }
 }
 
-\chapter{Building the System}{
-  System was built in Kaldi \citep{Povey_et_al_2011}.
-  Reproducing the architecture described by Snyder et al. in LID setting \citep{Snyder_et_al_2018}. The authors adapted the architecture from the speaker recognition setting \citep{Snyder_et_al_2018b}, which is accessible as the SRE16 recipe in Kaldi. We used that recipe and the GlobalPhone Kaldi recipe.
+\chapter{Background}{
+  Definitions (interespersed, not having a separate section)
+    LID, identification vs verification
+    acoustic (MFCC, SDC) vs prosodic (intonation, stress, rhythm) LID
+    other definitions added later as needed
+
+  \section{Spoken language identification}{
+
+  }
+  \section{Traditional approaches}{
+    GMMs and i-vectors
+  }
+  \section{State of the art}{
+    TDNNs and x-vectors
+  }
+  \section{Features used for LID}{
+    Acoustic
+      MFCCs (vanilla and with delta terms)
+      SDCs
+    Prosodic
+      F0 (intonation), and KaldiPitch
+      Energy (stress)
+      Duration (rhythm)
+  }
+}
+
+\chapter{Data}{
+  Intro: Popular datasets
+  \section{GlobalPhone}{
+
+  }
+  \section{Data partitioning}{
+    explanation of the use of training/enrollment/evaluation/testing data
+  }
+  \section{Data preprocessing}{
+    SHN to WAV
+    splitting long utterances into shorter ones
+  }
+}
+
+\chapter{Implementation}{
+  \section{The Kaldi toolkit}{
+
+  }
+  \section{Adapted implementations}{
+    Snyder et al.'s LID x-vector paper
+    GlobalPhone recipe
+    SRE16 recipe
+  }
+  \section{Final architecture}{
+    Description of x-vector+GP architecture (highlighting own contributions)
+    how the whole pipeline works: go into much more detail than in the Related work section
+    mention possibility of direct classification with TDNN and that I focus on using independent classifier because it provides extra flexibility
+  }
+  \section{Computing environment}{
+    cluster, Slurm, GPUs, parallelisation, rough runtimes of the different stages
+  }
+  \section{Hyperparameters}{
+    tuned on the baseline (see next section)
+    decided: TDNN layers, activation function, learning algorithm (TO-DO: understand shrinking), log-regression parameters
+    empirically established: number of TDNN training epochs (also mention training time)
+  }
+}
+
+\chapter{Experiments}{
+  Intro: I will compare acoustic and prosodic features, leaving formants and BNF for later.
+  Evaluation metric: $C_primary$
+
+  \section{Baseline}{
+    vanilla MFCCs (expand on MFCC configuration)
+    30s enrollment segments, 10s eval/test segments
+  }
+  \section{SDC vectors}{
+    wanna compare with MFCCs
+  }
+  \section{KaldiPitch+Energy vectors}{
+
+  }
+  \section{MFCC/SDC + KaldiPitch+Energy}{
+    feature vectors concatenated, wanna see if they are complementary
+  }
+  \section{Possibly fusion of MFCC/SDC and KaldiPitch+Energy scores}{
+    fucion of results instead of feature vectors
+    using evaluation data for training the fusion logistic regression
+  }
+}
+
+\chapter{Results}{
+  Reported: overall $C_primary$, language-specific score, accuracy (for illustrative purposes), confusion matrix (to see which language pairs are confusing)
+  Focus on Slavic languages (Czech, Croatian, Polish, Russian, Bulgarian)
+}
+
+\chapter{Discussion}{
   
-  \section{Choice of classifier}{
-    The SRE16 recipe uses PLDA because it does not do identification, but verification. For our purposes, we needed a proper classifier. Current popular and well-performing classifiers are various flavours of GMM and logistic regression, with no clear winner. \cite{Snyder_et_al_2018}, for instance, used GMM trained using MMI -- based on \cite{McCree_2014}. We decided to re-use a model which is already implemented in the LRE07/v2 recipe -- logistic regression. Our decision was also consulted with \cite{Snyder_2018_kaldi-help}.
+}
+
+\chapter{Future work}{
+  \section{Plans for Part 2 of the MInf project}{
+
   }
+  \section{Other future ideas}{
+
+  }
+}
+
+\chapter{Conclusions}{
   
-  \section{Setting Hyperparameters}{
-    \begin{enumerate}
-    \item MFCC extraction parameters
-    \item DNN architecture: Layers, activation functions, choice of extraction layer, ...
-    \item DNN training: Learning algorithm and its parameters, number of epochs, ...
-    \item 
-    \end{enumerate}
-  }
 }
-
-\chapter{Features for LID}{
-  \section{Acoustic Features}{
-
-  }
-  \section{Prosodic Features}{
-
-  }
-  \section{Features used in literature}{
-    Various features used in the past in LID experiments:
-    \begin{enumerate}
-    \item{Shifted delta cepstra (SDC) by \cite{Ferrer_et_al_2016} and \cite{Sarma_et_al_2018} (7D MFCC + 7-1-3-7 SDCs = 56D) and by \cite{Torres-Carrasquillo_et_al_2002} (10-1-3-3), }
-    \item{19 MFCCs + energy + 20 $\Delta$ + 20 $\Delta\Delta$ = 60D by \cite{Sarma_et_al_2018} -- outperformed by SDCs, but note that they trained an ASR TDNN for generating i-vectors}
-    \item{39D MFCC vectors combined with 4D pitch features \citep{Song_et_al_2013}}
-    \item{39 PLP features (including $\Delta$ and $\Delta\Delta$) \citep{Lopez-Moreno_et_al_2014}}
-    \item{\cite{Lin_et_al_2005} do LID just from the pitch contour parametrised by Legendre polynomials}
-    \item{\cite{Ghahremani_et_al_2014} show ASR improvements with a pitch-tracking algorithm that calculates pitch even for unvoiced frames}
-    \end{enumerate}
-  }
-  \section{Experiments with Prosodic Features}{
-    MFCC vs SDC fed into DNN: SDCs are traditionally preferred because they capture more long-range phenomena whereas MFCCs only capture frame-level stuff. However, with a TDNN that does aggregation over time automatically, it's not so clear whether SDC provide more value. I will compare them with vanilla MFCCs (without any $\Delta$ terms) to see how powerful the TDNN is in terms of context aggregation.
-
-    MFCC/SDC and KaldiPitch concatenatedfed and fed into X-vector DNN
-    Two X-vector DNNs trained separately on MFCC/SDC and KaldiPitch
-    - evaluated separately
-    - the two X-vectors concatenated and classified and evaluated as a whole
-  }
-}
-
 
 % use the following and \cite{} as above if you use BibTeX
 % otherwise generate bibtem entries

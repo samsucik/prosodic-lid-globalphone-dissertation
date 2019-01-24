@@ -9,15 +9,25 @@ Introduction
     structure of the report
 
 Background
-  Definitions
+  Definitions (interespersed, not having a separate section)
     LID, identification vs verification
     acoustic (MFCC, SDC) vs prosodic (intonation, stress, rhythm) LID
     other definitions added later as needed
 
-  Related work
-    Standard approach -- GMMs and i-vectors
-    State of the art -- x-vectors
-
+  LID
+  Traditional approaches
+    GMMs and i-vectors
+  State of the art
+    TDNNs and x-vectors
+  Features used for LID
+    Acoustic
+      MFCCs (vanilla and with delta terms)
+      SDCs
+    Prosodic
+      F0 (intonation), and KaldiPitch
+      Energy (stress)
+      Duration (rhythm)
+    
 Data
   Intro: Popular datasets
   GlobalPhone
@@ -37,20 +47,12 @@ Implementation
     how the whole pipeline works: go into much more detail than in the Related work section
     mention possibility of direct classification with TDNN and that I focus on using independent classifier because it provides extra flexibility
   Hyperparameters
+    tuned on the baseline: 30s classifier training data, 10s eval data
     decided: TDNN layers, activation function, learning algorithm (TO-DO: understand shrinking), log-regression parameters
     empirically established: number of TDNN training epochs
 
-Features used for language identification
-  Intro: I will compare acoustic and prosodic features, leaving formants and BNF for later.
-  Acoustic
-    MFCCs (vanilla and with delta terms)
-    SDCs
-  Prosodic
-    F0 (intonation), and KaldiPitch
-    Energy (stress)
-    Duration (rhythm)
-
 Experiments
+  Intro: I will compare acoustic and prosodic features, leaving formants and BNF for later.
   Baseline
     vanilla MFCCs (expand on MFCC configuration)
     30s enrollment segments, 10s eval/test segments
@@ -63,7 +65,7 @@ Experiments
 
 Results  
   Reported: overall C_primary, language-specific score
-  Focus on Slavic languages (Czech, Croatian, Polish, Russian)
+  Focus on Slavic languages (Czech, Croatian, Polish, Russian, Bulgarian)
 
 Discussion
 
