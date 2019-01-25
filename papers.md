@@ -32,7 +32,7 @@ DBNFs improve LID. Frame-level (or window-level) processing. Detailed architectu
 ### [A study on <abbr title="Universal Background Model">UBM</abbr> training in <abbr title="Speaker Verification">SV</abbr> (Hasan, 2011)](papers/Hasan_2011.pdf)
 Improving GMM-UBM performance: Choosing data smartly to decrease training time.
 
-### [Front-End Factor Analysis for <abbr title="Speaker Verification">SV</abbr> (Dehak et al., 2010)](papers/Dehak_et_al_2010.pdf)
+### [Front-End Factor Analysis for <abbr title="Speaker Verification">SV</abbr> (Dehak et al., 2011)](papers/Dehak_et_al_2011.pdf)
 Uses JFA in low-D space, introduces i-vectors. SV.
 
 ### [Support vector machines for speaker and language recognition (Campbell et al., 2006)](papers/Campbell_et_al_2006.pdf)

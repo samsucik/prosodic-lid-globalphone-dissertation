@@ -3,6 +3,12 @@
 \usepackage[round]{natbib}
 \usepackage[hidelinks]{hyperref}
 
+% For nice references including the words Figure, Section, etc
+\renewcommand*{\sectionautorefname}{Section}%
+\renewcommand*{\subsectionautorefname}{Section}%
+\renewcommand*{\figureautorefname}{Fig.}%
+\newcommand{\algorithmautorefname}{Alg.}
+
 \begin{document}
 
 \title{Prosodic features in state-of-the-art spoken language identification}
@@ -15,7 +21,9 @@
 \date{\today}
 
 \abstract{
-  TO-DO
+  The main point here is to show my intended structure and some idea of what each section would contain. Even where there is a paragraph or two written in a section (rather than just a bullet list or a few notes), it should be taken as a very early draft of the section and feedback should focus on outlined content (as opposed to the form).
+
+  \autoref{timeline} outlines the timeline for the next few weeks to finish all experiments.
 }
 
 \maketitle
@@ -29,117 +37,226 @@
 
 %\pagenumbering{arabic}
 
-
 \chapter{Introduction}{
   \section{Motivation}{
     LID is useful in ASR, in voice assistants, emergency call routing, etc.
     Traditionally, acoustic features are used (influence of ASR on LID and SID). Prosodic LID is much rarer, although results show that prosodic information can help identify language \citep{Lin_et_al_2005}, and that both LID and ASR can benefit from using acoustic \textit{and} prosodic features \citep{Martinez_et_al_2013,Ghahremani_et_al_2014}.
-    Just last year, a novel architecture for LID was proposed by \cite{Snyder_et_al_2018}, dramatically improving the state-of-the-art results. Although the authors find that using bottleneck features from an ASR DNN yields better results than using the standard acoustic MFCC features, even the ASR DNN was trained just using MFCCs. Thus the work ignores the potential of speech information other than that captured by MFCCs.
+    Just last year, a novel architecture for LID utilising \textit{x-vectors} was proposed by \cite{Snyder_et_al_2018}, dramatically improving the state-of-the-art results. Although the authors find that using bottleneck features from an ASR DNN yields better results than using the standard acoustic MFCC features, even the ASR DNN was trained just using MFCCs. Thus the work ignores the potential of speech information other than that captured by MFCCs.
   }
   \section{Aims}{
-    In this work, I aim to reproduce the state-of-the-art LID system and explore the use of prosodic features in addition to acoustic ones. Because the system uses a relatively novel architecture, in which a TDNN aggregates information across a speech segment, I also compare two types of acoustic features, one which has such aggregation over time encoded (SDC) and one that only containes information about single frames (vanilla MFCC).
+    In this work, I aim to reproduce the state-of-the-art x-vector LID system and explore the use of prosodic features in addition to acoustic ones. Because the system uses a relatively novel architecture, in which a TDNN aggregates information across a speech segment, I also compare two types of acoustic features, one which has such aggregation over time encoded (SDC) and one that only containes information about single frames (vanilla MFCC).
   }
   \section{Contributions}{
-    what exactly I did
-    adapted SRE implementation for LID
-    researched literature concerning prosodic LID
-    built a system that has the potential to become open source as part of the Kaldi toolkit, to be used by a wider community
+    \begin{enumerate}
+      \item {
+        Adapted an existing x-vector speaker verification implementation (based on \cite{Snyder_et_al_2018b}) for language identification
+      }
+      \item {
+        Explored the choice of classifiers and chose a different one than \cite{Snyder_et_al_2018}
+      }
+      \item {
+        Prepared the Global Phone corpus for LID with the x-vector system, extending the original partitioning of the corpus into datasets and analysing invalid data
+      }
+      \item {
+        Built and evaluated a baseline, end-to-end x-vector LID system using 19 languages of the Global Phone corpus
+      }
+      \item {
+        Explored, set and tuned important hyperparameters of the system, mainly the number of training epochs of the x-vector TDNN
+      }
+      \item {
+        Researched literature concerning the use of acoustic and prosodic features in language identification, speaker verification and ASR
+      }
+      \item {
+        Designed, run and evaluated experiments comparing two types of acoustic features (MFCC and SDC) and two prosodic features (pitch, energy), and their combinations
+      }
+      \item {
+        Built a system which has the potential to be open-sourced as part of the Kaldi ASR toolkit, to be used by a wider community
+      }
+    \end{enumerate}
   }
   \section{Overview}{
-    structure of the report
+    Describing the structure of the report that follows. (Is this useful at all?)
   }
 }
 
 \chapter{Background}{
-  Definitions (interespersed, not having a separate section)
-    LID, identification vs verification
-    acoustic (MFCC, SDC) vs prosodic (intonation, stress, rhythm) LID
-    other definitions added later as needed
-
   \section{Spoken language identification}{
+    Spoken language identification (in this work also simply language identification or LID) means recognising the language of a speech segment. In a way, it is analogous to speaker identification (SID). Importantly, LID is typically realised as two different tasks: Simple classification (answering the question "Which of these languages is X?"), or verification ("Is X this language?"). Simple classification is more suitable for use cases with a small and stable set of targets -- such as a set of supported languages. There, computing the probability of X being each of the target languages is feasible. Verification, on the other hand, is more suitable for use cases where the number of targets is very high (such as a set of possible speakers) and even changes over time -- there, it is often infeasible to compute the probability of X being each of the targets; instead, the system typically focuses only on evaluating the probability of X being the hypothesised language (or speaker). Throughout this work, I focus on LID as a classification task, with a closed set of target languages (i.e. not including the option to classify a speech segment as "unknown language").
+  }
+  \section{Traditional approach -- i-vectors }{
+    TO-DO: add a diagram of the pipeline
+    
+    Since 2011, the state of the art in language and speaker identification was dominated by \textit{i-vector} systems, first introduced by \cite{Dehak_et_al_2011}. These systems simulate the observation space using a huge Gaussian Mixture Model (GMM) -- often consisting of thousands of multivariate Gaussians, typically trained using maximum likelihood estimation. To score a speech segment, it is processed one frame at a time, each frame's feature vector is mapped onto the trained GMM, producing a high-dimensional vector representation. This representation is subsequently dimensionality-reduced and scored by a trained classifier.
+  }
+  \section{State of the art -- x-vectors}{
+    TO-DO: add a diagram of the pipeline, define TDNN and x-vectors properly
+    
+    In 2018, the Johns Hopkins University team -- \cite{Snyder_et_al_2018} -- introduced a system which uses deep convolutional neural networks (referred to as time-delay neural networks -- TDNN) to aggregate and process information across the frames of a variable-length speech segment. Such TDNN is trained to do direct language classification. Empirically, however, better results are achieved when low-dimensional embeddings called \textit{x-vectors}, representing entire segments, are extracted from the trained TDNN and scored by a separate trained classifier. This system is attractive not just because of the promising performance: It no longer operates on the frame level; instead, it has the potential to effectively aggregate low-level information over multiple frames and do further processing. As demonstrated by the authors, when using a separate classifier, the architecture also supports -- without much impact on the LID performance -- extending the set of target languages without having to expensively re-train the x-vector TDNN. It is enough to train the light-weight classifier.
+  }
+  \section{Features used in language identification}{
+    TO-DO: Add more references.
 
-  }
-  \section{Traditional approaches}{
-    GMMs and i-vectors
-  }
-  \section{State of the art}{
-    TDNNs and x-vectors
-  }
-  \section{Features used for LID}{
-    Acoustic
-      MFCCs (vanilla and with delta terms)
-      SDCs
-    Prosodic
-      F0 (intonation), and KaldiPitch
-      Energy (stress)
-      Duration (rhythm)
+    Historically, ASR has been the main point of focus among all speech processing areas, which is reflected in today's dominant use of acoustic features -- primarily developed for ASR -- in other tasks like LID and SID. These acoustic features, the most popular ones being MFCC, Mel filterbank and SDC, are not necessarilly best-suited for the other tasks. For instance, all three disregard any pitch information -- which makes sense in the context of ASR, where intonation is typically ignored, but is certainly not desirable in speaker identification, where intonation and the pitch range contribute to speaker-specific characteristics. Another ASR-inspired approach to LID is the \textit{phonotactic} one, which exploits the different phone distributions across languages.
+
+    In this work, I acknowledge \textit{acoustic} LID (using acoustic features), but \textit{prosodic} LID receives the most attention -- using features which are disregarded in ASR, but have a great potential in language and speaker identification tasks.
+
+    \subsection{Acoustic features}{
+      Definitions of MFCCs and SDCs, probably ignore PLPs, Mel filterbanks, etc
+
+      SDC used by \cite{Ferrer_et_al_2016} and \cite{Sarma_et_al_2018} (7D MFCC + 7-1-3-7 SDCs = 56D) and by \cite{Torres-Carrasquillo_et_al_2002} (10-1-3-3)
+
+      19 MFCCs + energy + 20 $\Delta$ + 20 $\Delta\Delta$ = 60D by \cite{Sarma_et_al_2018} -- outperformed by SDCs, but note that they trained an ASR TDNN for generating i-vectors
+      
+      MFCCs also used inderectly to train ASR DNNs which then provide bottle-neck features which give very promising results in both LID and SID
+    }
+    \subsection{Prosodic features}{
+      Elaborate on prosody as consisting of intonation (F0), stress (energy) and rhythm (segment durations).
+      
+      39D MFCC vectors combined with 4D pitch features \citep{Song_et_al_2013}
+
+      \cite{Lin_et_al_2005} do LID just from the pitch contour parametrised by Legendre polynomials
+
+      \cite{Ghahremani_et_al_2014} show ASR improvements with a pitch-tracking algorithm that calculates pitch even for unvoiced frames
+    }
   }
 }
 
 \chapter{Data}{
-  Intro: Popular datasets
-  \section{GlobalPhone}{
+  Intro: Historically, speech corpora were meant for ASR, but now used for LID and SID as well. Since 1996, NIST has also been organising Language Recognition Challenges (LREs), and the corpora used for LREs are now the typically used ones when it comes to evaluating different systems. However, NIST traditionally focuses on telephone, narrowband (8kHz) speech, which represents only one part of all the possible settings in which LID or SID are deployed. In this work, I use a relatively small (< 40GB) corpus which, however, has many qualities that the various NIST corpora lack.
 
+  \section{GlobalPhone}{
+    Presented by \cite{Schultz_et_al_2013}, originally for ASR. Wideband (16kHz), recorded native speakers of 23 languages reading newspaper articles -- very similar to the English corpora such as CSR-I, which are based on Wall Street Journal articles. Unlike in NIST corpora, the recording equipment and conditions vary very little. One disadvantage of GlobalPhone is the lack of spontaneous speech. On the other hand, the language goes well beyond the simple conversational language found in the NIST telephone speech corpora.
   }
+
   \section{Data partitioning}{
-    explanation of the use of training/enrollment/evaluation/testing data
+    GlobalPhone comes with a partitioning of each language's data into training, development and evaluation datasets, with the sizes of the datasets being roughly 80\%, 10\%, 10\%, respectively. However, for the purposes of the x-vector architecture, 4-way partitioning is required:
+    \begin{enumerate}
+      \item{training set -- for training the x-vector TDNN,}
+      \item{enrollment set -- for training the x-vector classifier,}
+      \item{evaluation set ('development' in the GlobalPhone terminology) -- for tuning the hyperparameters of both the TDNN and the classifier,}
+      \item{testing set -- for final performance evaluation on unseen data.}
+    \end{enumerate}
+
+    In order to use GlobalPhone with the x-vector system, I allocated part of the training data for enrollment. I tried to preserve the GlobalPhone development sets and evaluation sets (which I refer to as evaluation and testing sets, respectively), in order to enable fair comparison of my results obtained on those data portions with any other works that use the GlobalPhone corpus.
+
+    Taking into account the relatively small number of parameters of the x-vector classifier when compared to the x-vector TDNN, I split the training data such that approximately only one 8th is used for enrollment. This way, the training data accounts for roughly 70\% of the whole corpus, while the 3 other portions are roughly 10\% each.
+
+    Importantly, GlobalPhone (as of the GlobalPhone Documentation v4.1) still misses the partitioning for certain languages:
+    \begin{enumerate}
+      \item {no partitioning for Czech, Polish, Tamil, Swahili, Ukrainian, Vietnamese and Shanghai Chinese,}
+      \item {only partial partitioning for Arabic, French, Japanese, Russian.}
+    \end{enumerate}
+
+    The {\texttt GlobalPhone} Kaldi recipe contains an extended partitioning, which fixes Czech, French, Japanese, Polish, Russian, Swahili and Vietnamese. For the rest of the languages with incomplete partitioning (Arabic, Tamil, Ukrainian and Shanghai Chinese), I created the partitioning myself, following the same approach as the GlobalPhone authors: "No speaker appears in more than one group and no article was read by two speakers from different groups" (TO-DO: reference the GP docs).
+
+    Some languages didn't have speaker-article data; for those, the partitioning was done randomly.
+
+    For some languages, I could not construct a partitioning with zero article overlap; for those, I tried to at least minimise the overlap.    
   }
-  \section{Data preprocessing}{
-    SHN to WAV
-    splitting long utterances into shorter ones
+
+  \section{Initial data preprocessing}{
+    Basically, SHN to WAV
+
+    Splitting long utterances into shorter ones uniformly, to be able to do classifier training and end-to-end evaluation on segments of different lengths -- like in \cite{Snyder_et_al_2018}. One future improvement would be to not do uniform splitting, but rather split on breaks -- to prevent potentially bad edge effects.
+  }
+
+  \section{Invalid data}{
+    This was discovered while preprocessing the data from .shn to .wav:
+    \begin{enumerate}
+      \item {Hausa, Swahili and Ukrainian have broken data.}
+      \item {Bulgarian, German, Russian, Turkish and Vietnamese have one broken utterance recording each -- not a big deal, as the number of utterances per language is in hundreds.}
+      \item {Portuguese has 2 speakers with almost all data broken (these were discarded), and other 10 speakers with up to 3 broken utterance recordings each (these were keps)}
+    \end{enumerate}
+
+    This leaves us with 19 languages, which are used further in this work: Arabic (AR), Bulgarian (BG), Mandarin Chinese (CH), Croatian (CR), Czech (CZ), French (FR), German (GE), Japanese (JA), Korean (KO), Polish (PL), Portuguese (PO), Russian (RU), Spanish (SP), Swedish (SW), Tamil (TA), Thai (TH), Turkish (TU), Vietnamese (VN) and Shanghai Chinese (WU).
   }
 }
 
 \chapter{Implementation}{
   \section{The Kaldi toolkit}{
-
+    System was built in Kaldi \citep{Povey_et_al_2011}. (Introduce Kaldi.)
   }
   \section{Adapted implementations}{
-    Snyder et al.'s LID x-vector paper
-    GlobalPhone recipe
-    SRE16 recipe
+    Describe the SRE16 Kaldi recipe, the GlobalPhone ASR recipe, and how they were combined (also using the information from \cite{Snyder_et_al_2018}) to reproduce the LID x-vector system.
   }
+
+  \section{Choice of classifier}{
+    The SRE16 recipe uses PLDA, but for verification, not for classification. For our purposes, we needed a proper classifier. Current popular and well-performing classifiers are various flavours of GMM and logistic regression, with no clear winner. \cite{Snyder_et_al_2018}, for instance, used GMM trained using MMI -- based on \cite{McCree_2014}. I decided to re-use a model which is already implemented in the LRE07/v2 Kaldi recipe -- logistic regression. The decision was also consulted with \cite{Snyder_2018_kaldi-help}. One theoretical downside of logistic regression is that the resulting decision boundaries are linear, whereas with GMM (trained with full co-variance matrix), one can achieve more complex quadratic decision boundaries. On the other hand though, training a full covariance requires much data, and the enrollment set would likely be not big enough. Additionally, the Kaldi logit can describe each class using more than linear boundary (see next section), so the decision boundaries should be complex enough to be able to model the observed data well.
+  }
+
   \section{Final architecture}{
     Description of x-vector+GP architecture (highlighting own contributions)
+
     how the whole pipeline works: go into much more detail than in the Related work section
-    mention possibility of direct classification with TDNN and that I focus on using independent classifier because it provides extra flexibility
+
+    description of the Kaldi logit, which models each class using multiple "mixtures", i.e. multiple boundaries
+    
+    mention possibility of direct classification with TDNN and that I focus on using separate classifier because it provides extra flexibility and because it was shown to perform slightly better
   }
+
   \section{Computing environment}{
-    cluster, Slurm, GPUs, parallelisation, rough runtimes of the different stages
+    cluster, Slurm, GPUs, parallelisation, rough runtimes of the different stages (TDNN training, x-vector extraction, logit training, inference)
   }
+
   \section{Hyperparameters}{
-    tuned on the baseline (see next section)
-    decided: TDNN layers, activation function, learning algorithm (TO-DO: understand shrinking), log-regression parameters
-    empirically established: number of TDNN training epochs (also mention training time)
+    decided: TDNN layers, activation function, learning algorithm (TO-DO: read about shrinking)
+
+    tuned (using the baseline setting, see next chapter): number of TDNN training epochs, logit hyperparameters
   }
 }
 
 \chapter{Experiments}{
-  Intro: I will compare acoustic and prosodic features, leaving formants and BNF for later.
-  Evaluation metric: $C_primary$
+  Intro: I will compare a selection of acoustic and prosodic features. Despite their reported potential, I don't use BNFs in this work, as they are basically just a higher-level feature based on the acoustic MFCC information (at least the BNFs in \cite{Snyder_et_al_2018}).
+
+  Evaluation metric: $C_{primary}$, consistent with NIST LREs. Elaborate a bit more on the meaning of the metric, maybe compare with accuracy and other simpler metrics.
 
   \section{Baseline}{
-    vanilla MFCCs (expand on MFCC configuration)
-    30s enrollment segments, 10s eval/test segments
-  }
-  \section{SDC vectors}{
-    wanna compare with MFCCs
-  }
-  \section{KaldiPitch+Energy vectors}{
+    vanilla MFCCs (no deltas): also comment on the decisions made regarding MFCC MFCC configuration
 
+    $\leq 30s$ enrollment segments, $\leq 10s$ eval/test segments (should be possible to also report exact average segment length for each set)
   }
+
+  \section{Shifted delta cepstra}{
+    Want to see whether context aggregation in the form of added deltas in SDCs (compared to vanilla MFCCs) can improve performance, since the TDNN does context aggregation of its own.
+  }
+
+  \section{KaldiPitch+Energy vectors}{
+    Calculating pitch even for unvoiced frames using the algorithm presented by \cite{Ghahremani_et_al_2014}. Adding raw energy to model stress. Extremely low-dimensionality feature vectors, but will see how the TDNN and classifier trained on these can do prosodic LID. Hoping to achieve some sensible results, probably much worse than with MFCCs or SDCs.
+  }
+  
   \section{MFCC/SDC + KaldiPitch+Energy}{
-    feature vectors concatenated, wanna see if they are complementary
+    Taking the winner from MFCC/SDC, and concatenating those features with Kaldi pitch and raw energy values. Training the TDNN and classifier on that. Hopefully, seeing an improvement.
   }
-  \section{Possibly fusion of MFCC/SDC and KaldiPitch+Energy scores}{
-    fucion of results instead of feature vectors
-    using evaluation data for training the fusion logistic regression
+  
+  \section{Fusion of MFCC/SDC and KaldiPitch+Energy scores}{
+    Stretch goal, likely to be delayed for Year 5 (or abandoned if there are more attractive ideas)
+
+    Same as previous section, but scores computed separately (using two systems, one trained on acoustic features, the other one on prosodic) and fused using a logit fuser. Probably using evaluation set for training the fuser (although, ideally, a separate data portion would be reserved for that).
+  }
+
+  \section{Timeline for the experiments}{
+    \label{timeline}
+    \begin{enumerate}
+      \item {
+        Finished: System using MFCC and SDC.
+      }
+      \item {
+        By January 28th: Choose the TDNN and logit hyperparameters. TDNN using MFCCs has already been trained for, 2, 3, ... 10 epochs, now need to 1) establish reasonable logit parameters (driven by evaluation-set performance on x-vectors from TDNN trained for 3 epochs), 2) use that logit config to score the TDNNs with different number of training epochs, 3) choose a number of epochs that is a reasonable compromise between performance and training runtime
+      }
+      \item {
+        By February 4th: Have MFCC vs SDC comparison carried out (includes baseline results using MFCCs). Have KaldiPitch and raw energy features implemented (both are straightforward to compute with Kaldi -- the energy is just computing MFCCs with raw log energy instead of C0, and discarding all but the energy-corresponding resulting coefficient). Have splicing of MFCC/SDC features with prosodic features implemented.
+      }
+      \item {
+        By February 11th: Have results of KaldiPitch+Energy experiments and of the acoustic+prosodic experiment (MFCC/SDC + KaldiPitch+Energy)
+      }
+    \end{enumerate}
   }
 }
 
 \chapter{Results}{
-  Reported: overall $C_primary$, language-specific score, accuracy (for illustrative purposes), confusion matrix (to see which language pairs are confusing)
-  Focus on Slavic languages (Czech, Croatian, Polish, Russian, Bulgarian)
+  Reporting: overall $C_{primary}$, accuracy (for illustrative purposes), confusion matrix (to see which language pairs are confusing)
+  
+  Focus on Slavic languages, since there is so many of them (Czech, Croatian, Polish, Russian, Bulgarian) and intonation can be very characteristic and important here (my own intuition, based on my knowledge of Slavic languages).
 }
 
 \chapter{Discussion}{
@@ -150,8 +267,9 @@
   \section{Plans for Part 2 of the MInf project}{
 
   }
-  \section{Other future ideas}{
 
+  \section{Other future ideas}{
+    Everything that is sensible but unlikely in Year 5.
   }
 }
 
