@@ -9,3 +9,13 @@
 *.synctex.gz
 *.toc
 *.out
+
+.ipynb_checkpoints
+bin/
+etc/
+include/
+lib/
+lib64
+share/
+pip-selfcheck.json
+pyvenv.cfg
