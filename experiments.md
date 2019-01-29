@@ -1,4 +1,10 @@
 # Experiments
 
+## MFCC
+Training runtime: 19.05h
+
 ## SDC
-Training runtime: 23:48-19:17~19:30 = 19.5h (very similar to MFCC runtime).
+Training runtime: 19.5h (very similar to MFCC runtime).
+
+## MFCC+deltas
+Training runtime: 19.7h
