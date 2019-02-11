@@ -1,31 +1,44 @@
 # Experiments
-Training the TDNN for 7 epochs.
+Training the TDNN for 7 epochs, on 91100 utterances, 70 archives and 163 iterations.
 
 ## MFCC
-Training runtime: 19.05h
-163 iterations
+Training runtime:
 23D features
-
+Accuracy:
+C_primary:
 
 ## SDC
-Training runtime: 19.5h (very similar to MFCC runtime).
-163 iterations?
-56D features
+Training runtime:
+72D features
+Accuracy:
+C_primary:
 
 ## MFCC+deltas
-Training runtime: 19.7h
-163 iterations?
+Training runtime:
 69D features
+Accuracy:
+C_primary:
 
 ## Pitch+energy
-//Training runtime: 17.75h
-155 iterations
+Training runtime: 
 5D features
-//Accuracy: 0.838
-//C_primary value: 0.199
+Accuracy: 0.860
+C_primary: 0.177
 
 ## Pitch
-155 iterations
+Training runtime:
+4D features
+Accuracy: 0.695
+C_primary: 0.385 
 
 ## Energy
-163 iterations
+Training runtime:
+1D features
+Accuracy: 0.720
+C_primary: 0.359
+
+## MFCC+deltas + pitch+energy
+Training runtime:
+74D features
+Accuracy:
+C_primary:
