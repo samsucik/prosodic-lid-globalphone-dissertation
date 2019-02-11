@@ -19,3 +19,6 @@ lib64
 share/
 pip-selfcheck.json
 pyvenv.cfg
+
+# X-vectors for plotting t-SNE
+xvectors/
