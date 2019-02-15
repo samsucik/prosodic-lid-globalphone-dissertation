@@ -1,0 +1,10 @@
+exp,acc,c_prim
+mfcc,0.941,0.078
+sdc,0.945,0.070
+mfcc-deltas,0.944,0.074
+pitch,0.695,0.385
+energy,0.720,0.359
+pitch-energy,0.860,0.177
+sdc-pitch-energy,0.943,0.071
+sdc-pitch,0.945,0.072
+sdc-energy,0.945 ,0.069
