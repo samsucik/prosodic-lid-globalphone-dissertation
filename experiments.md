@@ -8,11 +8,35 @@ Training runtime:
 Accuracy:  0.941
 C_primary: 0.078
 
+## MFCC + energy
+Training runtime:
+23D features
+Accuracy:  0.9387
+C_primary: 0.0802
+
 ## SDC
 Training runtime:
 72D features
 Accuracy:  0.945
 C_primary: 0.070
+
+## SDC + pitch+energy
+Training runtime:
+77D features
+Accuracy: 0.943
+C_primary: 0.071
+
+## SDC + pitch
+Training runtime:
+76D features
+Accuracy: 0.945 
+C_primary: 0.072
+
+## SDC + energy
+Training runtime:
+76D features
+Accuracy: 0.945 
+C_primary: 0.069
 
 ## MFCC+deltas
 Training runtime:
@@ -38,20 +62,3 @@ Training runtime:
 Accuracy:  0.720
 C_primary: 0.359
 
-## SDC + pitch+energy
-Training runtime:
-77D features
-Accuracy: 0.943
-C_primary: 0.071
-
-## SDC + pitch
-Training runtime:
-76D features
-Accuracy: 0.945 
-C_primary: 0.072
-
-## SDC + energy
-Training runtime:
-76D features
-Accuracy: 0.945 
-C_primary: 0.069
