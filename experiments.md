@@ -1,6 +1,15 @@
 # Experiments
 Training the TDNN for 7 epochs, on 91100 utterances, 70 archives and 163 iterations.
-Evaluating on 20349 utterances.
+
+## Fusion
+
+Evaluating:
+- 10s: on 20284 segments (20282 for fusion cases involving pitch as a single feature)
+
+Testing:
+- 10s: on 18663 segments (18649 for fusion cases involving pitch as a single feature -- less by 0.075%)
+- 3s: on 46202 segments (45801 for fusion cases involving pitch as a single feature -- less by 0.877%)
+
 
 ## MFCC
 Training runtime:
@@ -8,11 +17,23 @@ Training runtime:
 Accuracy:  0.941
 C_primary: 0.078
 
+## MFCC + pitch
+Training runtime:
+23D features
+Accuracy:  0.9308
+C_primary: 0.0919
+
 ## MFCC + energy
 Training runtime:
 23D features
 Accuracy:  0.9387
 C_primary: 0.0802
+
+## MFCC + pitch+energy
+Training runtime:
+23D features
+Accuracy:  0.9378
+C_primary: 0.0822
 
 ## SDC
 Training runtime:
@@ -43,6 +64,24 @@ Training runtime:
 69D features
 Accuracy:  0.944 
 C_primary: 0.074
+
+## MFCC+deltas+energy
+Training runtime:
+69D features
+Accuracy:  0.9454
+C_primary: 0.0697
+
+## MFCC+deltas+pitch
+Training runtime:
+69D features
+Accuracy:  0.9397
+C_primary: 0.0797
+
+## MFCC+deltas+pitch+energy
+Training runtime:
+69D features
+Accuracy:  0.9451
+C_primary: 0.0722
 
 ## Pitch+energy
 Training runtime: 
