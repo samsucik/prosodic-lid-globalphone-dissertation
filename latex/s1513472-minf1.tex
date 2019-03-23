@@ -20,7 +20,7 @@
 \course{Master of Informatics}
 \project{\vspace{3cm}{\bf MInf Project (Part 1) Report}}
 
-\date{\today}
+\date{2019}
 
 \abstract{
   TO-DO
@@ -96,18 +96,33 @@
       \centering
       \includegraphics[width=14.5cm]{graphics/i-vectors}
       \vspace*{-1em}
-      \caption{Prediction using a typical i-vector system.}
+      \caption{Language identification using a typical i-vector system.}
       \label{fig:i-vector}
     \end{figure}
 
-    The main components of a typical i-vector system, together with their use for prediction, are shown in \autoref{fig:i-vector}. The universal background model (UBM) is a Gaussian mixture model (GMM) consisting of a large number (often over 1000) multivariate mixture components. The UBM is trained to model the observation space of feature vectors computed from speech frames (typically using the MFCC features, see \autoref{sec:acoustic-feats}). At test time, a feature vector $X$ is projected -- using the trained UBM -- into a high-dimensional \textit{supervector space}, producing a \textit{GMM supervector} $M_x$. The supervector is then decomposed as follows:
-    $$M_x = m + Tw_x$$
-    where "$m$ is the language- and channel-independent component \textit{mean supervector}" \citep[p.862]{Martinez_et_al_2011}, $T$ is the \textit{total variability matrix} (also called the i-vector extractor), and $w_x$ is the \textit{identity vector} (i-vector) of sample $X$. The total variability matrix $T$ is "a matrix of bases spanning the subspace covering the important variability in the supervector space" (\citeauthor[p.862]{Martinez_et_al_2011}). Effectively, $T$ is trained to project between the high-dimensional GMM supervector space and the low-dimensional \textit{total variability subspace} (also called the \textit{i-vector space}). The i-vector $w_x$ is then a low-dimensional set of factors projecting the supervector onto the total variability subspace base vectors. Once $w_x$ is extracted from $M_x$, a simple classifier or a different scoring technique (trained on i-vectors) is used to produce a final classification decision.
-    
-    To score an entire speech segment using an i-vector system, the speech is processed frame by frame and the shallow, frame-specific decisions are then combined. This is an example of \textit{frame-level} LID. While the frame-level approach may be important for segments with potentially multiple languages (e.g. where code switching can occur in speech), it makes the very unrealistic assumption that the languages in consecutive speech frames are independent of each other. Additionally, at inference time, an i-vector system needs to be run once for every frame, which is expensive with large systems and long speech segments.
+    The main components of a typical i-vector system, together with their use for prediction, are shown in \autoref{fig:i-vector}. The universal background model (UBM) is a Gaussian mixture model (GMM) consisting of a large number (e.g. 2048) multivariate mixture components. The UBM is trained using the Expectation-Maximisation algorithm to model the observation space of frame-level feature vectors $\mathbf{x}$ computed from all training utterances (typically 39-dimensional vector using the MFCC features, see \autoref{sec:acoustic-feats}). Given the trained UBM, an utterance $X$ can be represented by a language- and channel-specific GMM supervector $M$ as:
+    \begin{equation}
+      \label{eq:supervector}
+      M_X = m + Tw_X
+    \end{equation}
+    Here, $m$ is the language- and channel-independent GMM supervector of the UBM (consisting of the stacked means of all mixture components). $T$ is the \textit{total variability matrix} -- also called the i-vector extractor, and $w_x$ is the \textit{identity vector} (i-vector) of sample $X$. The total variability matrix $T$ is "a matrix of bases spanning the subspace covering the important [language and channel] variability in the supervector space" (\citeauthor[p.862]{Martinez_et_al_2011}). Effectively, $T$ projects between the high-dimensional GMM supervector space and the low-dimensional \textit{total variability subspace} (also called the \textit{i-vector space}). The i-vector $w_x$ is then a low-dimensional set of factors projecting the supervector onto the total variability subspace base vectors. The i-vector extractor $T$ is trained again using Expectation-Maximisation (for details see \citet[p. 100]{ivector_tutorial}). Without providing too much detail, I highlight the aspect that is most relevant to my work: training $T$ is based on calculating and further combining the 0\textsuperscript{th}, 1\textsuperscript{st} and 2\textsuperscript{nd} order statistics which are computed by \textit{summing over the frames} of an utterance.
+
+    Once the i-vector extractor has been trained, any utterance can be represented by its i-vector. This enables training a relatively simple and fast classifier operating over the low-dimensional i-vectors. Different classifiers have been successfully used with the i-vector back end; for example, \citeauthor{Martinez_et_al_2011} initially tried using these, all achieving roughly equal performance:
+    \begin{enumerate}
+      \item {a linear generative model -- modelling the i-vectors of each language by a Gaussian, with a shared full covariance matrix across all language-modelling Gaussians}
+      \item {a linear Support Vector Machine computing scores for all languages by doing binary classification in the one-versus-all fashion}
+      \item {a two-class logistic regression also doing one-versus-all classification.}
+    \end{enumerate}
+
+    At test time, a sequence of feature vectors for utterance $X$ is projected using the UBM into the high-dimensional \textit{supervector space}, producing $M_X$. Then, $T$ is used to extract the utterance-level i-vector, which is processed by the classifier.
+
+    Despite producing utterance-level scores, I describe the i-vector pipeline as shallow because it aggregates frame-level information over time very early (when projecting $X$ into the supervector space), effectively treating an utterance as a bag of frames and disregarding any temporal patterns spanning over multiple frames.
   }
+
   \section{Deep approach: x-vectors}{
-    SOTA but novel, not well-explored yet. Solves the shallowness problem.
+    \label{sec:x-vectors}
+    As opposed to the frame-level i-vector systems, this approach, introduced last year by the John Hopkins University team first for speaker verification \citep{Snyder_et_al_2018b} and subsequently for language identification \citep{Snyder_et_al_2018}, aggregates information over time and produces scores at segment level, even for variable-length speech segments. It is attractive also because \citeauthor{Snyder_et_al_2018} report beating the i-vector state-of-the-art system on the LID task.
+
     TO-DO: add a diagram of the pipeline, define TDNN and x-vectors properly
     
     In 2018, the Johns Hopkins University team -- \cite{Snyder_et_al_2018} -- introduced a system which uses deep convolutional neural networks (referred to as time-delay neural networks -- TDNN) to aggregate and process information across the frames of a variable-length speech segment. Such TDNN is trained to do direct language classification. Empirically, however, better results are achieved when low-dimensional embeddings called \textit{x-vectors}, representing entire segments, are extracted from the trained TDNN and scored by a separate trained classifier. This system is attractive not just because of the promising performance: It no longer operates on the frame level; instead, it has the potential to effectively aggregate low-level information over multiple frames and do further processing. As demonstrated by the authors, when using a separate classifier, the architecture also supports -- without much impact on the LID performance -- extending the set of target languages without having to expensively re-train the x-vector TDNN. It is enough to train the light-weight classifier.
