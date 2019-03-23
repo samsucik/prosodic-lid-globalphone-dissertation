@@ -76,7 +76,7 @@
 
 \chapter{Background}{
   \label{chap:Background}
-  This chapter elaborates on the key concepts relevant to my work, as shown in this condensed description of the project: Exploring \textbf{spoken language identification} in the context of the recently proposed \textbf{x-vector} system (an alternative to the more established state-of-the-art \textbf{i-vector} approach), focusing on utilising \textbf{prosodic information} in addition to the standard \textbf{acoustic information}.
+  This chapter elaborates on the key concepts relevant to my work, as shown in this condensed description of the project: Exploring \textbf{spoken language identification} in the context of the recently proposed \textbf{x-vector} system (contrasted with the more established state-of-the-art \textbf{i-vector} approach), focusing on utilising \textbf{prosodic information} in addition to the standard \textbf{acoustic information}.
 
   \section{The task: spoken language recognition}{
     \label{sec:LID}
@@ -88,7 +88,7 @@
     Identification is more suitable for use cases with a small and stable set of possible targets -- such as the set of supported languages. There, computing the probability of $T_x$ being each of the target languages is feasible. Verification, on the other hand, is more suitable for cases where the set of possible targets less constrained -- such as the large and changing set of possible speakers in speaker verification systems. There, it is often infeasible to compute the probability distribution over all possible values of $T_x$; instead, the system typically focuses only on evaluating the probability of $T_x$ being the hypothesised speaker. Throughout this work, I focus on \textit{language identificaion} (LID) with a \textit{closed set} of target languages (i.e. not including the option to identify a speech segment's language  as unknown/other).
   }
 
-  \section{Shallow approach to LID: i-vectors}{
+  \section{Shallow utterance-level approach to LID: i-vectors}{
     \label{sec:i-vectors}
     This approach, with its numerous variations, has now been the state of the art for 8 years -- since first introduced by \cite{Dehak_et_al_2011} for speaker recognition and later applied by \cite{Martinez_et_al_2011} in language recognition.
     
@@ -119,7 +119,16 @@
     Despite producing utterance-level scores, I describe the i-vector pipeline as shallow because it aggregates frame-level information over time very early (when projecting $X$ into the supervector space), effectively treating an utterance as a bag of frames and disregarding any temporal patterns spanning over multiple frames.
   }
 
-  \section{Deep approach: x-vectors}{
+  \section{Less shallow approach: d-vectors}{
+    \label{sec:d-vectors}
+    % in short: creating utterance-level representations by extracting frame-level information and averaging over frames
+    % main difference compared to i-vectors: looking at sequences, i.e. taking each frame's surrounding context into account (this was done by both Variani and Tkachenko)
+    % context aggregation done using standard DNN but Tkachenko used TDNN, more familiar from ASR acoustic models
+    % describing TDNN: like 1D CNN, but often made sparse. aggregates information along the time axis
+    Introduced for speaker verification by \citet{Variani_et_al_2014} and later adapted and applied to language identification by \citet{dvectors_lid}, this approach uses deep neural networks to extract frame-level information, which is then averaged across frames to produce utterance- or language-level representations.
+  }
+
+  \section{Deep utterance-level approach: x-vectors}{
     \label{sec:x-vectors}
     As opposed to the frame-level i-vector systems, this approach, introduced last year by the John Hopkins University team first for speaker verification \citep{Snyder_et_al_2018b} and subsequently for language identification \citep{Snyder_et_al_2018}, aggregates information over time and produces scores at segment level, even for variable-length speech segments. It is attractive also because \citeauthor{Snyder_et_al_2018} report beating the i-vector state-of-the-art system on the LID task.
 
