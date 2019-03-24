@@ -8,8 +8,16 @@
 % For nice references including the words Figure, Section, etc
 \renewcommand*{\sectionautorefname}{Section}%
 \renewcommand*{\subsectionautorefname}{Section}%
-\renewcommand*{\figureautorefname}{Fig.}%
-\newcommand{\algorithmautorefname}{Alg.}
+\renewcommand*{\figureautorefname}{Figure}%
+\renewcommand*{\tableautorefname}{Table}%
+\newcommand{\algorithmautorefname}{Algorithm}
+
+% Spacing around lines in tables
+\def\abovestrut#1{\rule[0in]{0in}{#1}\ignorespaces}
+\def\belowstrut#1{\rule[-#1]{0in}{#1}\ignorespaces}
+\def\abovespace{\abovestrut{0.17in}}
+\def\aroundspace{\abovestrut{0.17in}\belowstrut{0.10in}}
+\def\belowspace{\belowstrut{0.10in}}
 
 \begin{document}
 
@@ -76,7 +84,7 @@
 
 \chapter{Background}{
   \label{chap:Background}
-  This chapter elaborates on the key concepts relevant to my work, as shown in this condensed description of the project: Exploring \textbf{spoken language identification} in the context of the recently proposed \textbf{x-vector} system (contrasted with the more established state-of-the-art \textbf{i-vector} approach), focusing on utilising \textbf{prosodic information} in addition to the standard \textbf{acoustic information}.
+  This chapter elaborates on the key concepts relevant to my work, as shown in this condensed description of the project: Exploring \textbf{spoken language identification} in the context of the recently proposed \textbf{x-vector} system (contrasted with the more established state-of-the-art \textbf{i-vector} approach, followed by the more novel \textbf{d-vector} systems), focusing on utilising \textbf{prosodic information} in addition to the standard \textbf{acoustic information}.
 
   \section{The task: spoken language recognition}{
     \label{sec:LID}
@@ -123,9 +131,48 @@
     \label{sec:d-vectors}
     % in short: creating utterance-level representations by extracting frame-level information and averaging over frames
     % main difference compared to i-vectors: looking at sequences, i.e. taking each frame's surrounding context into account (this was done by both Variani and Tkachenko)
-    % context aggregation done using standard DNN but Tkachenko used TDNN, more familiar from ASR acoustic models
-    % describing TDNN: like 1D CNN, but often made sparse. aggregates information along the time axis
-    Introduced for speaker verification by \citet{Variani_et_al_2014} and later adapted and applied to language identification by \citet{dvectors_lid}, this approach uses deep neural networks to extract frame-level information, which is then averaged across frames to produce utterance- or language-level representations.
+    % nothing changes about the classifiers, just a different way of producing vectors
+    Introduced for speaker verification by \citet{Variani_et_al_2014} and later adapted and applied to language identification by \citet{dvectors_lid}, this approach uses neural networks to extract frame-level information, which is then aggregated across frames to produce utterance- or language-level vectors. Importantly, nothing changes about the final classification stage itself: It is the differences in producing the vector representations what makes i-vectors, d-vectors and x-vectors differ from each other.
+    
+
+    % context aggregation done using standard DNN but Tkachenko used TDNN, more familiar from ASR acoustic models and better suited for processing sequences (translation-invariant)
+    The biggest change introduced in d-vector systems compared to i-vectors is the notion of frame-level processing while considering each frame's temporal context, i.e. the sequence of a few preceding and following frames. While \citeauthor{Variani_et_al_2014} achieve this by simply feeding the feature vectors of the neighbouring frames together with the frame of interest into a standard deep neural network, \citeauthor{dvectors_lid} use a more suited architecture commonly used for processing temporal sequences in automatic speech recognition: the \textit{time-delay neural network} (TDNN).
+
+    % describing TDNN: like 1D CNN. often made sparse. aggregates information along the time axis
+    % TO-DO: Advantages of TDNN over a fully connected DNN?
+    % TO-DO: Mention where was TDNN first introduced?
+    \begin{figure}[h!]
+      \centering
+      \includegraphics[height=6.5cm]{graphics/tdnn-generic}
+      \caption{Example of a time-delay neural network.}
+      \label{fig:tdnn-generic}
+    \end{figure}
+    A TDNN works like a convolutional neural network (CNN) with 1-dimensional convolutions: only along the time axis, as opposed to the more common 2-dimensional convolutions in image CNNs. \autoref{fig:tdnn-generic} shows a TDNN with three layers which processes information over 9-frame contexts. Note that each blue circle from any layer corresponds to the layer itself (a collection of neurons, i.e. \textit{convolutional kernels}), and all blue circles drawn above each other as corresponding to a particular layer are in fact just one circle -- the layer itself -- sliding over multiple inputs. For example, the convolutional kernels from layer 1 are first applied to feature vectors $\mathbf{x_1}$-$\mathbf{x_5}$, then to vectors $\mathbf{x_3}$-$\mathbf{x_7}$ and then to $\mathbf{x_5}$-$\mathbf{x_9}$. Notice how the network is made more sparse by using \textit{subsampling}, i.e. not using the connections drawn in light grey. A concise and commonly used description of the sketched architecture is shown in \autoref{tab:tdnn-generic} (notice the difference between the interval and set notation).
+    \begin{table}[h!tb]
+      \centering
+      \begin{sc}
+        \begin{tabular}{c|cc}
+                      & Layer context      & Total context \\
+          \hline
+          \abovespace
+          layer 1     & $[t-2,\ t+2]$      & 5 \\
+          \abovespace
+          layer 2     & $\{t-2,\ t,\ t+2\}$& 9 \\
+          \abovespace
+          layer 3     & $\{t\}$            & 9 \\
+        \end{tabular}
+      \end{sc}
+      \caption{Example of architecture description of a TDNN (corresponds to \autoref{fig:tdnn-generic}).}
+      \label{tab:tdnn-generic}
+    \end{table}
+
+    % trained by doing frame-level classification. then the softmax layer ignored and getting activations from the last hidden layer. embeddings! also, GMM supervectors are some kind of embeddings as well ;-)
+    In a d-vector system, a TDNN is trained to do direct frame-wise language identification; for this purpose, an additional softmax layer can be added to produce classification outputs. Often, between the convolutional layers and the output layer the architecture contains a few fully connected layers. After training, the classification layer is disregarded and a frame is instead represented by the activation values from the last hidden layer. The TDNN thus serves as a feature extractor, and the representations produced are referred to as \textit{embeddings}.
+    % averaging to get utterance-level or language-level vectors.  which after extracting information from frames with contexts, average
+    A d-vector representing an entire utterance is then simply the average of the embeddings of all frames from the given utterance.
+    
+    % even though information is simply averaged across frames, d-vectors made a step beyond bag of frames: temporal features are being extracted, in the case of Tkachenko +-10 (21-frame window), Variani did -30 +10 (41-frame window)
+    Despite the naive averaging, utterances are no longer treated merely as bags of frames because each embeddings contains features extracted over short temporal window: 21-frame windows in the case of \citeauthor{dvectors_lid} and 41-frame windows used by \citeauthor{Variani_et_al_2014}, making d-vectors less shallow than i-vectors. On the other hand, a d-vector is still computationally expensive as a result of producing separate embeddings for each frame.
   }
 
   \section{Deep utterance-level approach: x-vectors}{
@@ -141,7 +188,7 @@
 
     Mention that acoustic are more accent-independent while prosodic may be misleading e.g. for non-native speakers.
 
-    Historically, ASR has been the main point of focus among all speech processing areas, which is reflected in today's dominant use of acoustic features -- primarily developed for ASR -- in other tasks like LID and SID. These acoustic features, the most popular ones being MFCC, Mel filterbank and SDC, are not necessarilly best-suited for the other tasks. For instance, all three disregard any pitch information -- which makes sense in the context of ASR, where intonation is typically ignored, but is certainly not desirable in speaker identification, where intonation and the pitch range contribute to speaker-specific characteristics. Another ASR-inspired approach to LID is the \textit{phonotactic} one, which exploits the different phone distributions across languages.
+    Historically, ASR has been the main point of focus among all speech processing areas, which is reflected in today's dominant use of acoustic features -- primarily developed for ASR -- in other tasks like LID and SID. These acoustic features, the most popular ones being MFCC, Mel filterbank and SDC, are not necessarily best-suited for the other tasks. For instance, all three disregard any pitch information -- which makes sense in the context of ASR, where intonation is typically ignored, but is certainly not desirable in speaker identification, where intonation and the pitch range contribute to speaker-specific characteristics. Another ASR-inspired approach to LID is the \textit{phonotactic} one, which exploits the different phone distributions across languages.
 
     In this work, I acknowledge \textit{acoustic} LID (using acoustic features), but \textit{prosodic} LID receives the most attention -- using features which are disregarded in ASR, but have a great potential in language and speaker identification tasks.
 
