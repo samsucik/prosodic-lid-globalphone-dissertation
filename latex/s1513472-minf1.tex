@@ -5,12 +5,22 @@
 
 \usepackage{graphicx}
 
-% For nice references including the words Figure, Section, etc
+% Nice references including the words Figure, Section, etc
 \renewcommand*{\sectionautorefname}{Section}%
 \renewcommand*{\subsectionautorefname}{Section}%
 \renewcommand*{\figureautorefname}{Figure}%
 \renewcommand*{\tableautorefname}{Table}%
 \newcommand{\algorithmautorefname}{Algorithm}
+
+%
+% TABLES
+%
+
+\usepackage{multirow} % multi-row and multi-column table cells
+\usepackage{makecell} % line breaks inside cells with \thead{} and \makecell{}
+
+% Globally setting the vertical padding in tables
+\renewcommand{\arraystretch}{1.1}
 
 % Spacing around lines in tables
 \def\abovestrut#1{\rule[0in]{0in}{#1}\ignorespaces}
@@ -18,6 +28,7 @@
 \def\abovespace{\abovestrut{0.17in}}
 \def\aroundspace{\abovestrut{0.17in}\belowstrut{0.10in}}
 \def\belowspace{\belowstrut{0.10in}}
+
 
 \begin{document}
 
@@ -105,10 +116,10 @@
       \includegraphics[width=14.5cm]{graphics/i-vectors}
       \vspace*{-1em}
       \caption{Language identification using a typical i-vector system.}
-      \label{fig:i-vector}
+      \label{fig:i-vectors}
     \end{figure}
 
-    The main components of a typical i-vector system, together with their use for prediction, are shown in \autoref{fig:i-vector}. The universal background model (UBM) is a Gaussian mixture model (GMM) consisting of a large number (e.g. 2048) multivariate mixture components. The UBM is trained using the Expectation-Maximisation algorithm to model the observation space of frame-level feature vectors $\mathbf{x}$ computed from all training utterances (typically 39-dimensional vector using the MFCC features, see \autoref{sec:acoustic-feats}). Given the trained UBM, an utterance $X$ can be represented by a language- and channel-specific GMM supervector $M$ as:
+    The main components of a typical i-vector system, together with their use for prediction, are shown in \autoref{fig:i-vectors}. The universal background model (UBM) is a Gaussian mixture model (GMM) consisting of a large number (e.g. 2048) multivariate mixture components. The UBM is trained using the Expectation-Maximisation algorithm to model the observation space of frame-level feature vectors $\mathbf{x}$ computed from all training utterances (typically 39-dimensional vector using the MFCC features, see \autoref{sec:acoustic-feats}). Given the trained UBM, an utterance $X$ can be represented by a language- and channel-specific GMM supervector $M$ as:
     \begin{equation}
       \label{eq:supervector}
       M_X = m + Tw_X
@@ -143,22 +154,19 @@
     % TO-DO: Mention where was TDNN first introduced?
     \begin{figure}[h!]
       \centering
-      \includegraphics[height=6.5cm]{graphics/tdnn-generic}
+      \includegraphics[height=6cm]{graphics/tdnn-generic}
       \caption{Example of a time-delay neural network.}
       \label{fig:tdnn-generic}
     \end{figure}
-    A TDNN works like a convolutional neural network (CNN) with 1-dimensional convolutions: only along the time axis, as opposed to the more common 2-dimensional convolutions in image CNNs. \autoref{fig:tdnn-generic} shows a TDNN with three layers which processes information over 9-frame contexts. Note that each blue circle from any layer corresponds to the layer itself (a collection of neurons, i.e. \textit{convolutional kernels}), and all blue circles drawn above each other as corresponding to a particular layer are in fact just one circle -- the layer itself -- sliding over multiple inputs. For example, the convolutional kernels from layer 1 are first applied to feature vectors $\mathbf{x_1}$-$\mathbf{x_5}$, then to vectors $\mathbf{x_3}$-$\mathbf{x_7}$ and then to $\mathbf{x_5}$-$\mathbf{x_9}$. Notice how the network is made more sparse by using \textit{subsampling}, i.e. not using the connections drawn in light grey. A concise and commonly used description of the sketched architecture is shown in \autoref{tab:tdnn-generic} (notice the difference between the interval and set notation).
+    A TDNN works like a convolutional neural network (CNN) with 1-dimensional convolutions: only along the time axis, as opposed to the more common 2-dimensional convolutions in image CNNs. \autoref{fig:tdnn-generic} shows a TDNN with three layers which processes information over 9-frame contexts. Note that each blue circle from any layer corresponds to the layer itself (a collection of neurons, i.e. \textit{convolutional kernels}), and all blue circles drawn above each other as corresponding to a particular layer are in fact just one circle -- the layer itself -- sliding over multiple inputs. For example, the convolutional kernels from layer 1 are first applied to feature vectors $\mathbf{x_1}$-$\mathbf{x_5}$, then to vectors $\mathbf{x_3}$-$\mathbf{x_7}$ and then to $\mathbf{x_5}$-$\mathbf{x_9}$. Notice how the network is made more sparse by using \textit{subsampling}, i.e. not using the connections drawn in light grey. A concise and commonly used description of the sketched architecture is shown in \autoref{tab:tdnn-generic} (notice the difference between the interval and set notation); "layer context" meant relative to the preceding layer.
     \begin{table}[h!tb]
       \centering
       \begin{sc}
-        \begin{tabular}{c|cc}
+        \begin{tabular}{l|cc}
                       & Layer context      & Total context \\
           \hline
-          \abovespace
           layer 1     & $[t-2,\ t+2]$      & 5 \\
-          \abovespace
           layer 2     & $\{t-2,\ t,\ t+2\}$& 9 \\
-          \abovespace
           layer 3     & $\{t\}$            & 9 \\
         \end{tabular}
       \end{sc}
@@ -172,17 +180,65 @@
     A d-vector representing an entire utterance is then simply the average of the embeddings of all frames from the given utterance.
     
     % even though information is simply averaged across frames, d-vectors made a step beyond bag of frames: temporal features are being extracted, in the case of Tkachenko +-10 (21-frame window), Variani did -30 +10 (41-frame window)
-    Despite the naive averaging, utterances are no longer treated merely as bags of frames because each embeddings contains features extracted over short temporal window: 21-frame windows in the case of \citeauthor{dvectors_lid} and 41-frame windows used by \citeauthor{Variani_et_al_2014}, making d-vectors less shallow than i-vectors. On the other hand, a d-vector is still computationally expensive as a result of producing separate embeddings for each frame.
+    Despite the naive averaging, utterances are no longer treated merely as bags of frames because each embeddings contains features extracted over short temporal window: 21-frame windows in the case of \citeauthor{dvectors_lid} and 41-frame windows used by \citeauthor{Variani_et_al_2014}, making d-vectors less shallow than i-vectors.
   }
 
   \section{Deep utterance-level approach: x-vectors}{
     \label{sec:x-vectors}
-    As opposed to the frame-level i-vector systems, this approach, introduced last year by the John Hopkins University team first for speaker verification \citep{Snyder_et_al_2018b} and subsequently for language identification \citep{Snyder_et_al_2018}, aggregates information over time and produces scores at segment level, even for variable-length speech segments. It is attractive also because \citeauthor{Snyder_et_al_2018} report beating the i-vector state-of-the-art system on the LID task.
-
-    TO-DO: add a diagram of the pipeline, define TDNN and x-vectors properly
+    % natural extension to d-vectors: computing not just average but also standard deviation.
+    The x-vector approach, introduced last year by the John Hopkins University team first for speaker verification \citep{Snyder_et_al_2018b} and subsequently for language identification \citep{Snyder_et_al_2018}, can be viewed as an extension to d-vectors, producing utterance-level embeddings even for variable-length speech segments. The architecture consists of (see also \autoref{fig:x-vectors-hl}):
+    \begin{enumerate}
+      \item {the context-aggregating TDNN layers operating at frame level (with the final context window of $\pm$7 frames),}
+      \item {a \textit{statistics pooling layer} which computes the mean and the standard deviation over all frames, effectively changing a variable-length sequence of frame-level activations into a fix-length vector, and}
+      \item {an utterance-level part consisting of 2 fully connected bottleneck layers which extract more sophisticated features and compress the information into a lower-dimensional space, and an additional softmax output layer.}
+    \end{enumerate}
     
-    In 2018, the Johns Hopkins University team -- \cite{Snyder_et_al_2018} -- introduced a system which uses deep convolutional neural networks (referred to as time-delay neural networks -- TDNN) to aggregate and process information across the frames of a variable-length speech segment. Such TDNN is trained to do direct language classification. Empirically, however, better results are achieved when low-dimensional embeddings called \textit{x-vectors}, representing entire segments, are extracted from the trained TDNN and scored by a separate trained classifier. This system is attractive not just because of the promising performance: It no longer operates on the frame level; instead, it has the potential to effectively aggregate low-level information over multiple frames and do further processing. As demonstrated by the authors, when using a separate classifier, the architecture also supports -- without much impact on the LID performance -- extending the set of target languages without having to expensively re-train the x-vector TDNN. It is enough to train the light-weight classifier.
+    \begin{figure}[h!]
+      \centering
+      \includegraphics[height=8cm]{graphics/x-vectors-hl}
+      \caption{A high-level sketch of the x-vector TDNN from \citeauthor{Snyder_et_al_2018}.}
+      \label{fig:x-vectors-hl}
+    \end{figure}
+    % bottleneck layers to extract _small_ enbeddings
+    % biggest difference: TDNN trained to do utterance-level classification (likely to improve the quality of embeddings)
+    After the TDNN has been trained, embeddings extracted as the activations of the first bottleneck layer -- named x-vectors -- are then utterance-level representations and can be used directly as input for a final classifier. The biggest difference compared to the d-vector neural networks discussed in \autoref{sec:d-vectors} is that the x-vector TDNN is trained to do not frame-level, but utterance-level classification. The utterance-level statistics (mean and standard deviation) are computed \textit{as part of the network} and are further processed by the additional fully connected layers with non-linear activation functions. These bottleneck layers also make it possible to preserve a higher number of useful features after the statistics-pooling layer: By enabling the last frame-level layer to inflate the representations to 1500-D. The bottleneck layers then learn a transform back to the 512-dimensional space (high-dimensional vectors would be inconvenient for the final classifier) while extracting from the aggregated statistics the features most useful for utterance-level classification (not just for frame-level decisions).
+
+    \begin{table}[h!tb]
+      \centering
+      \begin{sc}
+        \begin{tabular}{cl|ccc}
+                      && Layer context      & \thead{Total \\ context} & Number of units \\
+          \hline
+          \multirow{5}{*}{\rotatebox[origin=c]{90}{frame level\ }}
+          &layer 1     & $[t-2,\ t+2]$      & 5             & 512 \\
+          &layer 2     & $\{t-2,\ t,\ t+2\}$& 9             & 512 \\
+          &layer 3     & $\{t-3,\ t,\ t+3\}$& 15            & 512 \\
+          &layer 4     & $\{t\}$            & 15            & 512 \\
+          \belowspace
+          &layer 5     & $\{t\}$            & 15            & 1500 \\
+          \hline
+          \multicolumn{2}{c|}{\makecell{statistics pooling \\ layer}} 
+                       & $[1,T]$            & utterance     & \makecell{3000-dimensional\\ output} \\
+          \hline
+          \abovespace
+          \multirow{3}{*}{\rotatebox[origin=c]{90}{\shortstack[l]{utter.\\level}}}
+          & bottleneck 1& N/A               & utterance     & 512 \\
+          & bottleneck 2& N/A               & utterance     & 512 \\
+          & softmax     & N/A               & utterance     & \makecell{L-dimensional \\ output} \\
+        \end{tabular}
+      \end{sc}
+      \caption{Description of the x-vector TDNN from \citeauthor{Snyder_et_al_2018} and used in this work. $T$~is the number of frames in a given utterance. Table adapted from \citet[p. 106]{Snyder_et_al_2018}.}
+      \label{tab:x-vectors}
+    \end{table}
+
+    % trained architecture can be used directly as an end-to-end LID classifier, but found to perform better when x-vectors are extracted and fed into separate classifier. also, adding new languages is possible with classifier and has been shown to perform well even when the TDNN didn't see the language during training
+    Because of being an utterance-level classifier, the x-vector TDNN can be used directly as an end-to-end system, although \citeauthor{Snyder_et_al_2018} found that extracting x-vectors and training a separate classifier to classify them yielded lightly better results. Perhaps an even stronger argument in favour of the two-stage process is that, by using an external light-weight classifier, one can easily change the set of supported languages without having to expensively re-train the TDNN. \citeauthor{Snyder_et_al_2018} showed that simply re-training the classifier is enough to gain very good results for languages the TDNN has not observed during training (although the results are indeed worse than those for observed languages).
+
+    % outperforming various optimized variations of i-vectors
+    % TO-DO: Define somewhere the metric used to compare the systems and provide concrete numbers?
+    The x-vector system consistently beat several state-of-the-art i-vector architectures, which is a particularly interesting finding because i-vector systems have for long been dominant despite the nowadays so "fashionable" and successful deep learning approaches. Even so, the 2-stage x-vector system using a simple classifier still dominates the end-to-end neural network alternative.
   }
+
   \section{Features used in language identification}{
     TO-DO: Add more references.
 
