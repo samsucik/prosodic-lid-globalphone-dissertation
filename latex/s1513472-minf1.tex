@@ -54,14 +54,16 @@
 
 \tableofcontents
 
+%TO-DO: re-think and re-write
 \chapter{Introduction}{
+  \label{chap:Introduction}
   \section{Motivation}{
     LID is useful in ASR, in voice assistants, emergency call routing, etc.
     Traditionally, acoustic features are used (influence of ASR on LID and SID). Prosodic LID is much rarer, although results show that prosodic information can help identify language \citep{Lin_et_al_2005}, and that both LID and ASR can benefit from using acoustic \textit{and} prosodic features \citep{Martinez_et_al_2013,Ghahremani_et_al_2014}.
     Just last year, a novel architecture for LID utilising \textit{x-vectors} was proposed by \cite{Snyder_et_al_2018}, dramatically improving the state-of-the-art results. Although the authors find that using bottleneck features from an ASR DNN yields better results than using the standard acoustic MFCC features, even the ASR DNN was trained just using MFCCs. Thus the work ignores the potential of speech information other than that captured by MFCCs.
   }
   \section{Aims}{
-    In this work, I aim to reproduce the state-of-the-art x-vector LID system and explore the use of prosodic features in addition to acoustic ones. Because the system uses a relatively novel architecture, in which a TDNN aggregates information across a speech segment, I also compare two types of acoustic features, one which has such aggregation over time encoded (SDC) and one that only containes information about single frames (vanilla MFCC).
+    In this work, I aim to reproduce the state-of-the-art x-vector LID system and explore the use of prosodic features in addition to acoustic ones. Because the system uses a relatively novel architecture, in which a TDNN aggregates information across a speech segment, I also compare two types of acoustic features, one which has such aggregation over time encoded (SDC) and one that only contains information about single frames (vanilla MFCC).
   }
   \section{Contributions}{
     \begin{enumerate}
@@ -183,6 +185,7 @@
     Despite the naive averaging, utterances are no longer treated merely as bags of frames because each embeddings contains features extracted over short temporal window: 21-frame windows in the case of \citeauthor{dvectors_lid} and 41-frame windows used by \citeauthor{Variani_et_al_2014}, making d-vectors less shallow than i-vectors.
   }
 
+  % TO-DO: justify the use of 'deep'
   \section{Deep utterance-level approach: x-vectors}{
     \label{sec:x-vectors}
     % natural extension to d-vectors: computing not just average but also standard deviation.
@@ -240,6 +243,12 @@
   }
 
   \section{Features used in language identification}{
+    \label{sec:features}
+    % ASR being the main speech processing area and the powerhorse of research; to an extent, LID systems are motivated by ASR systems which need to know the language first
+    % Hence, most feature engineering has been done with the aim of extracting information useful for ASR -- the speaker- and language-independent information on the phones produced by the vocal tract. These are called acoustic features.
+    % Acoustic feats can also be described in terms of the information they disregard or do not explicitly capture: information which is language- and speaker-specific -- intonation, stress, pitch range, tone, and others, collectively referred to as prosodic information.
+    % Since this work focuses on using prosodic information to improve LID, it is useful to understand both acoustic and prosodic features, how they differ and how prosody can be utilised by systems that process frame sequences rather than individual frames.
+
     TO-DO: Add more references.
 
     Mention that acoustic are more accent-independent while prosodic may be misleading e.g. for non-native speakers.
@@ -250,6 +259,13 @@
 
     \subsection{Acoustic features}{
       \label{sec:acoustic-feats}
+      % Most common acoustic feats: MFCCs. Their aim is literally to describe the shape of the vocal tract (which maps to the shape of the spectral envelope, which maps to the phone produced).
+      % Image of MFCC pipeline with high-level descriptions of single steps.
+      % Note that recently, mel filterbanks have been used as well, because neural networks can deal well with correlated features, and doing one less feature processing step is attractive (with each step, some information is lost).
+      % To explicitly capture local temporal trends, delta and delta-delta terms are often computed and added to MFCCs or mel filterbanks
+      % To capture temporal trends over longer contexts, MFCCs are often turned into SDCs.
+      % diagram of SDCs
+      % Advantage of acoustic features for LID: where LID is part of ASD, acoustic feats are available anyway, hence there's no need to compute different feats just for the LID part.
       Definitions of MFCCs and SDCs, probably ignore PLPs, Mel filterbanks, etc
 
       SDC used by \cite{Ferrer_et_al_2016} and \cite{Sarma_et_al_2018} (7D MFCC + 7-1-3-7 SDCs = 56D) and by \cite{Torres-Carrasquillo_et_al_2002} (10-1-3-3)
