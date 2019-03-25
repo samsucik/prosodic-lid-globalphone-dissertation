@@ -249,13 +249,9 @@
     % Acoustic feats can also be described in terms of the information they disregard or do not explicitly capture: information which is language- and speaker-specific -- intonation, stress, pitch range, tone, and others, collectively referred to as prosodic information.
     % Since this work focuses on using prosodic information to improve LID, it is useful to understand both acoustic and prosodic features, how they differ and how prosody can be utilised by systems that process frame sequences rather than individual frames.
 
-    TO-DO: Add more references.
-
-    Mention that acoustic are more accent-independent while prosodic may be misleading e.g. for non-native speakers.
-
-    Historically, ASR has been the main point of focus among all speech processing areas, which is reflected in today's dominant use of acoustic features -- primarily developed for ASR -- in other tasks like LID and SID. These acoustic features, the most popular ones being MFCC, Mel filterbank and SDC, are not necessarily best-suited for the other tasks. For instance, all three disregard any pitch information -- which makes sense in the context of ASR, where intonation is typically ignored, but is certainly not desirable in speaker identification, where intonation and the pitch range contribute to speaker-specific characteristics. Another ASR-inspired approach to LID is the \textit{phonotactic} one, which exploits the different phone distributions across languages.
-
-    In this work, I acknowledge \textit{acoustic} LID (using acoustic features), but \textit{prosodic} LID receives the most attention -- using features which are disregarded in ASR, but have a great potential in language and speaker identification tasks.
+    % Mention that acoustic are more accent-independent while prosodic may be misleading e.g. for non-native speakers.
+    % Historically, ASR has been the main point of focus among all speech processing areas, which is reflected in today's dominant use of acoustic features -- primarily developed for ASR -- in other tasks like LID and SID. These acoustic features, the most popular ones being MFCC, Mel filterbank and SDC, are not necessarily best-suited for the other tasks. For instance, all three disregard any pitch information -- which makes sense in the context of ASR, where intonation is typically ignored, but is certainly not desirable in speaker identification, where intonation and the pitch range contribute to speaker-specific characteristics. Another ASR-inspired approach to LID is the \textit{phonotactic} one, which exploits the different phone distributions across languages.
+    % In this work, I acknowledge \textit{acoustic} LID (using acoustic features), but \textit{prosodic} LID receives the most attention -- using features which are disregarded in ASR, but have a great potential in language and speaker identification tasks.
 
     \subsection{Acoustic features}{
       \label{sec:acoustic-feats}
@@ -265,23 +261,37 @@
       % To explicitly capture local temporal trends, delta and delta-delta terms are often computed and added to MFCCs or mel filterbanks
       % To capture temporal trends over longer contexts, MFCCs are often turned into SDCs.
       % diagram of SDCs
-      % Advantage of acoustic features for LID: where LID is part of ASD, acoustic feats are available anyway, hence there's no need to compute different feats just for the LID part.
-      Definitions of MFCCs and SDCs, probably ignore PLPs, Mel filterbanks, etc
-
-      SDC used by \cite{Ferrer_et_al_2016} and \cite{Sarma_et_al_2018} (7D MFCC + 7-1-3-7 SDCs = 56D) and by \cite{Torres-Carrasquillo_et_al_2002} (10-1-3-3)
-
-      19 MFCCs + energy + 20 $\Delta$ + 20 $\Delta\Delta$ = 60D by \cite{Sarma_et_al_2018} -- outperformed by SDCs, but note that they trained an ASR TDNN for generating i-vectors
+      % Advantage of acoustic features for LID: where LID is part of ASR, acoustic feats are available anyway, hence there's no need to compute different feats just for the LID part.
       
-      MFCCs also used inderectly to train ASR DNNs which then provide bottle-neck features which give very promising results in both LID and SID
+      % Definitions of MFCCs and SDCs, probably ignore PLPs, Mel filterbanks, etc
+      % SDC used by \cite{Ferrer_et_al_2016} and \cite{Sarma_et_al_2018} (7D MFCC + 7-1-3-7 SDCs = 56D) and by \cite{Torres-Carrasquillo_et_al_2002} (10-1-3-3)
+      % 19 MFCCs + energy + 20 $\Delta$ + 20 $\Delta\Delta$ = 60D by \cite{Sarma_et_al_2018} -- outperformed by SDCs, but note that they trained an ASR TDNN for generating i-vectors
+      % MFCCs also used inderectly to train ASR DNNs which then provide bottle-neck features which give very promising results in both LID and SID
     }
+
+    % LEL2D lecture on tone: https://www.learn.ed.ac.uk/bbcswebdav/pid-2255587-dt-content-rid-4289141_1/courses/LASC080202016-7SV1SEM2/week05.02.html
+      % A language with tone is one in which an indication of pitch enters into the lexical realization of at least some morphemes (Hyman 2006) Hyman, Larry M. 2006. Word-prosodic typology. Phonology 23(2). 225–257.
+      % A language is a ‘tone language’ if the pitch of the word can change the meaning of the word. Not just its nuances, but its core meaning. (Yip 2002) Yip, Moira. 2002. Tone. Cambridge: Cambridge University Press.
     \subsection{Prosodic features}{
-      Elaborate on prosody as consisting of intonation (F0), stress (energy) and rhythm (segment durations).
+      \label{sec:prosodic-feats}
+      % compared to well-established acoustic feats, there is no good definition of prosodic feats and they are not commonly used
+      % for the purposes of this work, I narrow down the prosodic variables to four: intonation+tone, stress and rhythm. TO-DO: these should be the main ones, cite some paper?
       
-      39D MFCC vectors combined with 4D pitch features \citep{Song_et_al_2013}
+      % both intonation and tone are perceived qualities, typically associated with the variation of the physical quality called pitch, i.e. the fundamental frequency of vibration of the vocal folds (also denoted as F_0). 
+      % while the term 'tone' is used where pitch variation is contrastive (i.e. changes to it discriminate between different words) in the so-called tonal languages (such as Chinese, Vietnamese, Thai), intonation denotes the non-contrastive pitch variation mostly associated with speaker's emotions, dialect, social background, speaking style, and other factors (see, for example, this study by \citet{Grabe_2004} on the intonation differences across British English dialects).
+      % note: some recent results show what other physical variables can influence perceived intonation, but these are disregarded for now. TO-DO: find those works?
+      % \citet{Lin_et_al_2005} do LID just from the segmented pitch contour, each short pitch segment (around 100-200ms) parametrised by a few Legendre polynomials -- not too much success
+      % \citet{Metze_et_al_2013} show improvements in ASR on tonal (and partly on non-tonal) languages when including F0 variation feats.
+      % \citet{Song_et_al_2013} achieve LID improvements when using bottleneck features trained on MFCC+pitch vectors
+      % One disadvantage of pitch contours: F0 is undefined for unvoiced sounds, hence the computed pitch contour is not continuous.
+      % \cite{Ghahremani_et_al_2014} show ASR improvements with a pitch-tracking algorithm that calculates pitch even for unvoiced frames, creating continuous pitch contours. to the best of my knowledge, this feature type hasn't yet beet applied in an LID task.
 
-      \cite{Lin_et_al_2005} do LID just from the pitch contour parametrised by Legendre polynomials
+      % stress (also termed accent) is an unstable term, generally referring to relative emphasis on certain syllables or words and realised as a variation in loudness (dynamic accent), pitch (pitch accent) or length (quantitative accent).
+      % ASR models dynamic and quantitative accent implicitly under certain conditions when using acoustic feats. but I isolate 
 
-      \cite{Ghahremani_et_al_2014} show ASR improvements with a pitch-tracking algorithm that calculates pitch even for unvoiced frames
+      % in this work, I contrain myself to using two feature types for modelling prosody: 
+      % - continuous pitch contours extracted using the KaldiPitch algorithm (introduced by \cite{Ghahremani_et_al_2014}) - I refer to this as the pitch feature
+      % - raw energy capturing the loudness of speech and modelling dynamic stress (at both word and sentence level)
     }
   }
 }
@@ -442,8 +452,6 @@
   
 }
 
-% use the following and \cite{} as above if you use BibTeX
-% otherwise generate bibtem entries
 \bibliographystyle{apalike}
 \bibliography{s1513472-minf1}
 
