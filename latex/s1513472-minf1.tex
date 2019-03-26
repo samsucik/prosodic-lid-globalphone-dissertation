@@ -296,13 +296,20 @@
 
       % NEW MATERIAL
       1. short intro into prosody (cite WALS where appropriate)
-      Prosody stands for information other than that about the produced phonemes. Standard elements: intonation/tone, stress, rhythm.
+      Prosody stands for information other than that about the produced phonemes. Standard elements: intonation/tone, stress, rhythm. As shown below, each of these can be used to differentiate between languages.
       - intonation and tone are perceived qualities, typically associated with the variation of the physical quality called pitch, i.e. the fundamental frequency of vibration of the vocal folds (F_0). while the term 'tone' is used where pitch variation is contrastive (i.e. changes to it discriminate between different words) in the so-called tonal languages (such as Chinese, Vietnamese, Thai), intonation denotes the non-contrastive pitch variation mostly associated with speaker's emotions, dialect, social background, speaking style, and other factors (see, for example, this study by \citet{Grabe_2004} on the intonation differences across British English dialects).
       - stress (also termed accent) is an unstable term, generally referring to relative emphasis on certain syllables or words and realised as a variation in loudness (dynamic accent), pitch (pitch accent) or vowel length (quantitative accent). Specific lexical (syllable-level) stress patterns or rules are often characteristic of a language, e.g. the position of stress is fixed to different positions within word in Czech and Polish (fixed stress), or describable by a set of rules in Arabic (rule-based stress, this needs citation).
-      - rhythm TO-DO
-      stress+rhythm => stress-timed/syllable-timed/mora-timed
+      - rhythm typically refers to syllable lengths, with the theory of isochrony categorising languages into three types based on their rhythm: syllable-timed, e.g. french or turkish (all syllables have roughly equal durations), mora-timed, e.g. slovak or japanese (all moras have equal durations) and stress-timed languages, e.g. german, arabic (intervals between stressed syllables are of equal durations).
+
+      % syllable-timed: french, spanish, mandarin, turkish
+      % mora-timed: japanese, slovak, tamil (https://www.sissa.it/cns/Articles/TBC_048.pdf)
+      % stress-timed: thai, german, russian, swedish, portuguese (EU), arabic
+      % bulgarian (http://www.personal.reading.ac.uk/~llsroach/phon2/sdjipa.htm), polish (https://www.sissa.it/cns/Articles/TBC_048.pdf): between stress-timed and syllable-timed
+      % stress+rhythm => stress-timed/syllable-timed/mora-timed
 
       2. what prosodic aspects acoustic features can capture: rhythm, quantitative stress
+      some of the mentioned prosodic aspects can in fact be captured even when using acoustic features like MFCCs. when the features capture the energy of speech, 
+
       3. what prosodic aspects have been modelled explicitly: intonation/tone/pitch accent (pitch contours)
       4. what features I use to explicitly model prosodic aspects: KaldiPitch, raw energy
     }
