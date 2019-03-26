@@ -1,13 +1,13 @@
-code,lat,lon,language name,family,genus,Tone (13A),Rhythm type (17A),Fixed stress location (14A),Weight-sensitive stress (15A),Syllable structure (12A),isochrony category
+code,lat,lon,language name,family,genus,Tone (13A),Rhythm type (17A),Fixed stress location (14A),Weight-sensitive stress (15A),Syllable structure (12A),isochrony
 AR,30,31,Arabic,Afro-Asiatic,Semitic,no,trochaic,no,Right-oriented,complex,Stress-timed
 BG,42.5,25,Bulgarian,Indo-European,Slavic,no,?,?,?,complex,Stress-timed/syllable-timed
 CH,34,110,Mandarin,Sino-Tibetan,Chinese,complex,?,no,not predictable,moderate,Syllable-timed
-CR,44,19,Croatian,Indo-European,Slavic,?,no,no,unbounded,?,
-CZ,50,15,Czech,Indo-European,Slavic,?,trochaic,initial,fixed,?,
+CR,44,19,Croatian,Indo-European,Slavic,?,no,no,unbounded,?,Stress-timed/syllable-timed
+CZ,50,15,Czech,Indo-European,Slavic,?,trochaic,initial,fixed,?,Stress-timed/syllable-timed
 FR,48,2,French,Indo-European,Romance,no,undetermined,no,Right-edge,complex,Syllable-timed
 GE,52,10,German,Indo-European,Germanic,no,trochaic,no,Right-oriented,complex,Stress-timed
 JA,37,140,Japanese,Japanese,Japanese,simple,?,?,?,moderate,Mora-timed
-KO,37.5,128,Korean,Korean,Korean,no,?,?,?,moderate,
+KO,37.5,128,Korean,Korean,Korean,no,?,?,?,moderate,Syllable-timed
 PL,52,20,Polish,Indo-European,Slavic,no,trochaic,penultimate,fixed,complex,Stress-timed/syllable-timed
 PO,39,-8,Portuguese,Indo-European,Romance,?,?,no,Right-edge,?,Stress-timed
 RU,56,38,Russian,Indo-European,Slavic,no,no,no,unbounded,complex,Stress-timed
@@ -16,5 +16,5 @@ SW,60,15,Swedish,Indo-European,Germanic,?,no,no,Right-oriented,?,Stress-timed
 TA,11,78.5,Tamil,Dravidian,Southern Dravidian,?,?,?,?,?,Mora-timed
 TH,16,101,Thai,Tai-Kadai,Kam-Tai,complex,?,?,?,moderate,Stress-timed
 TU,39,35,Turkish,Altaic,Turkic,no,no,no,unbounded,moderate,Syllable-timed
-VN,10.5,106.5,Vietnamese,Austro-Asiatic,Viet-Muong,complex,?,?,?,moderate,
-WU,31.6666666667,119.916666667,Chinese-Shanghai,Sino-Tibetan,Chinese,complex,?,?,?,?,
+VN,10.5,106.5,Vietnamese,Austro-Asiatic,Viet-Muong,complex,?,?,?,moderate,Syllable-timed
+WU,31.6666666667,119.916666667,Chinese-Shanghai,Sino-Tibetan,Chinese,complex,?,?,?,?,Syllable-timed/mora-timed
