@@ -286,13 +286,13 @@
       using the context of~$\pm$2~frames. Such dynamic features are justified especially in systems which apply the bag-of-frames approach, not extracting temporal trends (such as the standard i-vector architectures).
 
       % To capture temporal trends over longer contexts, MFCCs are often turned into SDCs.
-      For modelling even longer-range trends specifically in the LID task, \citet{Torres-Carrasquillo_et_al_2002} used an extension of simple deltas called the \textit{shifted delta cepstra} (SDC) features -- essentially, deltas computed at multiple points and concatenated to the original MFCC vector as previously. SDCs can be configured by setting their 4 parameters: $N$, $d$, $p$, $k$ corresponding to a $N$-$d$-$p$-$k$, a typical one being 7-1-3-7. $N$ refers to the number of cepstral coefficients taken into account (not necessarily the full MFCC vector), $p$ denotes the distance between consecutive points at which deltas are computed, $d$ determines the size of the window for computing deltas ($d=1$ corresponds to \autoref{eq:dynamic-feats}) and $k$ is the number of points at which to compute deltas. The SDCs added to the original MFCC vector are then of the form:
+      For modelling even longer-range trends specifically in the LID task, \citet{Torres-Carrasquillo_et_al_2002} used an extension of simple deltas called the \textit{shifted delta cepstra} (SDC) features -- essentially, deltas computed at multiple points and concatenated with the original MFCC vector as previously. SDCs can be configured by setting their 4 parameters: $N$, $d$, $p$, $k$ corresponding to a $N$-$d$-$p$-$k$, a typical one being 7-1-3-7. $N$ refers to the number of cepstral coefficients taken into account (not necessarily the full MFCC vector), $p$ denotes the distance between consecutive points at which deltas are computed, $d$ determines the size of the window for computing deltas ($d=1$ corresponds to \autoref{eq:dynamic-feats}) and $k$ is the number of points at which to compute deltas. The SDCs added to the original MFCC vector are then of the form:
       \begin{equation}
         \label{eq:sdc-feats}
         \Delta_{SDC}(t+ip) = \mathbf{x}_{t+ip+d} - \mathbf{x}_{t+ip-d} \quad\quad \forall i \in \{0, ..., k-1\}
       \end{equation}
       % SDC used by \cite{Ferrer_et_al_2016} and \cite{Sarma_et_al_2018} (7D MFCC + 7-1-3-7 SDCs = 56D) and by \cite{Torres-Carrasquillo_et_al_2002} (10-1-3-3)
-      As with standard deltas, capturing long-range trends with SDCs can certainly be beneficial for i-vector systems (examples of SDC use include \cite{Ferrer_et_al_2016} and \cite{Sarma_et_al_2018}, the later reporting better results compared to using high-resolution MFCCs). However, its usefulness is not so clear in architectures inherently able to extracting temporal trends.
+      As with standard deltas, capturing long-range trends with SDCs can certainly be beneficial for i-vector systems. \cite{Ferrer_et_al_2016} used an i-vector system with SDC features as the state-of-the-art baseline system for their novel experiments. Additionally -- following the successful application of SDCs by \citeauthor{Torres-Carrasquillo_et_al_2002} in a pre-i-vector system, \cite{Sarma_et_al_2018} report slightly better results with SDCs compared to using high-resolution MFCCs when training an i-vector architecture with a deep neural network UBM. Still, the usefulness of SDCs is not so clear in architectures inherently able to extract temporal trends.
 
       % Advantage of acoustic features for LID: where LID is part of ASR, acoustic feats are available anyway, hence there's no need to compute different feats just for the LID part.
       Compared to the prosodic features described next, the discussed classic acoustic features have one clear advantage where the LID system is part of a bigger ASR pipelines: The two systems can share the same feature vectors without the need to compute additional features solely for the purpose of language identification.
@@ -306,63 +306,111 @@
     \subsection{Prosodic features}{
       \label{sec:prosodic-feats}
       % OLD MATERIAL TO BE RE-USED
-      % compared to well-established acoustic feats, there is no good definition of prosodic feats and they are not commonly used
-      % for the purposes of this work, I narrow down the prosodic variables to four: intonation+tone, stress and rhythm. TO-DO: these should be the main ones, cite some paper?
-      
-      % both intonation and tone are perceived qualities, typically associated with the variation of the physical quality called pitch, i.e. the fundamental frequency of vibration of the vocal folds (also denoted as F_0). 
-      % while the term 'tone' is used where pitch variation is contrastive (i.e. changes to it discriminate between different words) in the so-called tonal languages (such as Chinese, Vietnamese, Thai), intonation denotes the non-contrastive pitch variation mostly associated with speaker's emotions, dialect, social background, speaking style, and other factors (see, for example, this study by \citet{Grabe_2004} on the intonation differences across British English dialects).
-      % note: some recent results show what other physical variables can influence perceived intonation, but these are disregarded for now. TO-DO: find those works?
-      % \citet{Lin_et_al_2005} do LID just from the segmented pitch contour, each short pitch segment (around 100-200ms) parametrised by a few Legendre polynomials -- not too much success
-      % \citet{Metze_et_al_2013} show improvements in ASR on tonal (and partly on non-tonal) languages when including F0 variation feats.
-      % \citet{Song_et_al_2013} achieve LID improvements when using bottleneck features trained on MFCC+pitch vectors
-      % One disadvantage of pitch contours: F0 is undefined for unvoiced sounds, hence the computed pitch contour is not continuous.
-      % \cite{Ghahremani_et_al_2014} show ASR improvements with a pitch-tracking algorithm that calculates pitch even for unvoiced frames, creating continuous pitch contours. to the best of my knowledge, this feature type hasn't yet beet applied in an LID task.
+        % compared to well-established acoustic feats, there is no good definition of prosodic feats and they are not commonly used
+        % for the purposes of this work, I narrow down the prosodic variables to four: intonation+tone, stress and rhythm. TO-DO: these should be the main ones, cite some paper?
+        
+        % both intonation and tone are perceived qualities, typically associated with the variation of the physical quality called pitch, i.e. the fundamental frequency of vibration of the vocal folds (also denoted as F_0). 
+        % while the term 'tone' is used where pitch variation is contrastive (i.e. changes to it discriminate between different words) in the so-called tonal languages (such as Chinese, Vietnamese, Thai), intonation denotes the non-contrastive pitch variation mostly associated with speaker's emotions, dialect, social background, speaking style, and other factors (see, for example, this study by \citet{Grabe_2004} on the intonation differences across British English dialects).
+        % note: some recent results show what other physical variables can influence perceived intonation, but these are disregarded for now. TO-DO: find those works?
+        % \citet{Lin_et_al_2005} do LID just from the segmented pitch contour, each short pitch segment (around 100-200ms) parametrised by a few Legendre polynomials -- not too much success
+        % \citet{Metze_et_al_2013} show improvements in ASR on tonal (and partly on non-tonal) languages when including F0 variation feats.
+        % \citet{Song_et_al_2013} achieve LID improvements when using bottleneck features trained on MFCC+pitch vectors
+        % One disadvantage of pitch contours: F0 is undefined for unvoiced sounds, hence the computed pitch contour is not continuous.
+        % \cite{Ghahremani_et_al_2014} show ASR improvements with a pitch-tracking algorithm that calculates pitch even for unvoiced frames, creating continuous pitch contours. to the best of my knowledge, this feature type hasn't yet beet applied in an LID task.
 
-      % stress (also termed accent) is an unstable term, generally referring to relative emphasis on certain syllables or words and realised as a variation in loudness (dynamic accent), pitch (pitch accent) or length (quantitative accent).
-      % ASR models dynamic and quantitative accent implicitly under certain conditions when using acoustic feats. but I isolate 
+        % stress (also termed accent) is an unstable term, generally referring to relative emphasis on certain syllables or words and realised as a variation in loudness (dynamic accent), pitch (pitch accent) or length (quantitative accent).
+        % ASR models dynamic and quantitative accent implicitly under certain conditions when using acoustic feats. but I isolate 
 
-      % in this work, I contrain myself to using two feature types for modelling prosody: 
-      % - continuous pitch contours extracted using the KaldiPitch algorithm (introduced by \cite{Ghahremani_et_al_2014}) - I refer to this as the pitch feature
-      % - raw energy capturing the loudness of speech and modelling dynamic stress (at both word and sentence level)
+        % in this work, I contrain myself to using two feature types for modelling prosody: 
+        % - continuous pitch contours extracted using the KaldiPitch algorithm (introduced by \cite{Ghahremani_et_al_2014}) - I refer to this as the pitch feature
+        % - raw energy capturing the loudness of speech and modelling dynamic stress (at both word and sentence level)
+      % END OF OLD MATERIAL
 
       % NEW MATERIAL
-      1. short intro into prosody (cite WALS where appropriate)
-      Prosody stands for information other than that about the produced phonemes. Standard elements: intonation/tone, stress, rhythm. As shown below, each of these can be used to differentiate between languages.
-      - intonation and tone are perceived qualities, typically associated with the variation of the physical quality called pitch, i.e. the fundamental frequency of vibration of the vocal folds (F0). while the term 'tone' is used where pitch variation is contrastive (i.e. changes to it discriminate between different words) in the so-called tonal languages (such as Chinese, Vietnamese, Thai), intonation denotes the non-contrastive pitch variation mostly associated with speaker's emotions, dialect, social background, speaking style, and other factors (see, for example, this study by \citet{Grabe_2004} on the intonation differences across British English dialects).
-      - stress (also termed accent) is an unstable term, generally referring to relative emphasis on certain syllables or words and realised as a variation in loudness (dynamic accent), pitch (pitch accent) or vowel length (quantitative accent). Specific lexical (syllable-level) stress patterns or rules are often characteristic of a language, e.g. the position of stress is fixed to different positions within word in Czech and Polish (fixed stress), or describable by a set of rules in Arabic (rule-based stress, this needs citation).
-      - rhythm typically refers to syllable lengths, with the theory of isochrony categorising languages into three types based on their rhythm: syllable-timed, e.g. french or turkish (all syllables have roughly equal durations), mora-timed, e.g. slovak or japanese (all moras have equal durations) and stress-timed languages, e.g. german, arabic (intervals between stressed syllables are of equal durations).
+      % 1. short intro into prosody (cite WALS where appropriate)
+      % Prosody stands for information other than that about the produced phonemes. Standard elements: intonation/tone, stress, rhythm. As shown below, each of these can be used to differentiate between languages.
+      Prosody is about information other than that directly describing the produced phones; the standard elements of prosody are: intonation/tone, stress and rhythm \citep{Prieto_et_al_2018}. As discussed below, importantly, each of these elements can be used to differentiate between languages.
+      \begin{itemize}
+        % - intonation and tone are perceived qualities, typically associated with the variation of the physical quality called pitch, i.e. the fundamental frequency of vibration of the vocal folds (F0). while the term 'tone' is used where pitch variation is contrastive (i.e. changes to it discriminate between different words) in the so-called tonal languages (such as Chinese, Vietnamese, Thai), intonation denotes the non-contrastive pitch variation mostly associated with speaker's emotions, dialect, social background, speaking style, and other factors (see, for example, this study by \citet{Grabe_2004} on the intonation differences across British English dialects).
+        \item {\textit{Intonation} and \textit{tone} are perceived qualities typically associated with the variation of the physical quality called pitch, i.e. the fundamental frequency of vibration of the vocal folds ($F_0$). The term 'tone' is used where pitch variation is contrastive (i.e. changes to it discriminate between different words): in the so-called \textit{tonal languages}, such as Chinese, Vietnamese and Thai. In each of these languages, a small 'alphabet' of distinct tone levels or tone contours can be observed as it conveys meaning. Intonation, on the other hand, denotes the non-contrastive pitch variation mostly associated with the speaker's emotions, language, dialect, social background, speaking style, and other factors (see, for example, the study by \citet{Grabe_2004} on the intonational differences between different British English dialects).}
+        % - stress (also termed accent) is an unstable term, generally referring to relative emphasis on certain syllables or words and realised as a variation in loudness (dynamic accent), pitch (pitch accent) or vowel length (quantitative accent). Specific lexical (syllable-level) stress patterns or rules are often characteristic of a language, e.g. the position of stress is fixed to different positions within word in Czech and Polish (fixed stress), or describable by a set of rules in Arabic (rule-based stress, this needs citation).
+        \item {\textit{Stress} (also termed \textit{accent}), despite being a somewhat ambiguous term, generally refers to the relative emphasis on certain syllables within a words or words within a sentence, realised as a variation in loudness (\textit{dynamic accent}), pitch (\textit{pitch accent}) or vowel length (\textit{quantitative accent}). Specific \textit{lexical} (intra-word, i.e syllable-level) stress patterns or rules are often characteristic of a language. For instance, the within-word location of stress is fixed but different for Czech and Polish (\textit{fixed stress}, see \citet{WALS_14}), or describable by a set of rules in Arabic (\textit{rule-based stress}, see \citet{WALS_15}).}
+        % - rhythm typically refers to syllable lengths, with the theory of isochrony categorising languages into three types based on their rhythm: syllable-timed, e.g. french or turkish (all syllables have roughly equal durations), mora-timed, e.g. slovak or japanese (all moras have equal durations) and stress-timed languages, e.g. german, arabic (intervals between stressed syllables are of equal durations).
+        \item {\textit{Rhythm} refers to regularity in sub-word unit lengths, with the most recognised theory of \textit{isochrony} categorising languages into three types based on their rhythm: \textit{syllable-timed} where all syllables have roughly equal durations (e.g. French or Turkish), \textit{mora-timed} where all moras\footnote{Mora is a basic timing unit; a long syllable having two moras and a short syllable having one mora. See \citet[p. 312]{Crystal_2008} for a broader definition and discussion.} have equal durations (e.g. Slovak or Japanese), and \textit{stress-timed} languages, e.g. German and Arabic (here, the intervals between stressed syllables are of equal durations).}
+      \end{itemize}
 
-      % syllable-timed: french, spanish, mandarin, turkish
-      % mora-timed: japanese, slovak, tamil (https://www.sissa.it/cns/Articles/TBC_048.pdf)
-      % stress-timed: thai, german, russian, swedish, portuguese (EU), arabic
-      % bulgarian (http://www.personal.reading.ac.uk/~llsroach/phon2/sdjipa.htm), polish (https://www.sissa.it/cns/Articles/TBC_048.pdf): between stress-timed and syllable-timed
-      % stress+rhythm => stress-timed/syllable-timed/mora-timed
+      % isochrony details
+        % syllable-timed: french, spanish, mandarin, turkish
+        % mora-timed: japanese, slovak, tamil (https://www.sissa.it/cns/Articles/TBC_048.pdf)
+        % stress-timed: thai, german, russian, swedish, portuguese (EU), arabic
+        % bulgarian (http://www.personal.reading.ac.uk/~llsroach/phon2/sdjipa.htm), polish (https://www.sissa.it/cns/Articles/TBC_048.pdf): between stress-timed and syllable-timed
 
-      % duration of syllable: some 100-200 ms (https://core.ac.uk/download/pdf/84560.pdf)
-      % TO-DO: comment on temporal ranges? 15 frames cover variation across maybe 1-2 syllables
-      2. what prosodic aspects acoustic features can capture: rhythm, quantitative stress
-      some of the mentioned prosodic aspects can in fact be captured even when using acoustic features like MFCCs. because prosody surfaces as temporal variation, systems which extract features from frame sequences (such as x-vectors) have the potential to capture it (unlike i-vector systems which apply the bag-of-frames approach). MFCCs can contain information about loudness (in the form of the energy-based C0 cepstral coefficient), which enables capturing dynamic stress. even without using C0, quantitative accent should be possible to capture using acoustic features. regarding rhythm, the temporal trends should be possible to capture for syllable-timed and mora-timed languages, but not necessarily for stress-timed languages (if C0 is not used or if the stress patterns rely heavily on pitch accent which cannot be captured using acoustic features). considering the prosodic aspects that acoustic features alone could theoretically capture, the most important prosodic feature that can be added to the input is pitch: to enable modelling pitch accent, tone, and language-specific intonation.
+      % TO-DO: comment on temporal ranges? 15 frames cover variation across maybe 1-2 syllables. duration of syllable: some 100-200 ms (https://core.ac.uk/download/pdf/84560.pdf)
+      % 2. what prosodic aspects acoustic features can capture: rhythm, quantitative stress
+      % some of the mentioned prosodic aspects can in fact be captured even when using acoustic features like MFCCs. because prosody surfaces as temporal variation, systems which extract features from frame sequences (such as x-vectors) have the potential to capture it (unlike i-vector systems which apply the bag-of-frames approach). MFCCs can contain information about loudness (in the form of the energy-based C0 cepstral coefficient), which enables capturing dynamic stress. even without using C0, quantitative accent should be possible to capture using acoustic features. regarding rhythm, the temporal trends should be possible to capture for syllable-timed and mora-timed languages, but not necessarily for stress-timed languages (if C0 is not used or if the stress patterns rely heavily on pitch accent which cannot be captured using acoustic features). considering the prosodic aspects that acoustic features alone could theoretically capture, the most important prosodic feature that can be added to the input is pitch: to enable modelling pitch accent, tone, and language-specific intonation.
+      Before turning to bespoke alternative features for modelling prosody, it should be noted that some prosodic aspects can be captured by acoustic features like MFCCs. Because prosody surfaces as temporal variation, systems which extract information from frame sequences (such as TDNN-based systems) have the potential to capture it. MFCCs can be (and often are) used together with energy (see \autoref{fig:mfcc}), which enables capturing dynamic accent. Even without using energy as part of MFCCs, the quantitative accent should be possible to capture because durations of vowels are preserved as a result of windowing extracting the frames at evenly spaced points of a speech waveform. Regarding rhythm, the duration regularity (isochrony) should be possible to capture for syllable-timed and mora-timed languages because syllable boundaries occur at phoneme boundaries, which are captured by acoustic features. For stress-timed languages, however, the units with equal durations are marked by stressed syllables, meaning that this regularity may not be fully captured -- in particular if an energy measure is not included in MFCCs, or if the stress is realised as a variation in pitch rather than in loudness. Considering the prosodic aspects that acoustic features alone \textit{could} theoretically capture, I conclude that the most important prosodic feature that can be deemed complementary to acoustic features and added to the input is pitch: to enable modelling pitch accent, tone, and language-specific intonation.
 
-      3. what prosodic aspects have been modelled explicitly: intonation/tone/pitch accent (pitch contours)
-      perhaps unsurprisingly, extracting information from pitch for LID has been explored in the past -- although the number of studies very small compared to those using conventional acoustic features. long before i-vectors, \citet{Lin_et_al_2005} attempted LID just from the pitch contour segmented into syllable-like units (around 100-200ms), contour segments parametrised by a few Legendre polynomials. later, \citet{Metze_et_al_2013} show improvements in ASR on tonal (and partly on non-tonal) languages when augmenting MFCCs with F0 variation features. One disadvantage of pitch contours: F0 is not present for unvoiced sounds, hence a pitch contour computed from F0 is not continuous. this issue was addressed by \cite{Ghahremani_et_al_2014} who developed a pitch-tracking algorithm that approximates the pitch contour even for unvoiced frames, making it continuous. they report improved ASR performance mainly on tonal languages. to the best of my knowledge, this feature type hasn't yet beet applied in an LID task.
 
-      4. what features I use to explicitly model prosodic aspects: KaldiPitch, raw energy
-      In this work I explore two feature types that explicitly help to capture prosodic information: energy and pitch. I refer to these as the prosodic features.
-      By energy I mean the logarithm of the raw energy extracted in the MFCC pipeline right after pre-emphasis and windowing. To isolate the effects of using this prosodic feature, I do not include it in any of the acoustic features used in this work.
-      TO-DO: make it clear that C0 is still used!
-      By pitch I mean the continuous pitch extracted using the algorithm presented by \citeauthor{Ghahremani_et_al_2014}.
-      
-      TO-DO: diagram and formulae describing KaldiPitch.
-      - subsample and normalise (divide by root mean square)
-      - establish frequency range to be searched (geometrically spaced, more sparse for lower frequencies)
-      - compute NCCF for all different time positions and lags, producing a grid of values TxI. the NCCF computation includes the ballast term which makes the values close to zero for very weak normalised cross-correlation values
-      - define cost function for a sequence of frequencies (a pitch contour): penalising low NCCF values, too low frequencies and big frequency jumps
-      - do a Viterbi-based search over the grid to find the optimal sequence of frequencies
-      Postprocessing:
-      on top of the raw pitch, add:
-      - probability of voicing (POV): converting the NCCF values (which have range [-1,1]) to a feature which was empirically found to work well for ASR in multiple languages
-      - normalised pitch: weighted-mean subtraction over windows of 151 frames (+-75), with weights roughly corresponding to log(p(voiced)/p(unvoiced))
-      - delta terms computed over windows of +- 2 frames from the unnormalised pitch
+      % 3. what prosodic aspects have been modelled explicitly: intonation/tone/pitch accent (pitch contours)
+      % perhaps unsurprisingly, extracting information from pitch for LID has been explored in the past -- although the number of studies very small compared to those using conventional acoustic features. long before i-vectors, \citet{Lin_et_al_2005} attempted LID just from the pitch contour segmented into syllable-like units (around 100-200ms), contour segments parametrised by a few Legendre polynomials. later, \citet{Metze_et_al_2013} show improvements in ASR on tonal (and partly on non-tonal) languages when augmenting MFCCs with F0 variation features. One disadvantage of pitch contours: F0 is not present for unvoiced sounds, hence a pitch contour computed from F0 is not continuous. this issue was addressed by \cite{Ghahremani_et_al_2014} who developed a pitch-tracking algorithm that approximates the pitch contour even for unvoiced frames, making it continuous. they report improved ASR performance mainly on tonal languages. to the best of my knowledge, this feature type hasn't yet beet applied in an LID task.
+      Perhaps unsurprisingly, extracting information from pitch for LID has been explored in the past -- although the number of studies is very small compared to those using the conventional acoustic features. Long before i-vectors, \citet{Lin_et_al_2005} attempted to do language identification solely from the pitch contour. This was segmented into syllable-like units (around 100-200ms), each contour segment subsequently represented as the first few coefficients of its approximation by Legendre polynomials. Even though the results were far from those achieved by today's systems, it was demonstrated that LID can be done on pitch information alone. Later, \citet{Metze_et_al_2013} showed improvements in ASR on tonal (and partly on non-tonal) languages when augmenting MFCCs with custom-designed $F_0$ variation features. Nevertheless, one disadvantage of using pitch persisted: The fact that $F_0$ is typically considered to be only present in voiced sounds and undefined for unvoiced ones -- making a pitch contour based on $F_0$ discontinuous. This inconvenience has been recently addressed by \cite{Ghahremani_et_al_2014} who developed a pitch-tracking algorithm that approximates pitch values even for unvoiced regions and produces a continuous pitch contour. Adding this feature to MFCCs, the authors report improved ASR performance mainly on tonal languages. To the best of my knowledge, this feature type has not yet been used for language identification.
+
+
+      % 4. what features I use to explicitly model prosodic aspects: KaldiPitch, raw energy
+      % In this work I explore two feature types that explicitly help to capture prosodic information: energy and pitch. I refer to these as the prosodic features.
+      In this work, I explore two feature types that explicitly help to capture prosodic information: \textit{energy} and \textit{pitch}. I refer to these as the prosodic features.
+      \begin{itemize}
+        % By energy I mean the logarithm of the raw energy extracted in the MFCC pipeline right after pre-emphasis and windowing. To isolate the effects of using this prosodic feature, I do not include it in any of the acoustic features used in this work.
+        \item {By energy I mean the logarithm\footnote{The use of logarithm is given solely by the Kaldi toolkit I use for feature extraction, although it is by no means an arbitrary design decision: Human perception of loudness is non-linear and logarithm is used also in the standard MFCC computation pipeline (see \autoref{fig:mfcc}).} of the raw energy extracted in the MFCC pipeline right after windowing (as shown in \autoref{fig:mfcc}). To isolate the effects of using this prosodic feature, I do not include it in any of the acoustic features used in this work. However, I do not exclude the 0\textsuperscript{th} cepstral coefficient from MFCCs, even though it bears some loudness-related information; more specifically, it can be considered as "a collection of average energies of each frequency bands in the signal that is being analyzed" \citep{Zheng_and_Zhang_2000}.}
+        % By pitch I mean the continuous pitch extracted using the algorithm presented by \citeauthor{Ghahremani_et_al_2014}.
+        \item {By pitch I mean the continuous pitch (and features derived from it) extracted using the Kaldi pitch algorithm presented by \citeauthor{Ghahremani_et_al_2014}. Because this feature type is not well known, I elaborate on it in the next section.}
+      \end{itemize}
+    }
+    \subsection{The continuous Kaldi pitch as a prosodic feature}{
+      \label{sec:kaldi-pitch}
+      Even though the original paper \citep{Ghahremani_et_al_2014} contains a detailed description of the Kaldi pitch algorithm (along with a working implementation as part of the Kaldi ASR toolkit), I provide an additional, more holistic view to give the reader an intuitive understanding of the algorithm and the features it produces (see \autoref{fig:kaldi-pitch}).
+      \begin{figure}[h!]
+        \centering
+        \includegraphics[width=\textwidth]{graphics/kaldi-pitch}
+        \vspace*{-1em}
+        \caption{The steps of the Kaldi pitch algorithm.}
+        \label{fig:kaldi-pitch}
+      \end{figure}
+      % TO-DO: diagram and formulae describing KaldiPitch.
+      % - subsample and normalise (divide by root mean square)
+      % - establish frequency range to be searched (geometrically spaced, more sparse for lower frequencies)
+      % - compute NCCF for all different time positions and lags, producing a grid of values TxI. the NCCF computation includes the ballast term which makes the values close to zero for very weak normalised cross-correlation values
+      % - define cost function for a sequence of frequencies (a pitch contour): penalising low NCCF values, too low frequencies and big frequency jumps
+      % - do a Viterbi-based search over the grid to find the optimal sequence of frequencies
+      % Postprocessing:
+      % on top of the raw pitch, add:
+      % - probability of voicing (POV): converting the NCCF values (which have range [-1,1]) to a feature which was empirically found to work well for ASR in multiple languages
+      % - normalised pitch: weighted-mean subtraction over windows of 151 frames (+-75), with weights roughly corresponding to log(p(voiced)/p(unvoiced))
+      % - delta terms computed over windows of +- 2 frames from the unnormalised pitch
+      Perhaps the biggest contribution lies in abandoning the binary decision making about voiced/unvoiced speech, and only calculating pitch for the voiced frames. Instead, soft decisions are made based on the values of the normalised cross-correlation function (NCCF). For two pieces of digitised waveform separated by temporal distance $l$ from each other and represented as vectors $\mathbf{v}_{t, 0}$ and $\mathbf{v}_{t, l}$, the NCCF is computed as follows (adapted from \citeauthor[Eq. 2]{Ghahremani_et_al_2014}):
+      \begin{equation}
+        \label{eq:nccf}
+        \Phi_{t, l} = \frac{\mathbf{v}_{t, 0}^T \mathbf{v}_{t, l}}{\sqrt{(\mathbf{v}_{t, 0}^T \mathbf{v}_{t, 0})(\mathbf{v}_{t, l}^T \mathbf{v}_{t, l})+B}}
+      \end{equation}
+      where normally $B=0$, but the authors use a non-zero value to push the NCCF values towards 0 where the cross-correlation on its own is very low. By computing NCCF for different spacings $l$  -- called \textit{lags} by the authors, and being effectively the periods of different hypothesised frequencies -- one obtains continuous confidence values about the presence of the corresponding frequencies in the signal for the time position $t$. After computing these for all temporal positions, the algorithm finds the optimal continuous contour by minimising the proposed cost function (see \citeauthor[Eq. 4]{Ghahremani_et_al_2014}), which prefers higher NCCF values and penalises too low frequencies and too big frequency jumps.
+
+      Finally, the algorithm post-processes the raw pitch contour to provide these additional features:
+      \begin{enumerate}
+        \item {A mean-normalised pitch contour, with the mean computed over 151-frame windows and weighted by a measure roughly corresponding to the log likelihood of a particular frame being voiced (i.e. putting more weight on voiced frames).}
+        \item {\textit{Probability of voicing} (POV): A feature which is not a probability, but acts similarly and has been empirically found by the authors to provide improvements in ASR performance.}
+        \item {Delta-pitch terms, computed in the same way as the simple deltas in \autoref{eq:dynamic-feats}.}
+      \end{enumerate}
+    }
+
+    \subsection{Illustrating the prosodic features used in this work}{
+      \begin{figure}[h!]
+        \centering
+        \hspace*{-2.5cm}
+        \includegraphics[width=19cm]{../img/prosody_sample}
+        \vspace*{-3em}
+        \caption{The steps of the Kaldi pitch algorithm.}
+        \label{fig:kaldi-pitch}
+      \end{figure}
     }
   }
 }
@@ -523,6 +571,7 @@
   
 }
 
+% TO-DO: Make sure 'Proc.' is where it has to be (some entries are marked as @article when they should be @inproceedings)
 \bibliographystyle{apalike}
 \bibliography{s1513472-minf1}
 
