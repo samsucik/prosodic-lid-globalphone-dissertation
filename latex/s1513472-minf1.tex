@@ -6,11 +6,12 @@
 \usepackage{graphicx}
 
 % Nice references including the words Figure, Section, etc
+\renewcommand*{\chapterautorefname}{Chapter}
 \renewcommand*{\sectionautorefname}{Section}
 \renewcommand*{\subsectionautorefname}{Section}
-\renewcommand*{\figureautorefname}{Figure}
-\renewcommand*{\tableautorefname}{Table}
-\newcommand{\algorithmautorefname}{Algorithm}
+\renewcommand*{\figureautorefname}{Fig.}
+\renewcommand*{\tableautorefname}{Tab.}
+\newcommand{\algorithmautorefname}{Alg.}
 \renewcommand{\equationautorefname}{Eq.}
 
 %
@@ -400,22 +401,28 @@
         \item {\textit{Probability of voicing} (POV): A feature which is not a probability, but acts similarly and has been empirically found by the authors to provide improvements in ASR performance.}
         \item {Delta-pitch terms, computed in the same way as the simple deltas in \autoref{eq:dynamic-feats}.}
       \end{enumerate}
+      In this work, I work with all four feature types (the raw pitch contour and the three derived feature types) and refer to them collectively as the Kaldi pitch.
     }
 
     \subsection{Illustrating the prosodic features used in this work}{
+      Having familiarised the reader with the two prosodic features I will use (the energy and the Kaldi pitch), I now illustrate them on a realistic example. Because the multi-lingual corpus used for this project does not contain English, I used the freely accessible sample utterance from the CSR-I (WSJ0) Complete corpus\footnote{\url{https://catalog.ldc.upenn.edu/LDC93S6A}}, which has important characteristics such as the recording conditions and the speaking style the same as the corpus I later use (see \autoref{chap:data}).
       \begin{figure}[h!]
         \centering
-        \hspace*{-2.5cm}
-        \includegraphics[width=19cm]{../img/prosody_sample}
+        \vspace{-1.2em}
+        \hspace*{-2.4cm}
+        \includegraphics[width=18.7cm]{../img/prosody_sample.pdf} % TO-DO: Eventually change to PDF (compilation then takes long).
         \vspace*{-3em}
-        \caption{The steps of the Kaldi pitch algorithm.}
-        \label{fig:kaldi-pitch}
+        \caption{The prosodic features I use in this project (together with the spectrogram and the fundamental frequency $F_0$), illustrated on an English utterance. I manually created the time-aligned transcription for better understanding.}
+        \label{fig:prosodic-feats}
       \end{figure}
+      
+      \autoref{fig:prosodic-feats} shows the prosodic features on the English utterance. For clarity and comparison, I added the spectrogram as well as the discontinuous $F_0$ contour -- both generated in Praat \citep{Praat}. As expected, the $F_0$ segments match the Kaldi pitch contour. Notice how the Kaldi pitch does not drop in unvoiced regions, but rather behaves like a smooth bridging between the regions. Also note that the POV values are effectively negated: High values corresponding to the regions where true $F_0$ is absent and low values marking the voiced regions.
     }
   }
 }
 
 \chapter{Data}{
+  \label{chap:data}
   Intro: Historically, speech corpora were meant for ASR, but now used for LID and SID as well. Since 1996, NIST has also been organising Language Recognition Challenges (LREs), and the corpora used for LREs are now the typically used ones when it comes to evaluating different systems. However, NIST traditionally focuses on telephone, narrowband (8kHz) speech, which represents only one part of all the possible settings in which LID or SID are deployed. In this work, I use a relatively small (< 40GB) corpus which, however, has many qualities that the various NIST corpora lack.
 
   \section{GlobalPhone}{
