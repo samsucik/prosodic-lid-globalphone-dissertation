@@ -434,7 +434,7 @@
     \label{sec:GlobalPhone}    
     % copies the style of the CRS-I corpus: newspaper articles read by native speakers
     % started in 1995, presented in 2002 and 2013 (citations). I use the newest version from 2016 which contains 22 languages.
-    The corpus I use is the GlobalPhone multilingual ASR corpus \citep{Schultz_et_al_2013}, more precisely its newest version -- updated in 2016 and covering 22 languages from around the world: Arabic, Bulgarian, Chinese-Mandarin, Chinese-Shanghai (Wu), Croatian, Czech, French, German, Hausa, Japanese, Korean, Brazilian Portuguese, Polish, Russian, Spanish, Swahili, Swedish, Tamil, Thai, Turkish, Ukrainian, and Vietnamese. The corpus follows the style established for English by the Wall Street Journal-based corpora \citep{Paul_Baker_1992} such as the CSR-I (WSJ0) Complete corpus\footnote{\url{https://catalog.ldc.upenn.edu/LDC93S6A}}: Newspaper articles are read by native speakers, recorder as wideband (16kHz) audio in a controlled environment, using a close-talking microphone (in the case of GlobalPhone the Sennheiser microphone HD-440-6).
+    The corpus I use is the GlobalPhone multilingual ASR corpus \citep{Schultz_et_al_2013}, more precisely its newest version -- updated in 2016 and covering 22 languages from around the world: Arabic, Bulgarian, Chinese-Mandarin, Chinese-Shanghai (Wu), Croatian, Czech, French, German, Hausa, Japanese, Korean, Brazilian Portuguese, Polish, Russian, Spanish, Swahili, Swedish, Tamil, Thai, Turkish, Ukrainian, and Vietnamese. The corpus follows the style established for English by the Wall Street Journal-based corpora \citep{Paul_Baker_1992} such as the CSR-I (WSJ0) Complete corpus\footnote{\url{https://catalog.ldc.upenn.edu/LDC93S6A}}. It consists of newspaper articles read by native speakers (around 100 speakers per language, each speaker producing about 20 minutes of audio by reading 3-5 articles), recorded as wideband (16kHz) audio in a controlled environment, using a close-talking microphone (in the case of GlobalPhone the Sennheiser microphone HD-440-6).
     
     % wideband, controlled clean recording conditions -- good for reasoning! (don't need to worry about results being affected by channel differences)
     The controlled environment, speaking style and nature of the texts (all are major newspaper articles) make the data better suited for analysing effects of, for example, prosodic features: Any observed trends can be more reliably attributed to my controlled independent variables (such as the feature type) or to the known language differences.
@@ -447,36 +447,39 @@
   }
 
   \section{Data partitioning}{
-    GlobalPhone comes with a partitioning of each language's data into training, development and evaluation datasets, with the sizes of the datasets being roughly 80\%, 10\%, 10\%, respectively. However, for the purposes of the x-vector architecture, 4-way partitioning is required:
+    \label{sec:partitioning}
+    GlobalPhone ships with a partitioning of each language's data into training, evaluation and testing (in GlobalPhone documentation referred to as training, development and evaluation, respectively) sets, with the sizes of the 3 partitions being roughly 80\%, 10\%, 10\%, respectively. However, for the purposes of the x-vector architecture, a 4-way partitioning is required:
     \begin{enumerate}
       \item{training set -- for training the x-vector TDNN,}
       \item{enrollment set -- for training the x-vector classifier,}
-      \item{evaluation set ('development' in the GlobalPhone terminology) -- for tuning the hyperparameters of both the TDNN and the classifier,}
-      \item{testing set -- for final performance evaluation on unseen data.}
+      \item{evaluation set -- for tuning the hyperparameters of both the TDNN and the classifier,}
+      \item{testing set -- for final end-to-end evaluation on unseen data.}
     \end{enumerate}
 
-    In order to use GlobalPhone with the x-vector system, I allocated part of the training data for enrollment. I tried to preserve the GlobalPhone development sets and evaluation sets (which I refer to as evaluation and testing sets, respectively), in order to enable fair comparison of my results obtained on those data portions with any other works that use the GlobalPhone corpus.
+    To create the desired 4-way partitioning, I allocated part of the training data for enrollment. This way, I preserved the original evaluation and testing, enabling fairer comparisons of my results with any other future works that use the GlobalPhone corpus.
+    Because the classifier is typically a much simpler model (with many fewer learnable parameters) than the x-vector TDNN, I allocate only $1/8$ of the training set for enrollment (splitting each language's data in equal proportion). This way, my new training set accounts for roughly 70\% of the whole corpus, while the 3 other sets are roughly 10\% each.
 
-    Taking into account the relatively small number of parameters of the x-vector classifier when compared to the x-vector TDNN, I split the training data such that approximately only one 8th is used for enrollment. This way, the training data accounts for roughly 70\% of the whole corpus, while the 3 other portions are roughly 10\% each.
-
-    Importantly, GlobalPhone (as of the GlobalPhone Documentation v4.1) still misses the partitioning for certain languages:
+    Importantly, GlobalPhone\footnote{as of newest version of its documentation I had access to: v4.1 from January 2016} still misses partitioning for certain languages:
     \begin{enumerate}
-      \item {no partitioning for Czech, Polish, Tamil, Swahili, Ukrainian, Vietnamese and Shanghai Chinese,}
-      \item {only partial partitioning for Arabic, French, Japanese, Russian.}
+      \item {no partitioning for Czech, Polish, Tamil, Swahili, Ukrainian, Vietnamese and Wu,}
+      \item {incomplete partitioning for Arabic (incomplete evaluation and test sets), and for French, Japanese, Russian (missing evaluation sets for all three languages).}
     \end{enumerate}
+    The ASR GlobalPhone Kaldi recipe\footnote{\url{https://github.com/kaldi-asr/kaldi/tree/master/egs/gp/s5}} extends the partitioning, providing it for Czech, French, Japanese, Polish, Russian, Swahili and Vietnamese. I utilise this partitioning in order to stay consistent with previous work using the recipe. For the rest of the languages with incomplete or missing partitioning (Arabic, Tamil, Ukrainian and Wu), I partitioned the data myself, following the same approach as the GlobalPhone authors -- the only imposed constraint being: "no speaker appears in more than one group [partition] and no article is read by two speakers from different groups" \citep[p. 348]{Schultz_2002}. This constraint, however, could only be satisfied for languages which contained speaker metadata information (i.e. which articles were read by the particular speaker). Because this metadata was missing for Bulgarian, French, German, Polish, Tamil, Thai and Vietnamese, the splitting of the original training set into training and enrollment portions (and, in the case of Tamil, the entire 4-way partitioning) for these languages was done solely on a random basis.
 
-    The {\texttt GlobalPhone} Kaldi recipe contains an extended partitioning, which fixes Czech, French, Japanese, Polish, Russian, Swahili and Vietnamese. For the rest of the languages with incomplete partitioning (Arabic, Tamil, Ukrainian and Shanghai Chinese), I created the partitioning myself, following the same approach as the GlobalPhone authors: "No speaker appears in more than one group and no article was read by two speakers from different groups" (TO-DO: reference the GP docs).
+    I automated the entire partitioning process such that it would never allow one speaker to appear in multiple sets. However, I somewhat relaxed the constraint that the same article cannot appear in multiple sets. My implementation attempts to construct such partitioning, but -- if it cannot be constructed -- the allowed number of article overlaps is iteratively increased (from 0, incrementing by 1) until a satisfying partitioning is found.
+    From all the languages for which the partitioning was generated non-randomly, the following languages had non-zero article overlaps: Arabic (385), Turkish (16), and Wu (49). % TO-DO: comment on what this overlap could mean?
 
-    Some languages didn't have speaker-article data; for those, the partitioning was done randomly.
-
-    For some languages, I could not construct a partitioning with zero article overlap; for those, I tried to at least minimise the overlap.    
+    For the final partitioning (after excluding languages and speakers with corrupt data, see the next section) is shown in \autoref{tab:partitioning}.  
   }
 
   % recipe from https://github.com/kaldi-asr/kaldi/tree/master/egs/gp/s5, corresponding to citet{Lu_et_al_2012}
-  \section{Initial data preprocessing}{
-    Basically, SHN to WAV
+  \section{Data preprocessing}{
+    % Splitting long utterances into shorter ones uniformly, to be able to do classifier training and end-to-end evaluation on segments of different lengths -- like in \cite{Snyder_et_al_2018}. One future improvement would be to not do uniform splitting, but rather split on breaks -- to prevent potentially bad edge effects.
+    SHN to WAV
+    creating lists (wav files, utterance-to-speaker, utterance-to-language, utterance-to-length)
+    cutting into short segments: leave training data as it is (the TDNN chops it up into 1000-frame chunks anyway), split enrollment data into <30s segments, eval and test data into 3s or 10s (depending on the experiment)
+    compute VAD (used across all experiments) from MFCC feats (based on C0)
 
-    Splitting long utterances into shorter ones uniformly, to be able to do classifier training and end-to-end evaluation on segments of different lengths -- like in \cite{Snyder_et_al_2018}. One future improvement would be to not do uniform splitting, but rather split on breaks -- to prevent potentially bad edge effects.
   }
 
   \section{Dealing with invalid data}{
@@ -491,7 +494,18 @@
   }
 
   \section{Overview of the dataset}{
-
+    \begin{table}[h!tb]
+      \centering
+      \begin{sc}
+        \begin{tabular}{cccc}
+          training & enrollment & evaluation & testing \\
+          \hline
+          
+        \end{tabular}
+      \end{sc}
+      \caption{Example of architecture description of a TDNN (corresponds to \autoref{fig:tdnn-generic}).}
+      \label{tab:partitioning}
+    \end{table}
   }
 }
 
