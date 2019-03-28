@@ -405,12 +405,12 @@
     }
 
     \subsection{Illustrating the prosodic features used in this work}{
-      Having familiarised the reader with the two prosodic features I will use (the energy and the Kaldi pitch), I now illustrate them on a realistic example. Because the multi-lingual corpus used for this project does not contain English, I used the freely accessible sample utterance from the CSR-I (WSJ0) Complete corpus\footnote{\url{https://catalog.ldc.upenn.edu/LDC93S6A}}, which has important characteristics such as the recording conditions and the speaking style the same as the corpus I later use (see \autoref{chap:data}).
+      Having familiarised the reader with the two prosodic features I will use (the energy and the Kaldi pitch), I now illustrate them on a realistic example. Because the multi-lingual corpus used for this project does not contain English, I used the freely accessible sample utterance from the CSR-I (WSJ0) Complete corpus\footnote{\url{https://catalog.ldc.upenn.edu/LDC93S6A}}, which has important characteristics such as the recording conditions and the speaking style the same as the corpus I later use (see \autoref{sec:GlobalPhone}).
       \begin{figure}[h!]
         \centering
         \vspace{-1.2em}
         \hspace*{-2.4cm}
-        \includegraphics[width=18.7cm]{../img/prosody_sample.pdf} % TO-DO: Eventually change to PDF (compilation then takes long).
+        \includegraphics[width=18.7cm]{../img/prosody_sample.png} % TO-DO: Eventually change to PDF (compilation then takes long).
         \vspace*{-3em}
         \caption{The prosodic features I use in this project (together with the spectrogram and the fundamental frequency $F_0$), illustrated on an English utterance. I manually created the time-aligned transcription for better understanding.}
         \label{fig:prosodic-feats}
@@ -422,11 +422,28 @@
 }
 
 \chapter{Data}{
-  \label{chap:data}
-  Intro: Historically, speech corpora were meant for ASR, but now used for LID and SID as well. Since 1996, NIST has also been organising Language Recognition Challenges (LREs), and the corpora used for LREs are now the typically used ones when it comes to evaluating different systems. However, NIST traditionally focuses on telephone, narrowband (8kHz) speech, which represents only one part of all the possible settings in which LID or SID are deployed. In this work, I use a relatively small (< 40GB) corpus which, however, has many qualities that the various NIST corpora lack.
+  \label{chap:Data}
+  % LID often part of ASR, hence it makes sense to train on the same corpora
+  Because LID systems are often part of ASR systems, it makes sense to use the same datasets to train both.
+  % additionally, NIST has been having the LREs. which are now THE benchmarking datasets for LID. but they only to narrowband telephone speech...
+  Additionally, however, the U.S. National Institute of Standards and Technology (NIST) has been organising dedicated Language Recognition Evaluation\footnote{\url{https://www.nist.gov/itl/iad/mig/language-recognition}} (LRE) challenges since 1996, providing multilingual datasets which are today the standard benchmark for evaluating language recognition systems (used also by \citet{Snyder_et_al_2018}). The NIST datasets, however, only focus on narrowband (8kHz) conversational telephone speech and include strong channel variability as a result of the uncontrolled recording environment, which makes it more difficult to analyse any observed effects and attribute them to particular language pair similarities or particular prosodic aspects.
+  % I use the relatively small multilingual ASR corpus which is in many aspects different from the NIST data
+  In this work, I use a relatively compact ($\sim$400 hours of speech) corpus which is in many aspects different from the NIST datasets.
 
-  \section{GlobalPhone}{
-    Presented by \cite{Schultz_et_al_2013}, originally for ASR. Wideband (16kHz), recorded native speakers of 23 languages reading newspaper articles -- very similar to the English corpora such as CSR-I, which are based on Wall Street Journal articles. Unlike in NIST corpora, the recording equipment and conditions vary very little. One disadvantage of GlobalPhone is the lack of spontaneous speech. On the other hand, the language goes well beyond the simple conversational language found in the NIST telephone speech corpora.
+  \section{The corpus: GlobalPhone}{
+    \label{sec:GlobalPhone}    
+    % copies the style of the CRS-I corpus: newspaper articles read by native speakers
+    % started in 1995, presented in 2002 and 2013 (citations). I use the newest version from 2016 which contains 22 languages.
+    The corpus I use is the GlobalPhone multilingual ASR corpus \citep{Schultz_et_al_2013}, more precisely its newest version -- updated in 2016 and covering 22 languages from around the world: Arabic, Bulgarian, Chinese-Mandarin, Chinese-Shanghai (Wu), Croatian, Czech, French, German, Hausa, Japanese, Korean, Brazilian Portuguese, Polish, Russian, Spanish, Swahili, Swedish, Tamil, Thai, Turkish, Ukrainian, and Vietnamese. The corpus follows the style established for English by the Wall Street Journal-based corpora \citep{Paul_Baker_1992} such as the CSR-I (WSJ0) Complete corpus\footnote{\url{https://catalog.ldc.upenn.edu/LDC93S6A}}: Newspaper articles are read by native speakers, recorder as wideband (16kHz) audio in a controlled environment, using a close-talking microphone (in the case of GlobalPhone the Sennheiser microphone HD-440-6).
+    
+    % wideband, controlled clean recording conditions -- good for reasoning! (don't need to worry about results being affected by channel differences)
+    The controlled environment, speaking style and nature of the texts (all are major newspaper articles) make the data better suited for analysing effects of, for example, prosodic features: Any observed trends can be more reliably attributed to my controlled independent variables (such as the feature type) or to the known language differences.
+    % Plus (compared to NIST): rich vocabulary (newspaper articles).
+    Another advantage of the GlobalPhone corpus is the rich vocabulary (compare with short telephone conversations in the NIST corpora).
+    Finally, from a linguistic view, the corpus covers a wide range of language families and prosody-based categories, while also providing an interesting sample of related languages in the form of 5 Slavic languages (which the author -- as a native speaker of Slovak -- can relate to): Bulgarian, Czech, Croatian, Russian, and Ukrainian.
+
+    % Minus: no spontaneous speech! And no channel variation! (for LID on YT videos)
+    Unfortunately, the corpus does not cover spontaneous speech (which -- as known in ASR -- is much more challenging than read text). The extremely low channel variability is also a tight constraint and it is possible that, even if prosodic features improve LID performance on this dataset, the results will not necessarily generalise well to more realistic scenarios with greater channel variability and noise.    
   }
 
   \section{Data partitioning}{
@@ -455,13 +472,14 @@
     For some languages, I could not construct a partitioning with zero article overlap; for those, I tried to at least minimise the overlap.    
   }
 
+  % recipe from https://github.com/kaldi-asr/kaldi/tree/master/egs/gp/s5, corresponding to citet{Lu_et_al_2012}
   \section{Initial data preprocessing}{
     Basically, SHN to WAV
 
     Splitting long utterances into shorter ones uniformly, to be able to do classifier training and end-to-end evaluation on segments of different lengths -- like in \cite{Snyder_et_al_2018}. One future improvement would be to not do uniform splitting, but rather split on breaks -- to prevent potentially bad edge effects.
   }
 
-  \section{Invalid data}{
+  \section{Dealing with invalid data}{
     This was discovered while preprocessing the data from .shn to .wav:
     \begin{enumerate}
       \item {Hausa, Swahili and Ukrainian have broken data.}
@@ -470,6 +488,10 @@
     \end{enumerate}
 
     This leaves us with 19 languages, which are used further in this work: Arabic (AR), Bulgarian (BG), Mandarin Chinese (CH), Croatian (CR), Czech (CZ), French (FR), German (GE), Japanese (JA), Korean (KO), Polish (PL), Portuguese (PO), Russian (RU), Spanish (SP), Swedish (SW), Tamil (TA), Thai (TH), Turkish (TU), Vietnamese (VN) and Shanghai Chinese (WU).
+  }
+
+  \section{Overview of the dataset}{
+
   }
 }
 
