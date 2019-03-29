@@ -22,3 +22,5 @@ pyvenv.cfg
 
 # X-vectors for plotting t-SNE
 xvectors/
+
+.~lock*

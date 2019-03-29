@@ -20,7 +20,6 @@
 
 \usepackage{multirow} % multi-row and multi-column table cells
 \usepackage{makecell} % line breaks inside cells with \thead{} and \makecell{}
-
 \usepackage{longtable} % allow table to span multiple pages
 
 % Globally setting the vertical padding in tables
@@ -337,7 +336,7 @@
         % - intonation and tone are perceived qualities, typically associated with the variation of the physical quality called pitch, i.e. the fundamental frequency of vibration of the vocal folds (F0). while the term 'tone' is used where pitch variation is contrastive (i.e. changes to it discriminate between different words) in the so-called tonal languages (such as Chinese, Vietnamese, Thai), intonation denotes the non-contrastive pitch variation mostly associated with speaker's emotions, dialect, social background, speaking style, and other factors (see, for example, this study by \citet{Grabe_2004} on the intonation differences across British English dialects).
         \item {\textit{Intonation} and \textit{tone} are perceived qualities typically associated with the variation of the physical quality called pitch, i.e. the fundamental frequency of vibration of the vocal folds ($F_0$). The term 'tone' is used where pitch variation is contrastive (i.e. changes to it discriminate between different words): in the so-called \textit{tonal languages}, such as Chinese, Vietnamese and Thai. In each of these languages, a small 'alphabet' of distinct tone levels or tone contours can be observed as it conveys meaning. Intonation, on the other hand, denotes the non-contrastive pitch variation mostly associated with the speaker's emotions, language, dialect, social background, speaking style, and other factors (see, for example, the study by \citet{Grabe_2004} on the intonational differences between different British English dialects).}
         % - stress (also termed accent) is an unstable term, generally referring to relative emphasis on certain syllables or words and realised as a variation in loudness (dynamic accent), pitch (pitch accent) or vowel length (quantitative accent). Specific lexical (syllable-level) stress patterns or rules are often characteristic of a language, e.g. the position of stress is fixed to different positions within word in Czech and Polish (fixed stress), or describable by a set of rules in Arabic (rule-based stress, this needs citation).
-        \item {\textit{Stress} (also termed \textit{accent}), despite being a somewhat ambiguous term, generally refers to the relative emphasis on certain syllables within a words or words within a sentence, realised as a variation in loudness (\textit{dynamic accent}), pitch (\textit{pitch accent}) or vowel length (\textit{quantitative accent}). Specific \textit{lexical} (intra-word, i.e syllable-level) stress patterns or rules are often characteristic of a language. For instance, the within-word location of stress is fixed but different for Czech and Polish (\textit{fixed stress}, see \citet{WALS_14}), or describable by a set of rules in Arabic (\textit{rule-based stress}, see \citet{WALS_15}).}
+        \item {\textit{Stress} (also termed \textit{accent}), despite being a somewhat ambiguous term, generally refers to the relative emphasis on certain syllables within a word or words within a sentence, realised as a variation in loudness (\textit{dynamic accent}), pitch (\textit{pitch accent}) or vowel length (\textit{quantitative accent}). Specific \textit{lexical} (intra-word, i.e syllable-level) stress patterns or rules are often characteristic of a language. For instance, the within-word location of stress is fixed but different for Czech and Polish (\textit{fixed stress}, see \citet{WALS_14}), or describable by a set of rules in Arabic (\textit{rule-based stress}, see \citet{WALS_15}).}
         % - rhythm typically refers to syllable lengths, with the theory of isochrony categorising languages into three types based on their rhythm: syllable-timed, e.g. french or turkish (all syllables have roughly equal durations), mora-timed, e.g. slovak or japanese (all moras have equal durations) and stress-timed languages, e.g. german, arabic (intervals between stressed syllables are of equal durations).
         \item {\textit{Rhythm} refers to regularity in sub-word unit lengths, with the most recognised theory of \textit{isochrony} categorising languages into three types based on their rhythm: \textit{syllable-timed} where all syllables have roughly equal durations (e.g. French or Turkish), \textit{mora-timed} where all moras\footnote{Mora is a basic timing unit; a long syllable having two moras and a short syllable having one mora. See \citet[p. 312]{Crystal_2008} for a broader definition and discussion.} have equal durations (e.g. Slovak or Japanese), and \textit{stress-timed} languages, e.g. German and Arabic (here, the intervals between stressed syllables are of equal durations).}
       \end{itemize}
@@ -357,6 +356,7 @@
       % 3. what prosodic aspects have been modelled explicitly: intonation/tone/pitch accent (pitch contours)
       % perhaps unsurprisingly, extracting information from pitch for LID has been explored in the past -- although the number of studies very small compared to those using conventional acoustic features. long before i-vectors, \citet{Lin_et_al_2005} attempted LID just from the pitch contour segmented into syllable-like units (around 100-200ms), contour segments parametrised by a few Legendre polynomials. later, \citet{Metze_et_al_2013} show improvements in ASR on tonal (and partly on non-tonal) languages when augmenting MFCCs with F0 variation features. One disadvantage of pitch contours: F0 is not present for unvoiced sounds, hence a pitch contour computed from F0 is not continuous. this issue was addressed by \cite{Ghahremani_et_al_2014} who developed a pitch-tracking algorithm that approximates the pitch contour even for unvoiced frames, making it continuous. they report improved ASR performance mainly on tonal languages. to the best of my knowledge, this feature type hasn't yet beet applied in an LID task.
       Perhaps unsurprisingly, extracting information from pitch for LID has been explored in the past -- although the number of studies is very small compared to those using the conventional acoustic features. Long before i-vectors, \citet{Lin_et_al_2005} attempted to do language identification solely from the pitch contour. This was segmented into syllable-like units (around 100-200ms), each contour segment subsequently represented as the first few coefficients of its approximation by Legendre polynomials. Even though the results were far from those achieved by today's systems, it was demonstrated that LID can be done on pitch information alone. Later, \citet{Metze_et_al_2013} showed improvements in ASR on tonal (and partly on non-tonal) languages when augmenting MFCCs with custom-designed $F_0$ variation features. Nevertheless, one disadvantage of using pitch persisted: The fact that $F_0$ is typically considered to be only present in voiced sounds and undefined for unvoiced ones -- making a pitch contour based on $F_0$ discontinuous. This inconvenience has been recently addressed by \cite{Ghahremani_et_al_2014} who developed a pitch-tracking algorithm that approximates pitch values even for unvoiced regions and produces a continuous pitch contour. Adding this feature to MFCCs, the authors report improved ASR performance mainly on tonal languages. To the best of my knowledge, this feature type has not yet been used for language identification.
+      % TO-DO: Mention \citet{Martinez_et_al_2012}!!! Important work which I found earlier but forgot to include.
 
 
       % 4. what features I use to explicitly model prosodic aspects: KaldiPitch, raw energy
@@ -442,7 +442,7 @@
       \centering
       \includegraphics[width=7.7cm, angle=270]{graphics/GlobalPhone-map.pdf}
       \vspace*{-1em}
-      \caption{Languages of GlobalPhone as shown roughly at the location where they were recorded. Greyed out are Hausa, Swahili and Ukrainian -- the three languages I did not use in this work due to corrupt data (see \autoref{sec:invalid-data}).}
+      \caption{Languages of GlobalPhone as shown roughly at the location where they were recorded. Greyed out are Hausa, Swahili and Ukrainian -- the three languages I did not use in this work due to corrupt data (see \autoref{sec:invalid-data}). Also notice that Russian was, in fact, recorded in Belarus, and Spanish in Costa Rica.}
       \label{fig:GlobalPhone-map}
     \end{figure}
     
@@ -477,7 +477,7 @@
     Note that a partitioning in this context is represented simply in the form of partition- and language-specific lists of speakers (identified by their speaker IDs).
     The ASR GlobalPhone Kaldi recipe\footnote{\url{https://github.com/kaldi-asr/kaldi/tree/master/egs/gp/s5}} extends the original GlobalPhone partitioning to also cover Czech, French, Japanese, Polish, Russian, Swahili and Vietnamese. I utilise this partitioning in order to stay consistent with previous work using the recipe. For the rest of the languages with incomplete or missing partitioning (Arabic, Tamil, Ukrainian and Wu), I partitioned the data myself, following the same approach as the GlobalPhone authors -- the only imposed constraint being: "no speaker appears in more than one group [partition] and no article is read by two speakers from different groups" \citep[p. 348]{Schultz_2002}. This constraint, however, could only be satisfied for languages which contained speaker metadata information (i.e. which articles were read by the particular speaker). Because this metadata was missing for Bulgarian, French, German, Polish, Tamil, Thai and Vietnamese, the splitting of the original training set into training and enrollment portions (and, in the case of Tamil, the entire 4-way partitioning) for these languages was done solely on a random basis.
 
-    I automated the entire partitioning process such that it would never allow one speaker to appear in multiple sets. However, I somewhat relaxed the constraint that the same article cannot appear in multiple sets. My implementation attempts to construct such partitioning, but -- if it cannot be constructed -- the allowed number of article overlaps is iteratively increased (from 0, incrementing by 1) until a satisfying partitioning is found.
+    I automated the entire partitioning process such that it would never allow one speaker to appear in multiple sets. Further, the way I understand the declared 80\%-10\%-10\% splitting is that it is the \textit{numbers of speakers} for each languages that are split following this ratio (since there is roughly constant amount of data per speaker). Therefore, the way I realise the desired 4-way partitioning is based on distributing speakers in the desired 70\%-10\%-10\%-10\% ratio. Unfortunately, I had to somewhat relax the constraint that the same article cannot appear in multiple sets. My implementation attempts to construct such ideal partitioning, but -- if it cannot be constructed -- the allowed number of article overlaps is iteratively increased (from 0, incrementing by 1) until a satisfying partitioning is found.
     From all the languages for which the partitioning was generated non-randomly, the following languages had non-zero article overlaps: Arabic (385), Turkish (16), and Wu (49). % TO-DO: comment on what this overlap could mean?
 
     For the final partitioning (after excluding languages and speakers with corrupt data, see the next section) is shown in \autoref{tab:partitioning}.  
@@ -497,7 +497,8 @@
     \textbf{Organising the data into partitions} was done symbolically (without re-organising the .wav files), hence taking very short. This made it possible for the step to be a part of the pipeline repeated separately for each experiment -- or each time an utterance or a speaker was found to be unusable due to corrupt data and had to be excluded from the partitioning. Because the previous step did not create any data partitioning (i.e. all .wav files were only grouped by languages), in this step, for each partition, a list referring to the .wav files for that partition's speakers across all languages was compiled (based on the files storing the partitioning described in \autoref{sec:partitioning}). In addition to this list (named conventionally \texttt{vaw.scp}), a number of accompanying lists was generated as required by the conventions of Kaldi: \texttt{utt2spk} (mapping utterances to speakers), \texttt{utt2lang} (mapping utterances to languages), \texttt{utt2len} (mapping utterances to their lengths), and a number of further lists derived from these essential ones.
 
     % cutting into short segments: leave training data as it is (the TDNN chops it up into 1000-frame chunks anyway), split enrollment data into <30s segments, eval and test data into 3s or 10s (depending on the experiment)
-    \textbf{Splitting longer utterances into shorter segments} was done to match the set-up used by \citet{Snyder_et_al_2018}: Enrollment set utterances were split uniformly into segments of length 30s, and evaluation and testing set utterances were split into 10s segments (and later also into 3s segments because the trained system in each experiment was additionally tested on 3s segments). Note that I did not discard the cut-offs from the utterance ends (even though they were shorter than the desired lengths). Another downside of the uniform cutting is that utterances were split unnaturally -- not necessarily on breaks, hence creating arbitrary edge boundaries not naturally found in speech. The reason why I chose to implement this way of splitting the utterances was its simplicity; in the future, this would be one of the design decisions I would change.
+    % TO-DO: mention that utterances were rather short on average, and show the length distribution (particularly for the enrollment set because many utts will be under 30s).
+    \textbf{Splitting longer utterances into shorter segments} was done to match the set-up used by \citet{Snyder_et_al_2018}: Training set utterances were not split in this step because the x-vector TDNN splits them into chunks of at most 1000 frames (10s) at training time (TO-DO: reference the appropriate implementation section for details). Enrollment set utterances were split uniformly into segments of length 30s, and evaluation and testing set utterances were split into 10s segments (and later also into 3s segments because the trained system in each experiment was additionally tested on 3s segments). Note that I did not discard the cut-offs from the utterance ends (even though they were shorter than the desired lengths). Another downside of the uniform cutting is that utterances were split unnaturally -- not necessarily on breaks, hence creating arbitrary edge boundaries not naturally found in speech. The reason why I chose to implement this way of splitting the utterances was its simplicity; in the future, this would be one of the design decisions I would change.
     
     % compute VAD (used across all experiments) from MFCC feats (based on C0) 
     % TO-DO: this was a mistake; VAD should've been computed based on energy, not on C0
@@ -510,59 +511,93 @@
     \begin{itemize}
       \item {while converting .shn to .wav, converting all utterances for Hausa, Swahili and Ukrainian failed with the "No magic number" error thrown by the \texttt{shorten} tool\footnote{reported also here: \url{https://wiki.inf.ed.ac.uk/CSTR/GlobalPhone}, although only for a few utterances}}
       \item {the following utterances were not converted due to the same error: \texttt{095\_29} for Bulgarian; \texttt{003\_2} for German; almost all utterances for speakers \texttt{015}, \texttt{136}, and up to 3 utterances for speakers \texttt{014}, \texttt{017}, \texttt{021}, \texttt{022}, \texttt{024}, \texttt{026}, \texttt{031}, \texttt{036}, \texttt{058}, \texttt{139} in Portuguese; utterance \texttt{087\_102} in Russian; utterance \texttt{007\_77} in Turkish; and utterance \texttt{084\_122} for Vietnamese}
-      \item {while computing VAD, the \texttt{compute-vad} binary throwing the "Empty feature matrix for utterance <utterance-ID>" error for utterances \texttt{058\_16} and \texttt{058\_18} in Portuguese}
+      \item {while computing VAD, the \texttt{compute-vad} binary throwing the "Empty feature matrix for utterance [utterance-ID]" error for utterances \texttt{058\_16} and \texttt{058\_18} in Portuguese}
     \end{itemize}
 
     Naturally, the utterances which could not be converted were discarded. I also discarded the Portuguese speakers \texttt{015} and \texttt{136} altogether. Most importantly, the three problematic languages -- Hausa, Swahili and Ukrainian -- were not used any further, only the 19 remaining languages.
-
-    This leaves us with 19 languages, which are used further in this work: Arabic (AR), Bulgarian (BG), Mandarin Chinese (CH), Croatian (CR), Czech (CZ), French (FR), German (GE), Japanese (JA), Korean (KO), Polish (PL), Portuguese (PO), Russian (RU), Spanish (SP), Swedish (SW), Tamil (TA), Thai (TH), Turkish (TU), Vietnamese (VN) and Shanghai Chinese (WU).
   }
 
-  \section{Overview of the dataset}{
+  \section{Overview of the data used}{
     \label{sec:data-overview}
+    I present an overview of the data I ultimately used in my experiments -- after discarding the invalid data. \autoref{tab:partitioning} shows the speakers contained in each partition so that my partitioning can be replicated by other future works. \autoref{tab:data-amounts} shows the total data amounts for each language and partition.
+
+    Notice that the data amount varies across languages for a given partition (i.e. languages are represented unequally in the corpus -- compare Wu and Japanese), and even the declared 80\%-10\%-10\% split from the original GlobalPhone partitioning is not too reliable in some cases -- for instance Thai, German, Mandarin and Spanish -- although, in other cases, it does result in a split close to the declared one (such as for Korean, Swedish and Turkish). Further, the per-speaker amounts of data are clearly not equal, see Wu where there are 6 training-set speakers vs 4 testing-set speakers, yet the testing set has a greater total amount of data than the training set. While attempting at a perfect split is possible, instead, I appreciate the realisticity of certain languages being under-represented, and account for this in training the x-vector classifier (see [TO-DO: add reference once the section is written] for details of how this is implemented).
+
+    \begin{table}[h!tb]
+      \centering
+      \begin{sc}
+        \footnotesize
+        \begin{tabular}{l|c|c|c|c}
+             & training & enrollment & evaluation & testing \\
+          \hline
+          AR & 14.5 & 1.4 & 1.7 & 1.4\\
+          BG & 15.1 & 2.0 & 2.3 & 2.0\\
+          CH & 23.7 & 3.1 & 2.0 & 2.4\\
+          CR & 10.5 & 1.6 & 2.0 & 1.8\\
+          CZ & 23.7 & 3.1 & 2.4 & 2.7\\
+          FR & 20.1 & 2.7 & 2.1 & 2.0\\
+          GE & 13.2 & 1.7 & 2.0 & 1.5\\
+          JA & 29.2 & 3.0 & 0.9 & 0.8\\
+          KO & 14.6 & 2.2 & 2.2 & 2.1\\
+          PL & 17.0 & 2.3 & 2.8 & 2.3\\
+          PO & 20.8 & 1.9 & 1.6 & 1.8\\
+          RU & 17.3 & 2.5 & 2.5 & 2.4\\
+          SP & 16.1 & 2.3 & 2.1 & 1.7\\
+          SW & 15.4 & 2.0 & 2.1 & 2.2\\
+          TA & 10.7 & 2.2 & 1.1 & 1.3\\
+          TH & 22.0 & 2.9 & 2.3 & 0.9\\
+          TU & 11.6 & 1.7 & 2.0 & 1.9\\
+          VN & 15.8 & 1.7 & 1.4 & 0.8\\
+          WU & 1.0 & 0.8 & 0.7 & 1.1\\
+        \end{tabular}
+      \end{sc}
+      \caption{Amount of data (in hours) for each language and partition after excluding invalid data}
+      \label{tab:data-amounts}
+    \end{table}
+
     \begin{sc}
       \centering
       \footnotesize
-      \begin{longtable}{p{0.5cm}|p{3.9cm}|p{3.5cm}|p{3.5cm}|p{0.7cm}}
-        & enrollment & evaluation & testing & train. \\
+      \begin{longtable}{p{0.5cm}|p{0.8cm}|p{3.9cm}|p{3.5cm}|p{3.5cm}}
+        & train. & enrollment & evaluation & testing \\
         \hline
-        AR & 017, 023, 056, 104, 105, 114, 135 & 014, 030, 047, 067, 109, 115, 137 & 011, 012, 027, 050, 051, 055, 066 & 57 \\
+        AR & 57 & 017, 023, 056, 104, 105, 114, 135 & 014, 030, 047, 067, 109, 115, 137 & 011, 012, 027, 050, 051, 055, 066 \\
         \hline
-        BG & 042, 048, 056, 065, 088, 104, 107 & 051, 055, 058, 084, 090, 100, 106 & 040, 059, 063, 068, 095, 109, 110 & 56 \\
+        BG & 56 & 042, 048, 056, 065, 088, 104, 107 & 051, 055, 058, 084, 090, 100, 106 & 040, 059, 063, 068, 095, 109, 110 \\
         \hline
-        CH & 004, 005, 012, 034, 035, 036, 045, 048, 052, 053, 057, 120, 126 & 028, 029, 030, 031, 032, 039, 040, 041, 042, 043, 044 & 080, 081, 082, 083, 084, 085, 086, 087, 088, 089 & 98 \\
+        CH & 98 & 004, 005, 012, 034, 035, 036, 045, 048, 052, 053, 057, 120, 126 & 028, 029, 030, 031, 032, 039, 040, 041, 042, 043, 044 & 080, 081, 082, 083, 084, 085, 086, 087, 088, 089 \\
         \hline
-        CR & 001, 010, 018, 026, 029, 032, 074, 092, 093 & 033, 034, 035, 036, 046, 048, 051, 053, 054, 057 & 037, 038, 039, 040, 041, 042, 043, 044, 045, 047 & 63 \\
+        CR & 63 & 001, 010, 018, 026, 029, 032, 074, 092, 093 & 033, 034, 035, 036, 046, 048, 051, 053, 054, 057 & 037, 038, 039, 040, 041, 042, 043, 044, 045, 047 \\
         \hline
-        CZ & 005, 009, 031, 033, 034, 036, 053, 061, 071, 072 & 083, 085, 087, 089, 091, 093, 095, 097, 099, 101 & 084, 086, 088, 090, 092, 094, 096, 098, 100, 102 & 72 \\
+        CZ & 72 & 005, 009, 031, 033, 034, 036, 053, 061, 071, 072 & 083, 085, 087, 089, 091, 093, 095, 097, 099, 101 & 084, 086, 088, 090, 092, 094, 096, 098, 100, 102 \\
         \hline
-        FR & 009, 028, 030, 031, 033, 052, 064, 065, 070, 076 & 082, 083, 084, 085, 086, 087, 088, 089 & 091, 092, 093, 094, 095, 096, 097, 098 & 74 \\
+        FR & 74 & 009, 028, 030, 031, 033, 052, 064, 065, 070, 076 & 082, 083, 084, 085, 086, 087, 088, 089 & 091, 092, 093, 094, 095, 096, 097, 098 \\
         \hline
-        GE & 015, 017, 046, 056, 058, 065, 074 & 001, 002, 003, 004, 008, 010 & 018, 020, 021, 026, 029, 073 & 58 \\
+        GE & 58 & 015, 017, 046, 056, 058, 065, 074 & 001, 002, 003, 004, 008, 010 & 018, 020, 021, 026, 029, 073 \\
         \hline
-        JA & 002, 021, 037, 048, 051, 053, 057, 064, 086, 201, 202, 206, 209, 221 & 009, 031, 046, 081, 091 & 006, 025, 045, 047, 088, 101 & 119 \\
+        JA & 119 & 002, 021, 037, 048, 051, 053, 057, 064, 086, 201, 202, 206, 209, 221 & 009, 031, 046, 081, 091 & 006, 025, 045, 047, 088, 101 \\
         \hline
-        KO & 018, 030, 043, 044, 057, 065, 074, 078, 079, 090 & 006, 012, 025, 040, 045, 061, 084, 086, 091, 098 & 019, 029, 032, 042, 051, 064, 069, 080, 082, 088 & 70 \\
+        KO & 70 & 018, 030, 043, 044, 057, 065, 074, 078, 079, 090 & 006, 012, 025, 040, 045, 061, 084, 086, 091, 098 & 019, 029, 032, 042, 051, 064, 069, 080, 082, 088 \\
         \hline
-        PL & 008, 018, 032, 076, 083, 085, 088, 096, 099 & 005, 011, 012, 030, 040, 041, 046, 063, 090, 097 & 001, 004, 009, 023, 031, 033, 043, 044, 050, 098 & 70 \\
+        PL & 70 & 008, 018, 032, 076, 083, 085, 088, 096, 099 & 005, 011, 012, 030, 040, 041, 046, 063, 090, 097 & 001, 004, 009, 023, 031, 033, 043, 044, 050, 098 \\
         \hline
-        PO & 070, 071, 106, 109, 117, 120, 128, 146, 148, 150 & 064, 072, 102, 103, 104, 132, 133, 134 & 135, 137, 138, 139, 142, 143, 312 & 75 \\
+        PO & 75 & 070, 071, 106, 109, 117, 120, 128, 146, 148, 150 & 064, 072, 102, 103, 104, 132, 133, 134 & 135, 137, 138, 139, 142, 143, 312 \\
         \hline
-        RU & 017, 023, 035, 041, 088, 101, 114, 115, 119, 121, 123 & 005, 033, 042, 065, 078, 097, 103, 106, 110, 122 & 002, 027, 036, 063, 069, 092, 102, 104, 109, 112 & 84 \\
+        RU & 84 & 017, 023, 035, 041, 088, 101, 114, 115, 119, 121, 123 & 005, 033, 042, 065, 078, 097, 103, 106, 110, 122 & 002, 027, 036, 063, 069, 092, 102, 104, 109, 112 \\
         \hline
-        SP & 037, 041, 048, 059, 060, 064, 074, 083, 098, 099 & 001, 002, 003, 004, 005, 006, 007, 008, 009, 010 & 011, 012, 013, 014, 015, 016, 017, 018 & 72 \\
+        SP & 72 & 037, 041, 048, 059, 060, 064, 074, 083, 098, 099 & 001, 002, 003, 004, 005, 006, 007, 008, 009, 010 & 011, 012, 013, 014, 015, 016, 017, 018 \\
         \hline
-        SW & 001, 013, 023, 070, 072, 077, 078, 080, 084 & 045, 046, 047, 048, 049, 066, 067, 068, 069 & 040, 041, 042, 043, 044, 060, 061, 062, 063, 064 & 70 \\
+        SW & 70 & 001, 013, 023, 070, 072, 077, 078, 080, 084 & 045, 046, 047, 048, 049, 066, 067, 068, 069 & 040, 041, 042, 043, 044, 060, 061, 062, 063, 064 \\
         \hline
-        TA & 022, 028, 038, 047 & 003, 030, 035, 039 & 001, 005, 033, 037 & 35 \\
+        TA & 35 & 022, 028, 038, 047 & 003, 030, 035, 039 & 001, 005, 033, 037 \\
         \hline
-        TH & 001, 005, 027, 031, 041, 065, 067, 077, 083 & 023, 025, 028, 037, 045, 061, 073, 085 & 101, 102, 103, 104, 105, 106, 107, 108 & 73 \\
+        TH & 73 & 001, 005, 027, 031, 041, 065, 067, 077, 083 & 023, 025, 028, 037, 045, 061, 073, 085 & 101, 102, 103, 104, 105, 106, 107, 108 \\
         \hline
-        TU & 010, 017, 044, 048, 049, 051, 064, 091, 093, 096 & 001, 002, 003, 005, 006, 008, 013, 014, 015, 016, 019 & 025, 030, 031, 032, 037, 039, 041, 046, 056, 063 & 69 \\
+        TU & 69 & 010, 017, 044, 048, 049, 051, 064, 091, 093, 096 & 001, 002, 003, 005, 006, 008, 013, 014, 015, 016, 019 & 025, 030, 031, 032, 037, 039, 041, 046, 056, 063 \\
         \hline
-        VN & 012, 029, 031, 036, 043, 050, 053, 070, 077, 118, 119, 128 & 200, 201, 202, 203, 204, 205, 206, 207, 208 & 102, 103, 106, 110, 113 & 103 \\
+        VN & 103 & 012, 029, 031, 036, 043, 050, 053, 070, 077, 118, 119, 128 & 200, 201, 202, 203, 204, 205, 206, 207, 208 & 102, 103, 106, 110, 113 \\
         \hline
-        WU & 008, 011, 013, 015 & 002, 004, 006, 017 & 001, 003, 005, 009 & 6 \\
+        WU & 6 & 008, 011, 013, 015 & 002, 004, 006, 017 & 001, 003, 005, 009 \\
         \hline
         \multicolumn{3}{l}{} \\[-7pt]
         \caption{The partitioning of each language's speakers into the 4 partitions. For enrollment, evaluation and testing sets, speaker IDs are shown. For the training set, the rest of the speakers was used and only the number of speakers is shown.}
@@ -573,21 +608,84 @@
 }
 
 \chapter{Implementation}{
+  \label{chap:Implementation}
+  % I describe the entire implementation as a whole
+  % but two of us worked on this and we were building on existing implementations. I naturally put focus on parts which I myself implemented or adapted.
+  % unless stated otherwise, the design decisions (in particular the properties of the TDNN and the classifier) are adopted from the existing implementations without changes
+
   \section{The Kaldi toolkit}{
-    System was built in Kaldi \citep{Povey_et_al_2011}. (Introduce Kaldi.)
+    \label{sec:kaldi}
+    % System was built in Kaldi \citep{Povey_et_al_2011}
+    % most popular research ASR toolkit, used also for LR and SR.
+    % open source, featuring recipes -- working implementations often accompanying published papers
+    % has binary layer (e.g. for computing mfcc features, training a TDNN, or computing VAD), scripts layer (convenience Bash scripts for data manipulation, feature computation, end-to-end model training, ...) and custom layer (code written for a particular study, such as connecting particular datasets, running end-to-end experiments)
   }
-  \section{Adapted implementations}{
-    Describe the SRE16 Kaldi recipe, the GlobalPhone ASR recipe, and how they were combined (also using the information from \cite{Snyder_et_al_2018}) to reproduce the LID x-vector system.
+
+  \section{Kaldi recipes used in this work}{
+    \label{sec:recipes}
+    % GP inspired the code for connecting the corpus with the x-vector architecture, and the preprocessing steps described in \autoref{sec:preprocessing}
+    % SRE16 corresponding to \citet{Snyder_et_al_2018b}: basis for the x-vector TDNN without major changes, but not using the PLDA classifier
+    % lre07 (corresponding to \citet{Sarma_et_al_2018}) which served as basis for the x-vector classifier
+    % no existing recipe corresponding to \cite{Snyder_et_al_2018}, but the x-vector TDNN was the same as for SRE. further info from the LID was used to replicate the system used there as closely as possible (except for the classifier)
+    % most time spent connecting with dataset, implementing early and late fusion of acoustic and prosodic features, and creating the code for running entire experiments end-to-end as well as step by step
   }
 
   \section{Choice of classifier}{
-    The SRE16 recipe uses PLDA, but for verification, not for classification. For our purposes, we needed a proper classifier. Current popular and well-performing classifiers are various flavours of GMM and logistic regression, with no clear winner. \cite{Snyder_et_al_2018}, for instance, used GMM trained using MMI -- based on \cite{McCree_2014}. I decided to re-use a model which is already implemented in the LRE07/v2 Kaldi recipe -- logistic regression. The decision was also consulted with \cite{Snyder_2018_kaldi-help}. One theoretical downside of logistic regression is that the resulting decision boundaries are linear, whereas with GMM (trained with full co-variance matrix), one can achieve more complex quadratic decision boundaries. On the other hand though, training a full covariance requires much data, and the enrollment set would likely be not big enough. Additionally, the Kaldi logit can describe each class using more than linear boundary (see next section), so the decision boundaries should be complex enough to be able to model the observed data well.
+    \label{sec:classifier}
+    % The SRE16 recipe uses PLDA, but for verification, not for classification. For our purposes, we needed a proper classifier.
+    
+    Current popular and well-performing classifiers are various flavours of GMM and logistic regression, with no clear winner. 
+    % \citet{Martinez_et_al_2011} compare LR with SVM (LR slightly better)
+    % LR worse than GMM because cannot do out-of-set rejection (as pointed out by \citet{McCree_2014})
+    % \citet{Plchot_et_al_2016} use linear Gaussian classifier
+    % \cite{Snyder_et_al_2018}, for instance, used GMM trained using MMI -- based on \cite{McCree_2014}.
+
+    I decided to re-use a model which is already implemented in the LRE07/v2 Kaldi recipe -- logistic regression. The decision was also consulted with \cite{Snyder_2018_kaldi-help}. 
+    downside of logistic regression is that the resulting decision boundaries are linear, whereas with GMM (trained with full co-variance matrix), one can achieve more complex quadratic decision boundaries. 
+    On the other hand though, training a full covariance requires much data, and the enrollment set would likely be not big enough. 
+    Additionally, the Kaldi logit can operate as a mixture model, learning multiple decision boundaries per class, thus modelling complex, non-linear boundaries (see next section)
+
+    whitening, length normalisation or dimensionality reduction is not performed
+
   }
 
   \section{Final architecture}{
-    Description of x-vector+GP architecture (highlighting own contributions)
+    \label{sec:architecture}
 
-    how the whole pipeline works: go into much more detail than in the Related work section
+    pipeline overview (diagrams showing training and evaluation pipelines together as a whole)
+    - feature computation
+    - concatenating features (early fusion)
+    - removing silence (VAD)
+    - producing x-vector
+    - concatenating with another x-vector (late fusion)
+    - classifying
+
+    data preparation
+      feature computation
+      - existing scripts re-used for computing MFCCs (make\_mfcc.sh), I adapted the code for adding SDCs and deltas to MFCCs
+      - existing scripts re-used for adding pitch
+      - energy feature computed simply as a special case of MFCC: taking only 0th coefficient and using raw log energy instead of it
+
+      early fusion
+      - I wrote script for frame-wise concatenation
+      - done for all data partitions alike
+      - 3s mean normalisation before x-vector extraction and also for tdnn training samples -- for all feature types
+
+    training the tdnn
+    - architecture as described in \autoref{sec:x-vectors}, no changes to the code from the recipe
+    - corresponds to that described in \citet{Snyder_et_al_2018}: ReLU non-linearities, 64-sample minibatches, SGD training with lr going from 0.001 to 0.0001 and with momentum with the momentum-term coefficient $\mu=0.5$, dropout scheme is 0 (at 0\%-20\%), 0.1 (at 50\%), 0 (at 100\%)
+    - utts <5s (500 frames) removed from training data
+    - training data repeated 35 times, distributed into archives of roughly 50000000 frames each (around 140h). 70 training archives
+    - number of epochs translated into a number of iterations (each iteration = one archive)
+    - samples globally shuffled before training, then shuffled each iteration within batches of 1000
+
+    extracting x-vectors
+    - done using the sre16 code without any changes
+
+    late fusion
+    - I wrote script for concatenating 2 or 3 x-vectors together for each utterance
+
+    training the classifier
 
     description of the Kaldi logit, which models each class using multiple "mixtures", i.e. multiple boundaries
     
