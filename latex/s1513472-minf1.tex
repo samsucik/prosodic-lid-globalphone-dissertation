@@ -21,6 +21,8 @@
 \usepackage{multirow} % multi-row and multi-column table cells
 \usepackage{makecell} % line breaks inside cells with \thead{} and \makecell{}
 
+\usepackage{longtable} % allow table to span multiple pages
+
 % Globally setting the vertical padding in tables
 \renewcommand{\arraystretch}{1.1}
 
@@ -434,7 +436,7 @@
     \label{sec:GlobalPhone}    
     % copies the style of the CRS-I corpus: newspaper articles read by native speakers
     % started in 1995, presented in 2002 and 2013 (citations). I use the newest version from 2016 which contains 22 languages.
-    The corpus I use is the GlobalPhone multilingual ASR corpus \citep{Schultz_et_al_2013}, more precisely its newest version -- updated in 2016 and covering 22 languages from around the world: Arabic, Bulgarian, Chinese-Mandarin, Chinese-Shanghai (Wu), Croatian, Czech, French, German, Hausa, Japanese, Korean, Brazilian Portuguese, Polish, Russian, Spanish, Swahili, Swedish, Tamil, Thai, Turkish, Ukrainian, and Vietnamese. The corpus follows the style established for English by the Wall Street Journal-based corpora \citep{Paul_Baker_1992} such as the CSR-I (WSJ0) Complete corpus\footnote{\url{https://catalog.ldc.upenn.edu/LDC93S6A}}. It consists of newspaper articles read by native speakers (around 100 speakers per language, each speaker producing about 20 minutes of audio by reading 3-5 articles), recorded as wideband (16kHz) audio in a controlled environment, using a close-talking microphone (in the case of GlobalPhone the Sennheiser microphone HD-440-6).
+    The corpus I use is the GlobalPhone multilingual ASR corpus \citep{Schultz_et_al_2013}, more precisely its newest version -- updated in 2016 and covering 22 languages from around the world: Arabic (AR), Bulgarian (BG), Chinese-Mandarin (CH), Chinese-Shanghai (WU), Croatian (CR), Czech (CZ), French (FR), German (GE), Hausa (HA), Japanese (JA), Korean (KO), Brazilian Portuguese (PO), Polish, (PL), Russian, (RU), Spanish, (SP), Swahili (SWA), Swedish (SW), Tamil (TA), Thai (TH), Turkish (TU), Ukrainian (UA), and Vietnamese (VN). The corpus follows the style established for English by the Wall Street Journal-based corpora \citep{Paul_Baker_1992} such as the CSR-I (WSJ0) Complete corpus\footnote{\url{https://catalog.ldc.upenn.edu/LDC93S6A}}. It consists of newspaper articles read by native speakers (around 100 speakers per language, each speaker producing about 20 minutes of audio by reading 3-5 articles), recorded as wideband (16kHz) audio in a controlled environment, using a close-talking microphone (in the case of GlobalPhone the Sennheiser microphone HD-440-6).
     
     % wideband, controlled clean recording conditions -- good for reasoning! (don't need to worry about results being affected by channel differences)
     The controlled environment, speaking style and nature of the texts (all are major newspaper articles) make the data better suited for analysing effects of, for example, prosodic features: Any observed trends can be more reliably attributed to my controlled independent variables (such as the feature type) or to the known language differences.
@@ -475,47 +477,90 @@
 
   % recipe from https://github.com/kaldi-asr/kaldi/tree/master/egs/gp/s5, corresponding to citet{Lu_et_al_2012}
   \section{Data preprocessing}{
+    \label{sec:preprocessing}
     % Splitting long utterances into shorter ones uniformly, to be able to do classifier training and end-to-end evaluation on segments of different lengths -- like in \cite{Snyder_et_al_2018}. One future improvement would be to not do uniform splitting, but rather split on breaks -- to prevent potentially bad edge effects.
     These are the preprocessing steps that were carried out either only once (the time-consuming ones), or repeatedly (once for each of my experiments) but without any changes. Although the Kaldi GlobalPhone recipe was used as a starting point, in the end, most of the used Shell scripts were heavily adapted or re-written from scratch.
 
     % SHN to WAV
-    \textbf{Converting data to .wav format} was the most time-consuming preprocessing step (taking more than 7 hours) and was done only once. The reason for this step is that the Kaldi toolkit requires .wav files for computing features, but the GlobalPhone audio files are in the Shorten (.shn) format. Even though this conversion step could have been made a part of the feature computation pipeline itself -- without the need to store all the .wav files -- it would be time-consuming as the conversion would have to be repeated.
+    \textbf{Converting data to .wav format} was the most time-consuming preprocessing step (taking more than 7 hours) and was done only once. The reason for this step is that the Kaldi toolkit requires .wav files for computing features, but the GlobalPhone audio files are in the Shorten (.shn) format. The conversion itself was done using the \texttt{shorten} and \texttt{sox} command-line tools. Even though this step could have been made a part of the feature computation pipeline itself -- without the need to store all the .wav files -- it would be time-consuming as the conversion would have to be repeated.
 
     % creating lists (wav files, utterance-to-speaker, utterance-to-language, utterance-to-length)
     % TO-DO: mention specific script names?
     \textbf{Organising the data into partitions} was done symbolically (without re-organising the .wav files), hence taking very short. This made it possible for the step to be a part of the pipeline repeated separately for each experiment -- or each time an utterance or a speaker was found to be unusable due to corrupt data and had to be excluded from the partitioning. Because the previous step did not create any data partitioning (i.e. all .wav files were only grouped by languages), in this step, for each partition, a list referring to the .wav files for that partition's speakers across all languages was compiled (based on the files storing the partitioning described in \autoref{sec:partitioning}). In addition to this list (named conventionally \texttt{vaw.scp}), a number of accompanying lists was generated as required by the conventions of Kaldi: \texttt{utt2spk} (mapping utterances to speakers), \texttt{utt2lang} (mapping utterances to languages), \texttt{utt2len} (mapping utterances to their lengths), and a number of further lists derived from these essential ones.
 
     % cutting into short segments: leave training data as it is (the TDNN chops it up into 1000-frame chunks anyway), split enrollment data into <30s segments, eval and test data into 3s or 10s (depending on the experiment)
-    \textbf{Splitting longer utterances into shorter segments} was done to match the setup used by \citet{Snyder_et_al_2018}: Enrollment set utterances were split into 
+    \textbf{Splitting longer utterances into shorter segments} was done to match the set-up used by \citet{Snyder_et_al_2018}: Enrollment set utterances were split uniformly into segments of length 30s, and evaluation and testing set utterances were split into 10s segments (and later also into 3s segments because the trained system in each experiment was additionally tested on 3s segments). Note that I did not discard the cut-offs from the utterance ends (even though they were shorter than the desired lengths). Another downside of the uniform cutting is that utterances were split unnaturally -- not necessarily on breaks, hence creating arbitrary edge boundaries not naturally found in speech. The reason why I chose to implement this way of splitting the utterances was its simplicity; in the future, this would be one of the design decisions I would change.
     
-    % compute VAD (used across all experiments) from MFCC feats (based on C0) % this was a mistake; VAD should've been computed based on energy, not on C0
-
+    % compute VAD (used across all experiments) from MFCC feats (based on C0) 
+    % TO-DO: this was a mistake; VAD should've been computed based on energy, not on C0
+    \textbf{Computing voice activity decision} (VAD) for all segments to identify and later discard the frames containing silence. This was computed using the VAD implementation found in Kaldi, using the parameter values from the speaker recognition x-vector recipe\footnote{\url{https://github.com/kaldi-asr/kaldi/tree/master/egs/sre16/v2}, this is the recipe I adapted for LID in my implementation of the x-vector system.}, in particular the log-energy threshold of 5.5. Because in my experiments I wanted to frame-wise concatenate feature vectors of different feature types, I needed to make sure I would always discard the very same set of frames for all feature types. Hence, I computed VAD only once -- on the MFCC feature vectors -- and re-used it to discard silence frames throughout all experiments.
   }
 
   \section{Dealing with invalid data}{
-    This was discovered while preprocessing the data from .shn to .wav:
-    \begin{enumerate}
-      \item {Hausa, Swahili and Ukrainian have broken data.}
-      \item {Bulgarian, German, Russian, Turkish and Vietnamese have one broken utterance recording each -- not a big deal, as the number of utterances per language is in hundreds.}
-      \item {Portuguese has 2 speakers with almost all data broken (these were discarded), and other 10 speakers with up to 3 broken utterance recordings each (these were keps)}
-    \end{enumerate}
+    \label{sec:invalid-data}
+    While carrying out the preprocessing steps, a lot of data was identified as corrupt:
+    \begin{itemize}
+      \item {while converting .shn to .wav, converting all utterances for Hausa, Swahili and Ukrainian failed with the "No magic number" error thrown by the \texttt{shorten} tool\footnote{reported also here: \url{https://wiki.inf.ed.ac.uk/CSTR/GlobalPhone}, although only for a few utterances}}
+      \item {the following utterances were not converted due to the same error: \texttt{095\_29} for Bulgarian; \texttt{003\_2} for German; almost all utterances for speakers \texttt{015}, \texttt{136}, and up to 3 utterances for speakers \texttt{014}, \texttt{017}, \texttt{021}, \texttt{022}, \texttt{024}, \texttt{026}, \texttt{031}, \texttt{036}, \texttt{058}, \texttt{139} in Portuguese; utterance \texttt{087\_102} in Russian; utterance \texttt{007\_77} in Turkish; and utterance \texttt{084\_122} for Vietnamese}
+      \item {while computing VAD, the \texttt{compute-vad} binary throwing the "Empty feature matrix for utterance <utterance-ID>" error for utterances \texttt{058\_16} and \texttt{058\_18} in Portuguese}
+    \end{itemize}
+
+    Naturally, the utterances which could not be converted were discarded. I also discarded the Portuguese speakers \texttt{015} and \texttt{136} altogether. Most importantly, the three problematic languages -- Hausa, Swahili and Ukrainian -- were not used any further, only the 19 remaining languages.
 
     This leaves us with 19 languages, which are used further in this work: Arabic (AR), Bulgarian (BG), Mandarin Chinese (CH), Croatian (CR), Czech (CZ), French (FR), German (GE), Japanese (JA), Korean (KO), Polish (PL), Portuguese (PO), Russian (RU), Spanish (SP), Swedish (SW), Tamil (TA), Thai (TH), Turkish (TU), Vietnamese (VN) and Shanghai Chinese (WU).
   }
 
   \section{Overview of the dataset}{
-    \begin{table}[h!tb]
+    \label{sec:data-overview}
+    \begin{sc}
       \centering
-      \begin{sc}
-        \begin{tabular}{cccc}
-          training & enrollment & evaluation & testing \\
-          \hline
-          
-        \end{tabular}
-      \end{sc}
-      \caption{Example of architecture description of a TDNN (corresponds to \autoref{fig:tdnn-generic}).}
-      \label{tab:partitioning}
-    \end{table}
+      \footnotesize
+      \begin{longtable}{p{0.5cm}|p{3.9cm}|p{3.5cm}|p{3.5cm}|p{0.7cm}}
+        & enrollment & evaluation & testing & train. \\
+        \hline
+        AR & 017, 023, 056, 104, 105, 114, 135 & 014, 030, 047, 067, 109, 115, 137 & 011, 012, 027, 050, 051, 055, 066 & 57 \\
+        \hline
+        BG & 042, 048, 056, 065, 088, 104, 107 & 051, 055, 058, 084, 090, 100, 106 & 040, 059, 063, 068, 095, 109, 110 & 56 \\
+        \hline
+        CH & 004, 005, 012, 034, 035, 036, 045, 048, 052, 053, 057, 120, 126 & 028, 029, 030, 031, 032, 039, 040, 041, 042, 043, 044 & 080, 081, 082, 083, 084, 085, 086, 087, 088, 089 & 98 \\
+        \hline
+        CR & 001, 010, 018, 026, 029, 032, 074, 092, 093 & 033, 034, 035, 036, 046, 048, 051, 053, 054, 057 & 037, 038, 039, 040, 041, 042, 043, 044, 045, 047 & 63 \\
+        \hline
+        CZ & 005, 009, 031, 033, 034, 036, 053, 061, 071, 072 & 083, 085, 087, 089, 091, 093, 095, 097, 099, 101 & 084, 086, 088, 090, 092, 094, 096, 098, 100, 102 & 72 \\
+        \hline
+        FR & 009, 028, 030, 031, 033, 052, 064, 065, 070, 076 & 082, 083, 084, 085, 086, 087, 088, 089 & 091, 092, 093, 094, 095, 096, 097, 098 & 74 \\
+        \hline
+        GE & 015, 017, 046, 056, 058, 065, 074 & 001, 002, 003, 004, 008, 010 & 018, 020, 021, 026, 029, 073 & 58 \\
+        \hline
+        JA & 002, 021, 037, 048, 051, 053, 057, 064, 086, 201, 202, 206, 209, 221 & 009, 031, 046, 081, 091 & 006, 025, 045, 047, 088, 101 & 119 \\
+        \hline
+        KO & 018, 030, 043, 044, 057, 065, 074, 078, 079, 090 & 006, 012, 025, 040, 045, 061, 084, 086, 091, 098 & 019, 029, 032, 042, 051, 064, 069, 080, 082, 088 & 70 \\
+        \hline
+        PL & 008, 018, 032, 076, 083, 085, 088, 096, 099 & 005, 011, 012, 030, 040, 041, 046, 063, 090, 097 & 001, 004, 009, 023, 031, 033, 043, 044, 050, 098 & 70 \\
+        \hline
+        PO & 070, 071, 106, 109, 117, 120, 128, 146, 148, 150 & 064, 072, 102, 103, 104, 132, 133, 134 & 135, 137, 138, 139, 142, 143, 312 & 75 \\
+        \hline
+        RU & 017, 023, 035, 041, 088, 101, 114, 115, 119, 121, 123 & 005, 033, 042, 065, 078, 097, 103, 106, 110, 122 & 002, 027, 036, 063, 069, 092, 102, 104, 109, 112 & 84 \\
+        \hline
+        SP & 037, 041, 048, 059, 060, 064, 074, 083, 098, 099 & 001, 002, 003, 004, 005, 006, 007, 008, 009, 010 & 011, 012, 013, 014, 015, 016, 017, 018 & 72 \\
+        \hline
+        SW & 001, 013, 023, 070, 072, 077, 078, 080, 084 & 045, 046, 047, 048, 049, 066, 067, 068, 069 & 040, 041, 042, 043, 044, 060, 061, 062, 063, 064 & 70 \\
+        \hline
+        TA & 022, 028, 038, 047 & 003, 030, 035, 039 & 001, 005, 033, 037 & 35 \\
+        \hline
+        TH & 001, 005, 027, 031, 041, 065, 067, 077, 083 & 023, 025, 028, 037, 045, 061, 073, 085 & 101, 102, 103, 104, 105, 106, 107, 108 & 73 \\
+        \hline
+        TU & 010, 017, 044, 048, 049, 051, 064, 091, 093, 096 & 001, 002, 003, 005, 006, 008, 013, 014, 015, 016, 019 & 025, 030, 031, 032, 037, 039, 041, 046, 056, 063 & 69 \\
+        \hline
+        VN & 012, 029, 031, 036, 043, 050, 053, 070, 077, 118, 119, 128 & 200, 201, 202, 203, 204, 205, 206, 207, 208 & 102, 103, 106, 110, 113 & 103 \\
+        \hline
+        WU & 008, 011, 013, 015 & 002, 004, 006, 017 & 001, 003, 005, 009 & 6 \\
+        \hline
+        \multicolumn{3}{l}{} \\[-7pt]
+        \caption{The partitioning of each language's speakers into the 4 partitions. For enrollment, evaluation and testing sets, speaker IDs are shown. For the training set, the rest of the speakers was used and only the number of speakers is shown.}
+        \label{tab:partitioning}
+      \end{longtable}
+    \end{sc}
   }
 }
 
