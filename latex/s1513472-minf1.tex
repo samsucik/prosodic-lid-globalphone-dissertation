@@ -663,24 +663,18 @@
   \section{Choice of classifier}{
     \label{sec:classifier}
     % The SRE16 recipe uses PLDA, but for verification, not for classification. For our purposes, we needed a proper classifier.
+    As mentioned earlier, although the SRE16 Kaldi recipe provides a complete implementation of the x-vector TDNN architecture, it does not use the same classifier as the LID x-vector paper by \citeauthor{Snyder_et_al_2018}. Instead, it uses the Probabilistic Linear Discriminant Analysis (PLDA) model for \textit{binary} classification (because the task is speaker \textit{verification}). The LID x-vector paper, on the other hand, uses a multi-class classifier: more precisely, a GMM classifier trained using the Maximum Mutual information (MMI) criterion as presented by \citet{McCree_2014}. Unfortunately, as I found out and confirmed with David Snyder, this classifier is not implemented in Kaldi (as of January 2019). While implementing the classifier by myself was an option, it would have consumed too much time and effort -- whether implemented in Kaldi (including substantial changes to the Kaldi binaries), or separately (outside the toolkit). Bear in mind that my aim is to build \textit{some} well-performing architecture that leverages the power of x-vectors and enables me to experiment with different feature types and fusion strategies. Hence, I decided to use a different classifier -- ideally more established and implemented in Kaldi.
     
-    Current popular and well-performing classifiers are various flavours of GMM and logistic regression, with no clear winner. 
-    % \citet{Martinez_et_al_2011} compare LR with SVM (LR slightly better)
+    Recently, various types of classifiers have been used on top of i-vector and d-vector models, without a clear comparison -- suggesting that the choice of classifier is not nearly as important as back end producing utterance-level vectors. While various varieties of Gaussian classifiers are popular \citep{Martinez_et_al_2013,McCree_2014,Plchot_et_al_2016}, other approaches such as Support vector machines \citep{dvectors_lid,Martinez_et_al_2011} and logistic regression \citep{Sarma_et_al_2018,Martinez_et_al_2011,Martinez_et_al_2012}. I decided to use multi-class logistic regression as it is already implemented in Kaldi in the context of LID as part of the LRE07 recipe. Consulting my decision with David \citet{Snyder_2018_kaldi-help} only assured me that this was a solid choice.
+
     % LR worse than GMM because cannot do out-of-set rejection (as pointed out by \citet{McCree_2014})
-    % \citet{Plchot_et_al_2016} use linear Gaussian classifier
-    % \cite{Snyder_et_al_2018}, for instance, used GMM trained using MMI -- based on \cite{McCree_2014}.
-
-    I decided to re-use a model which is already implemented in the LRE07/v2 Kaldi recipe -- logistic regression. The decision was also consulted with \cite{Snyder_2018_kaldi-help}. 
-    downside of logistic regression is that the resulting decision boundaries are linear, whereas with GMM (trained with full co-variance matrix), one can achieve more complex quadratic decision boundaries. 
-    On the other hand though, training a full covariance requires much data, and the enrollment set would likely be not big enough. 
-    Additionally, the Kaldi logit can operate as a mixture model, learning multiple decision boundaries per class, thus modelling complex, non-linear boundaries (see next section)
-
-    whitening or dimensionality reduction is not performed (length normalisation was done!)
-
+    Of course, there are downsides to using this classifier. As \citet{McCree_2014} points out, unlike the discriminative logistic regression, a generative classifier (in this case GMM) can provide out-of-set rejection decisions. This, however, does not speak against logistic regression in my particular case as I do \textit{closed-set} classification. Perhaps more serious inherent disadvantage is that logistic regression uses only linear decision boundaries -- compare with GMMs with full covariance matrices, which can model more complex quadratic boundaries. The way this issue is addressed in Kaldi's implementation is by making logistic regression a mixture model, i.e. modelling each class by multiple decision boundaries (for more details see \autoref{sec:architecture}). This way, more complex boundaries can be modelled in the observation space. Because training GMMs with full covariance matrices is also known to be data demanding and computationally expensive, logistic regression might potentially be preferred where the classifier is to be trained on limited enrollment data: I refer to the findings of \citeauthor{Snyder_et_al_2018} that solid LID performance can be achieved even for languages unseen by the x-vector TDNN. This scenario, however, is not very relevant for LID systems which are parts of ASR systems -- there, just training acoustic models for ASR requires amounts of data that would likely be sufficient even for a simple GMM with a full covariance matrix.
   }
 
   \section{Final architecture}{
     \label{sec:architecture}
+
+    mention that implementing this end-to-end thing took the most time and running experiments was really fast
 
     pipeline overview (diagrams showing training and evaluation pipelines together as a whole)
     - feature computation
@@ -726,6 +720,7 @@
 
     training the classifier
     - all vectors length-normalised before fed into classifier!
+    - whitening or dimensionality reduction is not performed
     - rebalancing priors: $(count(lang-test) / count(lang-train) )^(prior-scale)$ where prior-scale=0.7 (same as in the original LRE07 recipe, and generally recommended values are between 0.5 and 1.0)
     - add graph showing distribution of priors and eval utt counts
     - optimising cross-entropy
@@ -733,8 +728,7 @@
       - max-steps: Maximum steps in L-BFGS (default: 20).
       - normalizer: Coefficient for L2 regularization (default: 0.0025).
       - power: Power rule for determining the number of mixtures to create (default: 0.15).
-      - mix-up: Target number of mixture components to create (default: 0).
-    
+      - mix-up: Target number of mixture components to create (default: 0).    
     - first trained for max-steps with number of classes = K (19)
     - then split each class into a number of "sub-classes" like a mixture model. done iteratively, in each iteration splitting the biggest cluster into two. what 'biggest' means is determined by the 'power' parameter: $(total-occ^power)/num-components$ is taken as the adjusted per-component occupancy of the cluster, thus using using power closer to 0 means that the number of components will be more equal across all classes, whereas for big power (close to 1) big classes will be split into many more components than smaller classes
     - then trained for another max-steps but with number of classes corresponding to mix-up. the decision boundaries are initialised from the K decision boundaries with some added random noise so they would differ slightly. essentially, each class is modelled using multiple decision boundaries but all boundaries (mixture components) have the same weight
