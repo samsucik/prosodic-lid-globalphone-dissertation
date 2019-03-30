@@ -609,25 +609,55 @@
 
 \chapter{Implementation}{
   \label{chap:Implementation}
+  
+  % TO-DO: Can I just mention Paul like this?
+
   % I describe the entire implementation as a whole
+  In this chapter, I describe the entire architecture and computing environment.
   % but two of us worked on this and we were building on existing implementations. I naturally put focus on parts which I myself implemented or adapted.
+  Importantly, for the early implementation stage, I teamed up with Paul Moore and a big part of the baseline system was implemented jointly -- with his contributions. Naturally, in my writing, I focus more on parts which I developed independently, without Paul's help. These are in particular: splitting utterances into shorter segments; early and late fusion of different feature types; choosing and adapting the classifier; exploring the number of training epochs of the TDNN.
+  
   % unless stated otherwise, the design decisions (in particular the properties of the TDNN and the classifier) are adopted from the existing implementations without changes
+  As a matter of fact, the codebase of this project consists primarily of adapted existing implementations. Nevertheless, I describe the architecture in detail. However, I make it explicit where the design or hyper-parameter decisions were made by myself (possibly in collaboration with Paul). In the rest of the cases, the reader should implicitly assume that the decisions were made by the authors of the original implementations and found to work well. Importantly, my work does not primarily focus on optimizing the architecture or hyperparameters -- only on the different ways in which various feature types can be used and combined to improve LID performance.
 
   \section{The Kaldi toolkit}{
     \label{sec:kaldi}
+
     % System was built in Kaldi \citep{Povey_et_al_2011}
+    As hinted in earlier chapters, the system was implemented in the Kaldi toolkit\footnote{\url{http://kaldi-asr.org/}}.
     % most popular research ASR toolkit, used also for LR and SR.
+    First presented by its authors in \citep{Povey_et_al_2011} around the time i-vectors were first proposed, Kaldi is the most popular research toolkit for speech processing -- originally developed for ASR, but nowadays also used for speaker and language recognition.
     % open source, featuring recipes -- working implementations often accompanying published papers
+    As an actively maintained open-source toolkit, it reflects the state of the art research and contains working implementations of many accompanying published papers. (After all, the top-class research community significantly overlaps with the community of Kaldi developers.)
+    
     % has binary layer (e.g. for computing mfcc features, training a TDNN, or computing VAD), scripts layer (convenience Bash scripts for data manipulation, feature computation, end-to-end model training, ...) and custom layer (code written for a particular study, such as connecting particular datasets, running end-to-end experiments)
+    To understand what it means to implement an architecture like the one I use in Kaldi, one should understand and appreciate the three layers of code Kaldi contains:
+    \begin{enumerate}
+      \item {\textbf{Kaldi binaries} (written mostly in C++) provide low-level, task-specific functions, e.g. for computing MFCC features, training a generic neural network or computing VAD. The binaries typically require input and output in the specific Kaldi formats\footnote{for more information on Kaldi I/O see \url{http://kaldi-asr.org/doc/io.html}} and can be heavily customised by providing values for numerous parameters. Multiple binaries are often used sequentially to create a multi-step pipelines.}
+      \item {\textbf{Kaldi scripts} (written mostly in Bash) provide convenient implementations of more high-level steps combining multiple binaries, as well as code for data manipulation. In many cases, these scripts come with useful default values (for the binaries' parameters) empirically shown to work well.}
+      \item {\textbf{Kaldi recipes} are end-to-end implementations utilising the code from layers 1 and 2 and corresponding to particular studies or experiments, or just replicating a study with a different dataset. They typically come with one top-level script called \texttt{run.sh} which calls all other recipe-specific code (or code from layers 1 and 2) and can be run to replicate the study in question provided that one has the appropriate datasets available.}
+    \end{enumerate}
   }
 
   \section{Kaldi recipes used in this work}{
     \label{sec:recipes}
-    % GP inspired the code for connecting the corpus with the x-vector architecture, and the preprocessing steps described in \autoref{sec:preprocessing}
-    % SRE16 corresponding to \citet{Snyder_et_al_2018b}: basis for the x-vector TDNN without major changes, but not using the PLDA classifier
-    % lre07 (corresponding to \citet{Sarma_et_al_2018}) which served as basis for the x-vector classifier
-    % no existing recipe corresponding to \cite{Snyder_et_al_2018}, but the x-vector TDNN was the same as for SRE. further info from the LID was used to replicate the system used there as closely as possible (except for the classifier)
+
+    My entire implementation is simply a new Kaldi \textit{recipe} (see previous section) and -- by the nature of Kaldi -- it re-uses a lot of existing code, including the following Kaldi recipes:
+    \begin{itemize}
+      % GP inspired the code for connecting the corpus with the x-vector architecture, and the preprocessing steps described in \autoref{sec:preprocessing}
+      % recipe from https://github.com/kaldi-asr/kaldi/tree/master/egs/gp/s5, corresponding to citet{Lu_et_al_2012}
+      \item {The GlobalPhone (GP) recipe\footnote{\url{https://github.com/kaldi-asr/kaldi/tree/master/egs/gp/s5}}, corresponding to \citet{Lu_et_al_2012}, inspired my implementation of preprocessing the GlobalPhone corpus and connecting it with the rest of the architecture -- however, with almost all the final code being heavily adapted or re-written altogether with respect to the recipe (see \autoref{sec:preprocessing}).}
+
+      % SRE16 corresponding to \citet{Snyder_et_al_2018b}: basis for the x-vector TDNN without major changes, but not using the PLDA classifier
+      \item {The Speaker Recognition Evaluation 2016 (SRE16) recipe\footnote{\url{https://github.com/kaldi-asr/kaldi/tree/master/egs/sre16/v2}}, corresponding to \citet{Snyder_et_al_2018b} contains an end-to-end speaker verification pipeline using x-vectors. This recipe forms the basis for my implementation because there is no published recipe corresponding to the LID x-vector paper \citep{Snyder_et_al_2018}, but the two papers by Snyder et al. use the very same x-vector architecture, only substantially differing in the choice of the subsequent classifiers. Fortunately, the LID x-vector paper provides enough information on aspects that are different SRE x-vector architecture, which makes it possible to replicate the x-vector LID system very closely.}
+
+      % lre07 (corresponding to \citet{Sarma_et_al_2018}) which served as basis for the x-vector classifier
+      \item {The LRE07 recipe\footnote{\url{https://github.com/kaldi-asr/kaldi/tree/master/egs/lre07/v2}}, corresponding to \citet{Sarma_et_al_2018}, provided me with scripts for training a logistic regression classifier for LID, which I adapted and connected with the x-vector system.}
+
+    \end{itemize}
+    
     % most time spent connecting with dataset, implementing early and late fusion of acoustic and prosodic features, and creating the code for running entire experiments end-to-end as well as step by step
+    Apart from the time spent on familiarising myself with Kaldi and understanding, adapting and integrating the enumerated recipes, I put the most effort into connecting the corpus with the x-vector architecture, implementing early and late fusion, computing the various feature types, and building a robust end-to-end pipeline (within the \texttt{run.sh} script) which could be run without any changes either as a whole or step by step, only changing a simple configuration file to switch between different experiments.
   }
 
   \section{Choice of classifier}{
@@ -696,7 +726,7 @@
 
     training the classifier
     - all vectors length-normalised before fed into classifier!
-    - rebalancing priors: ( count(lang-test) / count(lang-train) )^(prior-scale) where prior-scale=0.7 (same as in the original LRE07 recipe, and generally recommended values are between 0.5 and 1.0)
+    - rebalancing priors: $(count(lang-test) / count(lang-train) )^(prior-scale)$ where prior-scale=0.7 (same as in the original LRE07 recipe, and generally recommended values are between 0.5 and 1.0)
     - add graph showing distribution of priors and eval utt counts
     - optimising cross-entropy
     - hyperparameters:
@@ -706,7 +736,7 @@
       - mix-up: Target number of mixture components to create (default: 0).
     
     - first trained for max-steps with number of classes = K (19)
-    - then split each class into a number of "sub-classes" like a mixture model. done iteratively, in each iteration splitting the biggest cluster into two. what 'biggest' means is determined by the 'power' parameter: (total-occ^power)/num-components is taken as the adjusted per-component occupancy of the cluster, thus using using power closer to 0 means that the number of components will be more equal across all classes, whereas for big power (close to 1) big classes will be split into many more components than smaller classes
+    - then split each class into a number of "sub-classes" like a mixture model. done iteratively, in each iteration splitting the biggest cluster into two. what 'biggest' means is determined by the 'power' parameter: $(total-occ^power)/num-components$ is taken as the adjusted per-component occupancy of the cluster, thus using using power closer to 0 means that the number of components will be more equal across all classes, whereas for big power (close to 1) big classes will be split into many more components than smaller classes
     - then trained for another max-steps but with number of classes corresponding to mix-up. the decision boundaries are initialised from the K decision boundaries with some added random noise so they would differ slightly. essentially, each class is modelled using multiple decision boundaries but all boundaries (mixture components) have the same weight
     - takes around 3.5 minutes
     - inference on test set, together with computing classification results, takes around 4s (single-threaded). 18663 10s test utts, hence around 0.2ms per utterance (very solid!) using one CPU
