@@ -645,7 +645,7 @@
     On the other hand though, training a full covariance requires much data, and the enrollment set would likely be not big enough. 
     Additionally, the Kaldi logit can operate as a mixture model, learning multiple decision boundaries per class, thus modelling complex, non-linear boundaries (see next section)
 
-    whitening, length normalisation or dimensionality reduction is not performed
+    whitening or dimensionality reduction is not performed (length normalisation was done!)
 
   }
 
@@ -673,34 +673,59 @@
 
     training the tdnn
     - architecture as described in \autoref{sec:x-vectors}, no changes to the code from the recipe
-    - corresponds to that described in \citet{Snyder_et_al_2018}: ReLU non-linearities, 64-sample minibatches, SGD training with lr going from 0.001 to 0.0001 and with momentum with the momentum-term coefficient $\mu=0.5$, dropout scheme is 0 (at 0\%-20\%), 0.1 (at 50\%), 0 (at 100\%)
+    - corresponds to that described in \citet{Snyder_et_al_2018}: ReLU non-linearities, 64-sample minibatches, NG-SGD training with EFFECTIVE lr exponentially decreasing from 0.001 to 0.0001, described in \citet{Povey_et_al_2014} (also:  Trained with 3 parallel jobs, parameter shrinking and with momentum with the momentum-term coefficient $\mu=0.5$ described therein), dropout scheme is 0 (at 0\%-20\%), 0.1 (at 50\%), 0 (at 100\%). batch normalisation. maximum parameter change: The maximum change in parameters allowed per minibatch, measured in Euclidean norm over the entire model (change will be clipped to this value): 2.0. Backstitch is NOT used.
     - utts <5s (500 frames) removed from training data
     - training data repeated 35 times, distributed into archives of roughly 50000000 frames each (around 140h). 70 training archives
     - number of epochs translated into a number of iterations (each iteration = one archive)
     - samples globally shuffled before training, then shuffled each iteration within batches of 1000
+    - training takes around 19 hours (see \autoref{sec:hyperparameters})
+    - uses the nnet3 Kaldi implementation
+    - 3 initial and 3 final jobs (i.e. simply 3 parallel jobs throughout training)
+    - number of parameters: 4.6M (MFCC+deltas+pitch+energy) to 4.4M (energy)
+    - optimising multi-class cross-entropy
 
     extracting x-vectors
     - done using the sre16 code without any changes
     - ignoring utts <1s
+    - 512-D x-vectors
+    - takes around 1.5h for enroll, eval and test data combined (when using 32 parallel jobs)
+    - have: 17212 30s enrollment segments + 20349 10s eval segments + 18710 10s test segments => around 100ms per segment (to produce x-vector)
 
     late fusion
-    - I wrote script for concatenating 2 or 3 x-vectors together for each utterance
+    - I wrote script for concatenating 2 or 3 x-vectors together for each utterance, resulting in 1024-D or 1536-D x-vectors
 
     training the classifier
-
-    description of the Kaldi logit, which models each class using multiple "mixtures", i.e. multiple boundaries
+    - all vectors length-normalised before fed into classifier!
+    - rebalancing priors: ( count(lang-test) / count(lang-train) )^(prior-scale) where prior-scale=0.7 (same as in the original LRE07 recipe, and generally recommended values are between 0.5 and 1.0)
+    - add graph showing distribution of priors and eval utt counts
+    - optimising cross-entropy
+    - hyperparameters:
+      - max-steps: Maximum steps in L-BFGS (default: 20).
+      - normalizer: Coefficient for L2 regularization (default: 0.0025).
+      - power: Power rule for determining the number of mixtures to create (default: 0.15).
+      - mix-up: Target number of mixture components to create (default: 0).
     
-    mention possibility of direct classification with TDNN and that I focus on using separate classifier because it provides extra flexibility and because it was shown to perform slightly better
+    - first trained for max-steps with number of classes = K (19)
+    - then split each class into a number of "sub-classes" like a mixture model. done iteratively, in each iteration splitting the biggest cluster into two. what 'biggest' means is determined by the 'power' parameter: (total-occ^power)/num-components is taken as the adjusted per-component occupancy of the cluster, thus using using power closer to 0 means that the number of components will be more equal across all classes, whereas for big power (close to 1) big classes will be split into many more components than smaller classes
+    - then trained for another max-steps but with number of classes corresponding to mix-up. the decision boundaries are initialised from the K decision boundaries with some added random noise so they would differ slightly. essentially, each class is modelled using multiple decision boundaries but all boundaries (mixture components) have the same weight
+    - takes around 3.5 minutes
+    - inference on test set, together with computing classification results, takes around 4s (single-threaded). 18663 10s test utts, hence around 0.2ms per utterance (very solid!) using one CPU
   }
 
   \section{Computing environment}{
-    cluster, Slurm, GPUs, parallelisation, rough runtimes of the different stages (TDNN training, x-vector extraction, logit training, inference)
+    the School of Informatics student GPU cluster
+    NVIDIA GTX1060 6GB
+    CPUs were:  Intel(R) Xeon(R) CPU E5-2620 v4 @ 2.10GHz
+    Slurm job scheduler
+    using one GPU per parallel job (i.e. 3 GPUs in TDNN training)
   }
 
   \section{Hyperparameters}{
-    decided: TDNN layers, activation function, learning algorithm (TO-DO: read about shrinking)
+    \label{sec:hyperparameters}
+    decided: TDNN layers, activation function, learning algorithm, ... decided for me mainly in the SRE16 recipe and in the X-vector paper
 
-    tuned (using the baseline setting, see next chapter): number of TDNN training epochs, logit hyperparameters
+    tuned (using the baseline setting, i.e. vanilla MFCCs, evaluation using 10s eval segments, optimising C-primary, see next chapter): number of TDNN training epochs E, logit hyperparameters
+    - E was tuned to provide a good tradeoff between training time and performance
   }
 }
 

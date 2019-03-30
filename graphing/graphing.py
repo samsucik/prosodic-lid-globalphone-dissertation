@@ -2,6 +2,7 @@ import matplotlib
 import matplotlib.pyplot as plt
 from matplotlib.colors import LogNorm
 from matplotlib.cm import ScalarMappable
+from matplotlib.ticker import MaxNLocator
 import numpy as np
 import seaborn as sns
 import pandas as pd
@@ -28,7 +29,7 @@ def style_axis(ax):
 def plot_linear(line_data, x_label=None, y_label=None, stats_interval=1, 
                 legend_loc=0, mark_maxima=False, axis_scales="normal", start=0, figsize=(8, 4),
                 ymin=None, ymax=None, use_legend=True, linewidth=1.2, title=None, fig=None, ax=None, 
-                markersize=12, drawLegendLines=True, tight_layout=True):
+                markersize=12, drawLegendLines=True, tight_layout=True, int_ticklabels="none", show_ticks="none"):
     """
     line data consists of dicts like:
         values (column)
@@ -88,6 +89,21 @@ def plot_linear(line_data, x_label=None, y_label=None, stats_interval=1,
                 ax.plot(max_x, max_y, "x", **params)
 
     ax.tick_params(axis='both', which='both', size=6, labelcolor='black', color='black', labelsize=font_size)
+    if int_ticklabels == "x":
+        ax.xaxis.set_major_locator(MaxNLocator(integer=True))
+    elif int_ticklabels == "y":
+        ax.yaxis.set_major_locator(MaxNLocator(integer=True))
+    elif int_ticklabels == "both":
+        ax.xaxis.set_major_locator(MaxNLocator(integer=True))
+        ax.yaxis.set_major_locator(MaxNLocator(integer=True))
+
+    if show_ticks == "x":
+        ax.xaxis.set_ticks_position('bottom')
+    elif show_ticks == "y":
+        ax.yaxis.set_ticks_position('left')
+    elif show_ticks == "both":
+        ax.xaxis.set_ticks_position('bottom')
+        ax.yaxis.set_ticks_position('left')
     
     if ymin is not None:
         ax.set_ylim(bottom=ymin)
