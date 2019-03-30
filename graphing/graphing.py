@@ -5,7 +5,6 @@ from matplotlib.cm import ScalarMappable
 import numpy as np
 import seaborn as sns
 import pandas as pd
-# plt.style.use('ggplot')
 
 font_size = 15
 matplotlib.rc('axes', edgecolor='black')

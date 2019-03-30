@@ -24,3 +24,5 @@ pyvenv.cfg
 xvectors/
 
 .~lock*
+__pycache__
+
