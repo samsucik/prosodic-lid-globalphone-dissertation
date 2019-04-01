@@ -33,6 +33,9 @@
 \def\belowspace{\belowstrut{0.10in}}
 
 
+% For minipages with multiple figures, each with its own subcaption
+\usepackage{subcaption}
+
 \begin{document}
 
 \title{\vspace{-5.0cm} \centering{\includeshield} \vspace{1cm} \\ Prosodic features \\in spoken language identification}
@@ -881,7 +884,7 @@
 
 
   % Evaluation metric: $C_{primary}$, consistent with NIST LREs (mentioned in an earlier section?). I also report confusion matrices and accuracy as these are easier to intuitively reason about and analyse.
-  Throughout all experiments, I use $C_{primary}$ as the main metric -- staying consistent with the latest LRE 2017 challenge and the work of \citet{Snyder_et_al_2018}. However, I also report accuracy and show confusion matrices as these are easier to intuitively grasp and reason about.
+  Throughout all experiments, I use $C_{primary}$ as the main metric -- staying consistent with the latest LRE 2017 challenge and the work of \citet{Snyder_et_al_2018}. In the tables with results, the best result in terms of the $C_{primary}$ value is always put in bold face. Additionally, I also report accuracy and later show confusion matrices as these are easier to intuitively grasp and reason about.
 
   \section{The setup}{
     \label{sec:exp-setup}
@@ -924,9 +927,9 @@
     \end{table}
 
     The results are presented in \autoref{tab:results-acoustic}.
-
     % context of MFCC: 15f, MFCC+deltas: 19f, SDC: 3x(7-1)+15=33
-    deltas improve performance by 14\% (7\%), sdcs by 18\% (worse by 7\%)
+    % deltas improve performance by 14\% (7\%), sdcs by 18\% (worse by 7\%)
+    Clearly, both simple deltas and SDCs improve on the performance achieved by simple MFCCs in the 10s condition -- in this case by 14\% and 18\%, respectively. The relative gain is smaller in the 3s condition. SDCs even make the performance worse, which, I hypothesise, can be attributed to the relatively big context of SDCs (in this case 33 frames), which makes a big portion of the SDC terms only partially computed: For a 3s segment with roughly 300 frames, the SDCs are incomplete for 32 frames -- more than 10\%! For the simple delta terms, only 4 terms would be incomplete (2 at either end of the segment). Thus, for shorter segments, features computed over shorter contexts may be favoured.
   }
 
   \section{Comparing prosodic features}{
@@ -951,15 +954,18 @@
           pitch + energy (intermediate) & 0.180 & 0.851 & 0.347 & 0.712\\
         \end{tabular}
       \end{sc}
-      \caption{Comparing the systems trained on acoustic features.}
+      \caption{Comparing the systems trained on prosodic features and their combinations.}
       \label{tab:results-prosodic}
     \end{table}
 
-    early fusion improves separate prosodic features by around 50\% (40\%) but still performs 183\% (128\%) worse than the best acoustic system
+    % conclude that. early fusion improves separate prosodic features by around 50\% (40\%) but still performs 183\% (128\%) worse than the best acoustic system
+    In line with the results of \citet{Lin_et_al_2005} and \citet{Martinez_et_al_2012}, prosodic information on its own is enough for a relatively well performing LID system -- achieving accuracy of over 87\% on 10s segments and over 74\% on 3s segments (but the $C_{primary}$ score being worse by around 150\% compared to the best acoustic systems). Unsurprisingly, energy and pitch seem to be capturing different and complementary information, which results in big performance improvements when the two features are combined (relative improvement of roughly 50\% and 40\% for the 10s and 3s conditions, respectively, when compared to the use of energy or pitch in isolation). The fact of early fusion gaining consistently better results than intermediate fusion I relate to the inherently tied relationship between energy and pitch in the realisation of stress and intonation.
   }
 
   \section{Combining acoustic and prosodic features}{
     \label{sec:exp-acoustic+prosodic}
+
+    Having shown the individual performances of acoustic and prosodic systems, this experiment finds out whether (and to what extent) the acoustic and prosodic information is complementary, i.e. leading to improved performance when combined. For each acoustic feature type, I combined it with (one or both) prosodic features using either early or intermediate fusion. Notice that -- for obvious reasons -- the pipeline does not allow the two prosodic features to be fused at the intermediate (x-vector) level and then combined with an acoustic system at the early level. However, three feature types can be combined all at the feature level (early fusion), or the two prosodic features (combined at any of the two levels) can be combined with an acoustic system at the intermediate level.
 
     \begin{table}[h!tb]
       \centering
@@ -998,8 +1004,8 @@
           \multicolumn{2}{c|}{feature combination} & $C_{primary}$ & accuracy & $C_{primary}$ & accuracy \\
           \hline
           \multirow{4}{*}{\rotatebox[origin=c]{90}{\makecell{MFCC\\ \\+}}}
-          & energy & 0.0556 & 0.956 & 0.149 & 0.878 \\
           & pitch & 0.0624 & 0.950 & 0.138 & 0.886 \\
+          & energy & 0.0556 & 0.956 & 0.149 & 0.878 \\
           & pitch + energy (early) & 0.0382 & 0.968 & 0.107 & 0.910 \\
           & pitch + energy (intermediate) & 0.0501 & 0.958 & 0.132 & 0.890 \\
           \hline
@@ -1020,16 +1026,40 @@
       \caption{Combining acoustic and prosodic systems using intermediate fusion (the combinations of 2 prosodic features used early or intermediate fusion).}
       \label{tab:results-combined-intermediate}
     \end{table}
+
+    \autoref{tab:results-combined-early} shows the results for systems in which an acoustic system and a prosodic one were combined using early fusion, while \autoref{tab:results-combined-intermediate} refers to the systems in which acoustic and prosodic information was combined at the intermediate (x-vector) level. Regardless of the fusion type, combining acoustic and prosodic information clearly improves the performance: Comparing the best acoustic system with the best combined system, the relative improvement in $C_{primary}$ is 37\% and 28\% for the 10s and 3s conditions, respectively. Moreover, intermediate fusion improves on early fusion by 14\% and 22\% in the 10s and 3s conditions, respectively, the best system using \textit{both} prosodic features combined as a pair at the feature level (early fusion) as expected, having observed the results of prosody-only system in \autoref{sec:exp-prosodic}.
   }
 }
 
 \chapter{Overall results and discussion}{
   \label{chap:results-and-discussion}
+
+  clearly, energy helps MFCCs (compare vanilla MFCC with MFCC+energy (early))
+
   Reporting: overall $C_{primary}$, accuracy (for illustrative purposes), confusion matrix (to see which language pairs are confusing)
   
   Focus on Slavic languages, since there is so many of them (Czech, Croatian, Polish, Russian, Bulgarian) and intonation can be very characteristic and important here (my own intuition, based on my knowledge of Slavic languages).
   
   I ignore BNFs (as used by Snyder and some others). In essence, they're computed from acoustic features. I just wanna know how much the prosodic information can help when combined with acoustic information.
+
+  \begin{figure}[h!]
+    \centering
+    \begin{minipage}{0.5\textwidth}
+      \centering
+      \includegraphics[width=\textwidth]{../img/summary-early-10s.pdf}
+      \subcaption{...}
+      \label{fig:summary-early-10s}
+    \end{minipage}
+    \begin{minipage}{0.49\textwidth}
+      \centering
+      \includegraphics[width=\textwidth]{../img/summary-early-3s.pdf}
+      \subcaption{...}
+      \label{fig:summary-early-3s}
+    \end{minipage}
+    % \vspace*{-1em}
+    \caption{Evaluation set performance and training runtime for varying number of training epochs $E$ of the TDNN.}
+    \label{fig:summary-early}
+  \end{figure}
 }
 
 \chapter{Future work}{
