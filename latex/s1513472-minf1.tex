@@ -288,7 +288,7 @@
       using the context of~$\pm$2~frames. Such dynamic features are justified especially in systems which apply the bag-of-frames approach, not extracting temporal trends (such as the standard i-vector architectures).
 
       % To capture temporal trends over longer contexts, MFCCs are often turned into SDCs.
-      For modelling even longer-range trends specifically in the LID task, \citet{Torres-Carrasquillo_et_al_2002} used an extension of simple deltas called the \textit{shifted delta cepstra} (SDC) features -- essentially, deltas computed at multiple points and concatenated with the original MFCC vector as previously. SDCs can be configured by setting their 4 parameters: $N$, $d$, $p$, $k$ corresponding to a $N$-$d$-$p$-$k$, a typical one being 7-1-3-7. $N$ refers to the number of cepstral coefficients taken into account (not necessarily the full MFCC vector), $p$ denotes the distance between consecutive points at which deltas are computed, $d$ determines the size of the window for computing deltas ($d=1$ corresponds to \autoref{eq:dynamic-feats}) and $k$ is the number of points at which to compute deltas. The SDCs added to the original MFCC vector are then of the form:
+      For modelling even longer-range trends specifically in the LID task, \citet{Torres-Carrasquillo_et_al_2002} used an extension of simple deltas called the \textit{shifted delta cepstra} (SDC) features -- essentially, deltas computed at multiple points and stacked together. They can then be used as a new feature vector, or concatenated with the original MFCC vector. SDCs can be configured by setting their 4 parameters: $N$, $d$, $p$, $k$ corresponding to a $N$-$d$-$p$-$k$, a typical one being 7-1-3-7. $N$ refers to the number of first cepstral coefficients taken into account (not necessarily the full MFCC vector), $p$ denotes the distance between consecutive points at which deltas are computed, $d$ determines the size of the window for computing deltas ($d=1$ corresponds to \autoref{eq:dynamic-feats}) and $k$ is the number of points at which to compute deltas. The SDC terms for frame $t$ and to be stacked together are then:
       \begin{equation}
         \label{eq:sdc-feats}
         \Delta_{SDC}(t+ip) = \mathbf{x}_{t+ip+d} - \mathbf{x}_{t+ip-d} \quad\quad \forall i \in \{0, ..., k-1\}
@@ -642,6 +642,16 @@
       %   - existing scripts re-used for adding pitch
       %   - energy feature computed simply as a special case of MFCC: taking only 0th coefficient and using raw log energy instead of it
       Throughout my experiments, the following feature types are used (as a refresher, see \autoref{sec:features}): MFCC, MFCC+$\Delta$+$\Delta\Delta$, SDC, energy, and Kaldi pitch. For more details, see (TO-DO: link the experiments section where the dimensionalities of these are explained).
+
+      To enable frame-wise feature concatenation, all feature types were computed with the same frame width of 25ms and frame shift of 10ms. Windowing was done using the Povey window\footnote{the default windowing function in Kaldi, defined and implemented here: \url{https://github.com/kaldi-asr/kaldi/blob/master/src/feat/feature-window.cc\#L109}}, a slight variation of the commonly used Hamming window \citep[p. 200]{Blackman_Tukey_1958}; see \autoref{fig:window-types} for a comparisons.
+      \begin{figure}[h!]
+        \centering
+        \includegraphics[width=9cm]{../img/window-types.pdf}
+        \vspace*{-1em}
+        \caption{Comparison of the Hamming and Povey tapered windowing functions on a frame of length 25ms. (The frame length, however, does not make a difference, it is the different shapes of the windows that matter.)}
+        \label{fig:window-types}
+      \end{figure}
+
       While MFCC features were computed using the existing script \verb|steps/make_mfcc.sh|, I adapted the script in order to conveniently compute the SDCs, MFCCs with deltas, and the Kaldi pitch. The energy feature was computed as a special case of the MFCC feature -- by computing the raw log energy instead of the 0\textsuperscript{th} cepstral coefficient, and discarding all remaining cepstral coefficients.
     }
 
@@ -854,41 +864,172 @@
 % TO-DO: mention and explain C-primary and why I use it!
 \chapter{Experiments}{
   \label{chap:Experiments}
-  Aims
-  - compare acoustic feats, see if deltas or context aggregation with SDCs can help (TDNN should be able to do it on its own)
-  - see how prosodic features on their own perform, and also combined (early and intermediate fusion)
-  - see how well prosodic+acoustic features work (early and intermediate fusion)
 
-  I ignore BNFs (as used by Snyder and some others). In essence, they're computed from acoustic features. I just wanna know how much the prosodic information can help when combined with acoustic information.
+  In this chapter, I describe the experiments that I carried out, in the order they were designed. I provide some immediate results and discussion -- especially where these directed my decisions in designing the next experiment.
 
-  Evaluation metric: $C_{primary}$, consistent with NIST LREs (mentioned in an earlier section?). I also report confusion matrices and accuracy as these are easier to intuitively reason about and analyse.
+  My aims can be summarised into the following key points:
+  \begin{enumerate}
+    % - compare acoustic feats, see if deltas or context aggregation with SDCs can help (TDNN should be able to do it on its own)
+    \item {Compare the different types of acoustic features in the context of the x-vector system. Dynamic features -- be it simple delta terms or the more sophisticated SDCs -- were designed primarily to help frame-level models to capture temporal contexts. The x-vector TDNN, on the other hand, does capture such contexts explicitly. Therefore, a question I ask is whether the more sophisticated acoustic features can still improve performance compared to simple MFCCs.}
+    
+    % - see how prosodic features on their own perform, and also combined (early and intermediate fusion)
+    \item {Evaluate the usefulness of prosodic features alone. Even though there is no good reason to use only the prosody (i.e. to not consider acoustic features at all), I believe that building a system that uses only prosodic features can help me better understand and analyse the nature and value of the prosodic information.}
+    
+    % - see how well prosodic+acoustic features work (early and intermediate fusion)
+    \item {This is my ultimate aim: to evaluate the effect of using both acoustic and prosodic information -- combined in different ways.}
+  \end{enumerate}
+
+
+  % Evaluation metric: $C_{primary}$, consistent with NIST LREs (mentioned in an earlier section?). I also report confusion matrices and accuracy as these are easier to intuitively reason about and analyse.
+  Throughout all experiments, I use $C_{primary}$ as the main metric -- staying consistent with the latest LRE 2017 challenge and the work of \citet{Snyder_et_al_2018}. However, I also report accuracy and show confusion matrices as these are easier to intuitively grasp and reason about.
 
   \section{The setup}{
     \label{sec:exp-setup}
     definitions of features (dimensionalities)
+    The default condition was to use 10s evaluation and testing segments. As for the feature type, the default was the MFCC features of 23 dimensions without energy (same as \citet{Snyder_et_al_2018}). The other two acoustic features were derived from the computed MFCCs and designed such that their dimensionalities would be roughly the same (for a fairer comparison):
+    \begin{itemize}
+      \item {the MFCC+$\Delta$+$\Delta\Delta$ features were 69-dimensional, using 23 first-order and 23 second-order delta terms,}
+      \item {the SDC features were 72-dimensional, using the 9-1-3-7 configuration, i.e. computed at 7 locations using the first 9 cepstral coefficients and discarding the rest of the coefficients.}
+    \end{itemize}
+    I made the decision to compute the MFCC features using the default of 23 Mel filters, and on the frequency range of 20-7800Hz inspired by the Kaldi manual\footnote{\url{http://kaldi-asr.org/doc/feat.html\#feat_mfcc}}.
+
+    As for the prosodic features, the energy was computed from the MFCCs and was simply a 1-dimensional feature vector per frame.The Kaldi pitch was 5-dimensional, computed using the default parameter values of the Kaldi \verb|compute-kaldi-pitch-feats| binary, in particular using $B=7000$ (see \autoref{eq:nccf}), the penalty factor for frequency jumps of 0.1, and \verb|min-f0|$=50$Hz. I changed the \verb|max-f0| from the default of 400Hz to 500Hz, same as the upper $F_0$ limit used by \citet{Lin_et_al_2005}.
+
+    In addition to the default 10s condition (i.e. evaluation and testing segments being of length $\leq10\textrm{s}$), I also evaluate the systems on $\leq3$s testing segments (the 3s condition). On these shorter segments, the systems will perform worse, but the results are important because optimising LID performance on short segments is valuable and important for: on-line settings, low-resource settings, settings with frequent code switching, and similar scenarios where the segment to process is very short.
   }
 
   \section{Comparing acoustic features}{
     \label{sec:exp-acoustic}
 
-    Want to see whether context aggregation in the form of added deltas in SDCs (compared to vanilla MFCCs) can improve performance, since the TDNN does context aggregation of its own.
+    In this experiment, I compare systems trained on the three types of acoustic features and evaluated on the testing segments in both the 10s and the 3s conditions.
+
+    % MFCC & 0.0660 & 0.9426 & 0.1477 & 0.8746 \\
+    % MFCC+$\Delta$+$\Delta\Delta$ & 0.0567 & 0.9522 & 0.1380 & 0.8855 \\
+    % SDC & 0.0543 & 0.9526 & 0.1575 & 0.8677 \\
+    \begin{table}[h!tb]
+      \centering
+      \begin{sc}
+        \footnotesize
+        \begin{tabular}{l|cc|cc}
+                  & \multicolumn{2}{c|}{10s}  & \multicolumn{2}{c}{3s} \\
+          feature & $C_{primary}$ & accuracy & $C_{primary}$ & accuracy \\
+          \hline
+          MFCC & 0.0660 & 0.943 & 0.148 & 0.875 \\
+          MFCC+$\Delta$+$\Delta\Delta$ & 0.0567 & 0.952 & \textbf{0.138} & 0.886 \\
+          SDC & \textbf{0.0543} & 0.953 & 0.158 & 0.868 \\
+        \end{tabular}
+      \end{sc}
+      \caption{Comparing the systems trained on acoustic features.}
+      \label{tab:results-acoustic}
+    \end{table}
+
+    The results are presented in \autoref{tab:results-acoustic}.
+
+    % context of MFCC: 15f, MFCC+deltas: 19f, SDC: 3x(7-1)+15=33
+    deltas improve performance by 14\% (7\%), sdcs by 18\% (worse by 7\%)
   }
 
   \section{Comparing prosodic features}{
     \label{sec:exp-prosodic}
+
+    This experiment focuses on comparing systems trained on the two prosodic features, as well as systems where the Kaldi pitch and energy was combined via early and intermediate fusion.
+    % pitch & 0.3269 & 0.7324 & 0.5260 & 0.5752\\
+    % energy & 0.3067 & 0.7484 & 0.5196 & 0.5776\\
+    % pitch+energy (early) & 0.1535 & 0.8717 & 0.3142 & 0.7427\\
+    % pitch+energy (intermediate) & 0.1801 & 0.8506 & 0.3470 & 0.7155\\
+    \begin{table}[h!tb]
+      \centering
+      \begin{sc}
+        \footnotesize
+        \begin{tabular}{l|cc|cc}
+                  & \multicolumn{2}{c|}{10s}  & \multicolumn{2}{c}{3s} \\
+          feature & $C_{primary}$ & accuracy & $C_{primary}$ & accuracy \\
+          \hline
+          pitch & 0.327 & 0.732 & 0.526 & 0.575\\
+          energy & 0.307 & 0.748 & 0.520 & 0.578\\
+          pitch + energy (early) & \textbf{0.154} & 0.872 & \textbf{0.314} & 0.743\\
+          pitch + energy (intermediate) & 0.180 & 0.851 & 0.347 & 0.712\\
+        \end{tabular}
+      \end{sc}
+      \caption{Comparing the systems trained on acoustic features.}
+      \label{tab:results-prosodic}
+    \end{table}
+
+    early fusion improves separate prosodic features by around 50\% (40\%) but still performs 183\% (128\%) worse than the best acoustic system
   }
 
   \section{Combining acoustic and prosodic features}{
     \label{sec:exp-acoustic+prosodic}
-    Taking the winner from MFCC/SDC, and concatenating those features with Kaldi pitch and raw energy values. Training the TDNN and classifier on that. Hopefully, seeing an improvement.
+
+    \begin{table}[h!tb]
+      \centering
+      \begin{sc}
+        \footnotesize
+        \begin{tabular}{ll|cc|cc}
+          &         & \multicolumn{2}{c|}{10s}  & \multicolumn{2}{c}{3s} \\
+          \multicolumn{2}{c|}{feature combination} & $C_{primary}$ & accuracy & $C_{primary}$ & accuracy \\
+          \hline
+          \multirow{3}{*}{\rotatebox[origin=c]{90}{\makecell{MFCC\\ \\+}}}
+          & pitch & 0.0693 & 0.941 & 0.153 & 0.871 \\
+          & energy & 0.0581 & 0.952 & 0.137 & 0.888 \\
+          & pitch + energy & 0.0562 & 0.954 & 0.136 & 0.889 \\
+          \hline
+          \multirow{3}{*}{\rotatebox[origin=c]{90}{\makecell{MFCC+\\$\Delta$+$\Delta\Delta$\\+}}}
+          & pitch & 0.0577 & 0.950 & 0.134 & 0.886 \\
+          & energy & 0.0523 & 0.957 & 0.129 & 0.895 \\
+          & pitch + energy & 0.0544 & 0.956 & 0.139 & 0.888 \\
+          \hline
+          \multirow{3}{*}{\rotatebox[origin=c]{90}{\makecell{SDC\\ \\+}}}
+          & pitch & 0.0559 & 0.952 & 0.159 & 0.867 \\
+          & energy & \textbf{0.0401} & 0.967 & \textbf{0.128} & 0.896 \\
+          & pitch + energy & 0.0484 & 0.960 & 0.137 & 0.888 \\
+        \end{tabular}
+      \end{sc}
+      \caption{Combining acoustic and prosodic features (early fusion used in all instances).}
+      \label{tab:results-combined-early}
+    \end{table}
+
+    \begin{table}[h!tb]
+      \centering
+      \begin{sc}
+        \footnotesize
+        \begin{tabular}{ll|cc|cc}
+          &         & \multicolumn{2}{c|}{10s}  & \multicolumn{2}{c}{3s} \\
+          \multicolumn{2}{c|}{feature combination} & $C_{primary}$ & accuracy & $C_{primary}$ & accuracy \\
+          \hline
+          \multirow{4}{*}{\rotatebox[origin=c]{90}{\makecell{MFCC\\ \\+}}}
+          & energy & 0.0556 & 0.956 & 0.149 & 0.878 \\
+          & pitch & 0.0624 & 0.950 & 0.138 & 0.886 \\
+          & pitch + energy (early) & 0.0382 & 0.968 & 0.107 & 0.910 \\
+          & pitch + energy (intermediate) & 0.0501 & 0.958 & 0.132 & 0.890 \\
+          \hline
+          \multirow{4}{*}{\rotatebox[origin=c]{90}{\makecell{MFCC+\\$\Delta$+$\Delta\Delta$\\+}}}
+          & pitch & 0.0467 & 0.961 & 0.120 & 0.900 \\
+          & energy & 0.0508 & 0.960 & 0.140 & 0.886 \\
+          & pitch + energy (early) & \textbf{0.0343} & 0.971 & \textbf{0.0993} & 0.918 \\
+          & pitch + energy (intermediate) & 0.0511 & 0.959 & 0.129 & 0.895 \\
+          \hline
+          \multirow{4}{*}{\rotatebox[origin=c]{90}{\makecell{SDC\\ \\+}}}
+          & pitch & 0.0622 & 0.949 & 0.142 & 0.881 \\
+          & energy & 0.0674 & 0.947 & 0.167 & 0.864 \\
+          & pitch + energy (early) & 0.0376 & 0.968 & 0.114 & 0.906 \\
+          & pitch + energy (intermediate) & 0.0545 & 0.954 & 0.139 & 0.883 \\
+
+        \end{tabular}
+      \end{sc}
+      \caption{Combining acoustic and prosodic systems using intermediate fusion (the combinations of 2 prosodic features used early or intermediate fusion).}
+      \label{tab:results-combined-intermediate}
+    \end{table}
   }
 }
 
-\chapter{Results and discussion}{
+\chapter{Overall results and discussion}{
   \label{chap:results-and-discussion}
   Reporting: overall $C_{primary}$, accuracy (for illustrative purposes), confusion matrix (to see which language pairs are confusing)
   
   Focus on Slavic languages, since there is so many of them (Czech, Croatian, Polish, Russian, Bulgarian) and intonation can be very characteristic and important here (my own intuition, based on my knowledge of Slavic languages).
+  
+  I ignore BNFs (as used by Snyder and some others). In essence, they're computed from acoustic features. I just wanna know how much the prosodic information can help when combined with acoustic information.
 }
 
 \chapter{Future work}{

@@ -176,8 +176,8 @@ def plot_heatmap(values, xs, ys, x_label, y_label, height=None, width=None, cmap
     return fig
 
 def plot_cat(x, y, hue, data, legend_descs=None, order=None, hue_order=None, palette=None,
-             legend_title=None, title=None, ylabel=None, xlabel=None, xticks=None):
-    plt.figure(figsize=(9, 7))
+             legend_title=None, title=None, ylabel=None, xlabel=None, xticks=None, figsize=(9,7)):
+    plt.figure(figsize=figsize)
     ax = plt.gca()
     ax = style_axis(ax)
     f = sns.catplot(x=x, y=y, hue=hue, data=data, height=6, kind="bar", ax=ax, 
@@ -190,7 +190,7 @@ def plot_cat(x, y, hue, data, legend_descs=None, order=None, hue_order=None, pal
     plt.close(f.fig)
 
     ax.set_ylabel(ylabel)
-    ax.set_xlabel(None)
+    ax.set_xlabel(xlabel)
     ax.set_xticklabels(xticks)
     ax.set_title(title)
     fig = plt.gcf()
