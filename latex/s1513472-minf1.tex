@@ -35,7 +35,7 @@
 
 \begin{document}
 
-\title{\vspace{-5.0cm} \centering{\includeshield} \vspace{1cm} \\ Prosodic features in state-of-the-art \\spoken language identification}
+\title{\vspace{-5.0cm} \centering{\includeshield} \vspace{1cm} \\ Prosodic features \\in spoken language identification}
 
 \author{Sam Sucik}
 
@@ -377,7 +377,7 @@
         \caption{The steps of the Kaldi pitch algorithm.}
         \label{fig:kaldi-pitch}
       \end{figure}
-      % TO-DO: diagram and formulae describing KaldiPitch.
+      % diagram and formulae describing KaldiPitch.
       % - subsample and normalise (divide by root mean square)
       % - establish frequency range to be searched (geometrically spaced, more sparse for lower frequencies)
       % - compute NCCF for all different time positions and lags, producing a grid of values TxI. the NCCF computation includes the ballast term which makes the values close to zero for very weak normalised cross-correlation values
@@ -421,7 +421,7 @@
   }
 }
 
-\chapter{Data}{
+\chapter{Data -- GlobalPhone}{
   \label{chap:Data}
   % LID often part of ASR, hence it makes sense to train on the same corpora
   Because LID systems are often part of ASR systems, it makes sense to use the same datasets to train both.
@@ -430,7 +430,7 @@
   % I use the relatively small multilingual ASR corpus which is in many aspects different from the NIST data
   In this work, I use a relatively compact ($\sim$400 hours of speech) corpus which is in many aspects different from the NIST datasets.
 
-  \section{The corpus: GlobalPhone}{
+  \section{Overview of the GlobalPhone corpus}{
     \label{sec:GlobalPhone}    
     % copies the style of the CRS-I corpus: newspaper articles read by native speakers
     % started in 1995, presented in 2002 and 2013 (citations). I use the newest version from 2016 which contains 22 languages.
@@ -517,7 +517,7 @@
 
   \section{Overview of the data used}{
     \label{sec:data-overview}
-    I present an overview of the data I ultimately used in my experiments -- after discarding the invalid data. \autoref{tab:partitioning} shows the speakers contained in each partition so that my partitioning can be replicated by other future works. \autoref{tab:data-amounts} shows the total data amounts for each language and partition.
+    I present an overview of the data I ultimately used in my experiments -- after discarding the invalid data. \autoref{tab:data-amounts} shows the total data amounts for each language and partition. A detailed list of speakers contained in each partition (so that my partitioning can be replicated by other future works) is in \autoref{tab:partitioning} in the appendix.
 
     Notice that the data amount varies across languages for a given partition (i.e. languages are represented unequally in the corpus -- compare Wu and Japanese), and even the declared 80\%-10\%-10\% split from the original GlobalPhone partitioning is not too reliable in some cases -- for instance Thai, German, Mandarin and Spanish -- although, in other cases, it does result in a split close to the declared one (such as for Korean, Swedish and Turkish). Further, the per-speaker amounts of data are clearly not equal, see Wu where there are 6 training-set speakers vs 4 testing-set speakers, yet the testing set has a greater total amount of data than the training set. While attempting at a perfect split is possible, instead, I appreciate the realisticity of certain languages being under-represented, and account for this in training the x-vector classifier (see [TO-DO: add reference once the section is written] for details of how this is implemented).
 
@@ -552,56 +552,6 @@
       \caption{Amount of data (in hours) for each language and partition after excluding invalid data}
       \label{tab:data-amounts}
     \end{table}
-
-    \begin{sc}
-      \centering
-      \footnotesize
-      \begin{longtable}{p{0.5cm}|p{0.8cm}|p{3.9cm}|p{3.5cm}|p{3.5cm}}
-        & train. & enrollment & evaluation & testing \\
-        \hline
-        AR & 57 & 017, 023, 056, 104, 105, 114, 135 & 014, 030, 047, 067, 109, 115, 137 & 011, 012, 027, 050, 051, 055, 066 \\
-        \hline
-        BG & 56 & 042, 048, 056, 065, 088, 104, 107 & 051, 055, 058, 084, 090, 100, 106 & 040, 059, 063, 068, 095, 109, 110 \\
-        \hline
-        CH & 98 & 004, 005, 012, 034, 035, 036, 045, 048, 052, 053, 057, 120, 126 & 028, 029, 030, 031, 032, 039, 040, 041, 042, 043, 044 & 080, 081, 082, 083, 084, 085, 086, 087, 088, 089 \\
-        \hline
-        CR & 63 & 001, 010, 018, 026, 029, 032, 074, 092, 093 & 033, 034, 035, 036, 046, 048, 051, 053, 054, 057 & 037, 038, 039, 040, 041, 042, 043, 044, 045, 047 \\
-        \hline
-        CZ & 72 & 005, 009, 031, 033, 034, 036, 053, 061, 071, 072 & 083, 085, 087, 089, 091, 093, 095, 097, 099, 101 & 084, 086, 088, 090, 092, 094, 096, 098, 100, 102 \\
-        \hline
-        FR & 74 & 009, 028, 030, 031, 033, 052, 064, 065, 070, 076 & 082, 083, 084, 085, 086, 087, 088, 089 & 091, 092, 093, 094, 095, 096, 097, 098 \\
-        \hline
-        GE & 58 & 015, 017, 046, 056, 058, 065, 074 & 001, 002, 003, 004, 008, 010 & 018, 020, 021, 026, 029, 073 \\
-        \hline
-        JA & 119 & 002, 021, 037, 048, 051, 053, 057, 064, 086, 201, 202, 206, 209, 221 & 009, 031, 046, 081, 091 & 006, 025, 045, 047, 088, 101 \\
-        \hline
-        KO & 70 & 018, 030, 043, 044, 057, 065, 074, 078, 079, 090 & 006, 012, 025, 040, 045, 061, 084, 086, 091, 098 & 019, 029, 032, 042, 051, 064, 069, 080, 082, 088 \\
-        \hline
-        PL & 70 & 008, 018, 032, 076, 083, 085, 088, 096, 099 & 005, 011, 012, 030, 040, 041, 046, 063, 090, 097 & 001, 004, 009, 023, 031, 033, 043, 044, 050, 098 \\
-        \hline
-        PO & 75 & 070, 071, 106, 109, 117, 120, 128, 146, 148, 150 & 064, 072, 102, 103, 104, 132, 133, 134 & 135, 137, 138, 139, 142, 143, 312 \\
-        \hline
-        RU & 84 & 017, 023, 035, 041, 088, 101, 114, 115, 119, 121, 123 & 005, 033, 042, 065, 078, 097, 103, 106, 110, 122 & 002, 027, 036, 063, 069, 092, 102, 104, 109, 112 \\
-        \hline
-        SP & 72 & 037, 041, 048, 059, 060, 064, 074, 083, 098, 099 & 001, 002, 003, 004, 005, 006, 007, 008, 009, 010 & 011, 012, 013, 014, 015, 016, 017, 018 \\
-        \hline
-        SW & 70 & 001, 013, 023, 070, 072, 077, 078, 080, 084 & 045, 046, 047, 048, 049, 066, 067, 068, 069 & 040, 041, 042, 043, 044, 060, 061, 062, 063, 064 \\
-        \hline
-        TA & 35 & 022, 028, 038, 047 & 003, 030, 035, 039 & 001, 005, 033, 037 \\
-        \hline
-        TH & 73 & 001, 005, 027, 031, 041, 065, 067, 077, 083 & 023, 025, 028, 037, 045, 061, 073, 085 & 101, 102, 103, 104, 105, 106, 107, 108 \\
-        \hline
-        TU & 69 & 010, 017, 044, 048, 049, 051, 064, 091, 093, 096 & 001, 002, 003, 005, 006, 008, 013, 014, 015, 016, 019 & 025, 030, 031, 032, 037, 039, 041, 046, 056, 063 \\
-        \hline
-        VN & 103 & 012, 029, 031, 036, 043, 050, 053, 070, 077, 118, 119, 128 & 200, 201, 202, 203, 204, 205, 206, 207, 208 & 102, 103, 106, 110, 113 \\
-        \hline
-        WU & 6 & 008, 011, 013, 015 & 002, 004, 006, 017 & 001, 003, 005, 009 \\
-        \hline
-        \multicolumn{3}{l}{} \\[-7pt]
-        \caption{The partitioning of each language's speakers into the 4 partitions. For enrollment, evaluation and testing sets, speaker IDs are shown. For the training set, the rest of the speakers was used and only the number of speakers is shown.}
-        \label{tab:partitioning}
-      \end{longtable}
-    \end{sc}
   }
 }
 
@@ -901,62 +851,128 @@
   }
 }
 
+% TO-DO: mention and explain C-primary and why I use it!
 \chapter{Experiments}{
-  Intro: I will compare a selection of acoustic and prosodic features. Despite their reported potential, I don't use BNFs in this work, as they are basically just a higher-level feature based on the acoustic MFCC information (at least the BNFs in \cite{Snyder_et_al_2018}).
+  \label{chap:Experiments}
+  Aims
+  - compare acoustic feats, see if deltas or context aggregation with SDCs can help (TDNN should be able to do it on its own)
+  - see how prosodic features on their own perform, and also combined (early and intermediate fusion)
+  - see how well prosodic+acoustic features work (early and intermediate fusion)
 
-  Evaluation metric: $C_{primary}$, consistent with NIST LREs. Elaborate a bit more on the meaning of the metric, maybe compare with accuracy and other simpler metrics.
+  I ignore BNFs (as used by Snyder and some others). In essence, they're computed from acoustic features. I just wanna know how much the prosodic information can help when combined with acoustic information.
 
-  \section{Baseline}{
-    vanilla MFCCs (no deltas): also comment on the decisions made regarding MFCC MFCC configuration
+  Evaluation metric: $C_{primary}$, consistent with NIST LREs (mentioned in an earlier section?). I also report confusion matrices and accuracy as these are easier to intuitively reason about and analyse.
 
-    $\leq 30s$ enrollment segments, $\leq 10s$ eval/test segments (should be possible to also report exact average segment length for each set)
+  \section{The setup}{
+    \label{sec:exp-setup}
+    definitions of features (dimensionalities)
   }
 
-  \section{Shifted delta cepstra}{
+  \section{Comparing acoustic features}{
+    \label{sec:exp-acoustic}
+
     Want to see whether context aggregation in the form of added deltas in SDCs (compared to vanilla MFCCs) can improve performance, since the TDNN does context aggregation of its own.
   }
 
-  \section{KaldiPitch+Energy vectors}{
-    Calculating pitch even for unvoiced frames using the algorithm presented by \cite{Ghahremani_et_al_2014}. Adding raw energy to model stress. Extremely low-dimensionality feature vectors, but will see how the TDNN and classifier trained on these can do prosodic LID. Hoping to achieve some sensible results, probably much worse than with MFCCs or SDCs.
+  \section{Comparing prosodic features}{
+    \label{sec:exp-prosodic}
   }
-  
-  \section{MFCC/SDC + KaldiPitch+Energy}{
-    Taking the winner from MFCC/SDC, and concatenating those features with Kaldi pitch and raw energy values. Training the TDNN and classifier on that. Hopefully, seeing an improvement.
-  }
-  
-  \section{Fusion of MFCC/SDC and KaldiPitch+Energy scores}{
-    Stretch goal, likely to be delayed for Year 5 (or abandoned if there are more attractive ideas)
 
-    Same as previous section, but scores computed separately (using two systems, one trained on acoustic features, the other one on prosodic) and fused using a logit fuser. Probably using evaluation set for training the fuser (although, ideally, a separate data portion would be reserved for that).
+  \section{Combining acoustic and prosodic features}{
+    \label{sec:exp-acoustic+prosodic}
+    Taking the winner from MFCC/SDC, and concatenating those features with Kaldi pitch and raw energy values. Training the TDNN and classifier on that. Hopefully, seeing an improvement.
   }
 }
 
-\chapter{Results}{
+\chapter{Results and discussion}{
+  \label{chap:results-and-discussion}
   Reporting: overall $C_{primary}$, accuracy (for illustrative purposes), confusion matrix (to see which language pairs are confusing)
   
   Focus on Slavic languages, since there is so many of them (Czech, Croatian, Polish, Russian, Bulgarian) and intonation can be very characteristic and important here (my own intuition, based on my knowledge of Slavic languages).
 }
 
-\chapter{Discussion}{
-  
-}
-
 \chapter{Future work}{
-  \section{Plans for Part 2 of the MInf project}{
+  \label{chap:future-work}
 
+  \section{Possible directions}{
+    Everything that is sensible but unlikely in Year 5.
+
+    compute VAD correctly
+
+    explore segment boundary effects (but note that uniform segmentation shown to work well: Steve mentioned speaker diarization, I have \citet{Martinez_et_al_2013} that show the same...)
+
+    try late (score) fusion
+
+    try bottleneck features instead of acoustic ones and see how much prosody can help
+
+    use more noisy data or narrowband to see how well the energy and Kaldi pitch can be extracted there
   }
 
-  \section{Other future ideas}{
-    Everything that is sensible but unlikely in Year 5.
+  \section{Plan for Part 2 of the MInf project}{
+
   }
 }
 
 \chapter{Conclusions}{
-  
+  \label{chap:conclusions}
+  ...
 }
 
-% TO-DO: Make sure 'Proc.' is where it has to be (some entries are marked as @article when they should be @inproceedings)
 \bibliographystyle{apalike}
 \bibliography{s1513472-minf1}
+
+\appendix
+
+\chapter{Partitioning of the dataset}{
+  \begin{sc}
+    \centering
+    \footnotesize
+    \begin{longtable}{p{0.5cm}|p{0.8cm}|p{3.9cm}|p{3.5cm}|p{3.5cm}}
+      & train. & enrollment & evaluation & testing \\
+      \hline
+      AR & 57 & 017, 023, 056, 104, 105, 114, 135 & 014, 030, 047, 067, 109, 115, 137 & 011, 012, 027, 050, 051, 055, 066 \\
+      \hline
+      BG & 56 & 042, 048, 056, 065, 088, 104, 107 & 051, 055, 058, 084, 090, 100, 106 & 040, 059, 063, 068, 095, 109, 110 \\
+      \hline
+      CH & 98 & 004, 005, 012, 034, 035, 036, 045, 048, 052, 053, 057, 120, 126 & 028, 029, 030, 031, 032, 039, 040, 041, 042, 043, 044 & 080, 081, 082, 083, 084, 085, 086, 087, 088, 089 \\
+      \hline
+      CR & 63 & 001, 010, 018, 026, 029, 032, 074, 092, 093 & 033, 034, 035, 036, 046, 048, 051, 053, 054, 057 & 037, 038, 039, 040, 041, 042, 043, 044, 045, 047 \\
+      \hline
+      CZ & 72 & 005, 009, 031, 033, 034, 036, 053, 061, 071, 072 & 083, 085, 087, 089, 091, 093, 095, 097, 099, 101 & 084, 086, 088, 090, 092, 094, 096, 098, 100, 102 \\
+      \hline
+      FR & 74 & 009, 028, 030, 031, 033, 052, 064, 065, 070, 076 & 082, 083, 084, 085, 086, 087, 088, 089 & 091, 092, 093, 094, 095, 096, 097, 098 \\
+      \hline
+      GE & 58 & 015, 017, 046, 056, 058, 065, 074 & 001, 002, 003, 004, 008, 010 & 018, 020, 021, 026, 029, 073 \\
+      \hline
+      JA & 119 & 002, 021, 037, 048, 051, 053, 057, 064, 086, 201, 202, 206, 209, 221 & 009, 031, 046, 081, 091 & 006, 025, 045, 047, 088, 101 \\
+      \hline
+      KO & 70 & 018, 030, 043, 044, 057, 065, 074, 078, 079, 090 & 006, 012, 025, 040, 045, 061, 084, 086, 091, 098 & 019, 029, 032, 042, 051, 064, 069, 080, 082, 088 \\
+      \hline
+      PL & 70 & 008, 018, 032, 076, 083, 085, 088, 096, 099 & 005, 011, 012, 030, 040, 041, 046, 063, 090, 097 & 001, 004, 009, 023, 031, 033, 043, 044, 050, 098 \\
+      \hline
+      PO & 75 & 070, 071, 106, 109, 117, 120, 128, 146, 148, 150 & 064, 072, 102, 103, 104, 132, 133, 134 & 135, 137, 138, 139, 142, 143, 312 \\
+      \hline
+      RU & 84 & 017, 023, 035, 041, 088, 101, 114, 115, 119, 121, 123 & 005, 033, 042, 065, 078, 097, 103, 106, 110, 122 & 002, 027, 036, 063, 069, 092, 102, 104, 109, 112 \\
+      \hline
+      SP & 72 & 037, 041, 048, 059, 060, 064, 074, 083, 098, 099 & 001, 002, 003, 004, 005, 006, 007, 008, 009, 010 & 011, 012, 013, 014, 015, 016, 017, 018 \\
+      \hline
+      SW & 70 & 001, 013, 023, 070, 072, 077, 078, 080, 084 & 045, 046, 047, 048, 049, 066, 067, 068, 069 & 040, 041, 042, 043, 044, 060, 061, 062, 063, 064 \\
+      \hline
+      TA & 35 & 022, 028, 038, 047 & 003, 030, 035, 039 & 001, 005, 033, 037 \\
+      \hline
+      TH & 73 & 001, 005, 027, 031, 041, 065, 067, 077, 083 & 023, 025, 028, 037, 045, 061, 073, 085 & 101, 102, 103, 104, 105, 106, 107, 108 \\
+      \hline
+      TU & 69 & 010, 017, 044, 048, 049, 051, 064, 091, 093, 096 & 001, 002, 003, 005, 006, 008, 013, 014, 015, 016, 019 & 025, 030, 031, 032, 037, 039, 041, 046, 056, 063 \\
+      \hline
+      VN & 103 & 012, 029, 031, 036, 043, 050, 053, 070, 077, 118, 119, 128 & 200, 201, 202, 203, 204, 205, 206, 207, 208 & 102, 103, 106, 110, 113 \\
+      \hline
+      WU & 6 & 008, 011, 013, 015 & 002, 004, 006, 017 & 001, 003, 005, 009 \\
+      \hline
+      \multicolumn{3}{l}{} \\[-7pt]
+      \caption{The partitioning of each language's speakers into the 4 partitions. For enrollment, evaluation and testing sets, speaker IDs are shown. For the training set, the rest of the speakers was used and only the number of speakers is shown.}
+      \label{tab:partitioning}
+    \end{longtable}
+  \end{sc}
+}
 
 \end{document}
