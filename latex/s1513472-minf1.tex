@@ -334,7 +334,7 @@
       Prosody is about information other than that directly describing the produced phones; the standard elements of prosody are: intonation/tone, stress and rhythm \citep{Prieto_et_al_2018}. As discussed below, importantly, each of these elements can be used to differentiate between languages.
       \begin{itemize}
         % - intonation and tone are perceived qualities, typically associated with the variation of the physical quality called pitch, i.e. the fundamental frequency of vibration of the vocal folds (F0). while the term 'tone' is used where pitch variation is contrastive (i.e. changes to it discriminate between different words) in the so-called tonal languages (such as Chinese, Vietnamese, Thai), intonation denotes the non-contrastive pitch variation mostly associated with speaker's emotions, dialect, social background, speaking style, and other factors (see, for example, this study by \citet{Grabe_2004} on the intonation differences across British English dialects).
-        \item {\textit{Intonation} and \textit{tone} are perceived qualities typically associated with the variation of the physical quality called pitch, i.e. the fundamental frequency of vibration of the vocal folds ($F_0$). The term 'tone' is used where pitch variation is contrastive (i.e. changes to it discriminate between different words): in the so-called \textit{tonal languages}, such as Chinese, Vietnamese and Thai. In each of these languages, a small 'alphabet' of distinct tone levels or tone contours can be observed as it conveys meaning. Intonation, on the other hand, denotes the non-contrastive pitch variation mostly associated with the speaker's emotions, language, dialect, social background, speaking style, and other factors (see, for example, the study by \citet{Grabe_2004} on the intonational differences between different British English dialects).}
+        \item {\textit{Intonation} and \textit{tone} are perceived qualities typically associated with the variation of the physical quality called pitch, i.e. the fundamental frequency of vibration of the vocal folds ($F_0$). The term 'tone' is used where pitch variation is contrastive (i.e. changes to it discriminate between different words): in the so-called \textit{tonal languages}, such as Chinese, Vietnamese and Thai. In each of these languages, a small 'alphabet' of distinct tone levels or tone contours (also called \textit{tonemes} \citep{Trask_2004}) can be observed as it conveys meaning. Intonation, on the other hand, denotes the non-contrastive pitch variation mostly associated with the speaker's emotions, language, dialect, social background, speaking style, and other factors (see, for example, the study by \citet{Grabe_2004} on the intonational differences between different British English dialects).}
         % - stress (also termed accent) is an unstable term, generally referring to relative emphasis on certain syllables or words and realised as a variation in loudness (dynamic accent), pitch (pitch accent) or vowel length (quantitative accent). Specific lexical (syllable-level) stress patterns or rules are often characteristic of a language, e.g. the position of stress is fixed to different positions within word in Czech and Polish (fixed stress), or describable by a set of rules in Arabic (rule-based stress, this needs citation).
         \item {\textit{Stress} (also termed \textit{accent}), despite being a somewhat ambiguous term, generally refers to the relative emphasis on certain syllables within a word or words within a sentence, realised as a variation in loudness (\textit{dynamic accent}), pitch (\textit{pitch accent}) or vowel length (\textit{quantitative accent}). Specific \textit{lexical} (intra-word, i.e syllable-level) stress patterns or rules are often characteristic of a language. For instance, the within-word location of stress is fixed but different for Czech and Polish (\textit{fixed stress}, see \citet{WALS_14}), or describable by a set of rules in Arabic (\textit{rule-based stress}, see \citet{WALS_15}).}
         % - rhythm typically refers to syllable lengths, with the theory of isochrony categorising languages into three types based on their rhythm: syllable-timed, e.g. french or turkish (all syllables have roughly equal durations), mora-timed, e.g. slovak or japanese (all moras have equal durations) and stress-timed languages, e.g. german, arabic (intervals between stressed syllables are of equal durations).
@@ -355,9 +355,7 @@
 
       % 3. what prosodic aspects have been modelled explicitly: intonation/tone/pitch accent (pitch contours)
       % perhaps unsurprisingly, extracting information from pitch for LID has been explored in the past -- although the number of studies very small compared to those using conventional acoustic features. long before i-vectors, \citet{Lin_et_al_2005} attempted LID just from the pitch contour segmented into syllable-like units (around 100-200ms), contour segments parametrised by a few Legendre polynomials. later, \citet{Metze_et_al_2013} show improvements in ASR on tonal (and partly on non-tonal) languages when augmenting MFCCs with F0 variation features. One disadvantage of pitch contours: F0 is not present for unvoiced sounds, hence a pitch contour computed from F0 is not continuous. this issue was addressed by \cite{Ghahremani_et_al_2014} who developed a pitch-tracking algorithm that approximates the pitch contour even for unvoiced frames, making it continuous. they report improved ASR performance mainly on tonal languages. to the best of my knowledge, this feature type hasn't yet beet applied in an LID task.
-      Perhaps unsurprisingly, extracting information from pitch for LID has been explored in the past -- although the number of studies is very small compared to those using the conventional acoustic features. Long before i-vectors, \citet{Lin_et_al_2005} attempted to do language identification solely from the pitch contour. This was segmented into syllable-like units (around 100-200ms), each contour segment subsequently represented as the first few coefficients of its approximation by Legendre polynomials. Even though the results were far from those achieved by today's systems, it was demonstrated that LID can be done on pitch information alone. Later, \citet{Metze_et_al_2013} showed improvements in ASR on tonal (and partly on non-tonal) languages when augmenting MFCCs with custom-designed $F_0$ variation features. Nevertheless, one disadvantage of using pitch persisted: The fact that $F_0$ is typically considered to be only present in voiced sounds and undefined for unvoiced ones -- making a pitch contour based on $F_0$ discontinuous. This inconvenience has been recently addressed by \cite{Ghahremani_et_al_2014} who developed a pitch-tracking algorithm that approximates pitch values even for unvoiced regions and produces a continuous pitch contour. Adding this feature to MFCCs, the authors report improved ASR performance mainly on tonal languages. To the best of my knowledge, this feature type has not yet been used for language identification.
-      % TO-DO: Mention \citet{Martinez_et_al_2012}!!! Important work which I found earlier but forgot to include.
-
+      Perhaps unsurprisingly, extracting information from pitch for LID has been explored in the past -- although the number of studies is very small compared to those using the conventional acoustic features. Long before i-vectors, \citet{Lin_et_al_2005} attempted to do language identification solely from the pitch contour. This was segmented into syllable-like units (around 100-200ms), each contour segment subsequently represented as the first few coefficients of its approximation by Legendre polynomials. Even though the results were far from those achieved by today's systems, it was demonstrated that LID can be done on pitch information alone. Later, \citet{Martinez_et_al_2012} successfully applied a similar approach to modelling energy and pitch contours within small segments, additionally trying to capture rhythm by providing the duration of voiced speech within the segment as an additional feature. Fusing such prosodic system with an acoustic i-vector system significantly improved the performance. Later, \citet{Metze_et_al_2013} showed improvements in ASR on tonal (and partly on non-tonal) languages when augmenting MFCCs with custom-designed $F_0$ variation features. Nevertheless, one disadvantage of using pitch persisted: The fact that $F_0$ is typically considered to be only present in voiced sounds and undefined for unvoiced ones -- making a pitch contour based on $F_0$ discontinuous. While \citet{Martinez_et_al_2012} effectively ignore this issue by discarding unvoiced frames and thus ending up modelling contours which indeed contain sudden jumps, the problem was addressed in a more elegant way recently by \cite{Ghahremani_et_al_2014}. They developed a pitch-tracking algorithm that approximates pitch values even for unvoiced regions and produces a continuous pitch contour. Adding this feature to MFCCs, the authors report improved ASR performance mainly on tonal languages. To the best of my knowledge, this feature type has not yet been used for language identification.
 
       % 4. what features I use to explicitly model prosodic aspects: KaldiPitch, raw energy
       % In this work I explore two feature types that explicitly help to capture prosodic information: energy and pitch. I refer to these as the prosodic features.
@@ -615,7 +613,7 @@
   % I describe the entire implementation as a whole
   In this chapter, I describe the entire architecture and computing environment.
   % but two of us worked on this and we were building on existing implementations. I naturally put focus on parts which I myself implemented or adapted.
-  Importantly, for the early implementation stage, I teamed up with Paul Moore and a big part of the baseline system was implemented jointly -- with his contributions. Naturally, in my writing, I focus more on parts which I developed independently, without Paul's help. These are in particular: splitting utterances into shorter segments; early and late fusion of different feature types; choosing and adapting the classifier; exploring the number of training epochs of the TDNN.
+  Importantly, for the early implementation stage, I teamed up with Paul Moore and a big part of the baseline system was implemented jointly -- with his contributions. Naturally, in my writing, I focus more on parts which I developed independently, without Paul's help. These are in particular: splitting utterances into shorter segments; early and intermediate fusion of different feature types; choosing and adapting the classifier; exploring the number of training epochs of the TDNN.
   
   % unless stated otherwise, the design decisions (in particular the properties of the TDNN and the classifier) are adopted from the existing implementations without changes
   As a matter of fact, the codebase of this project consists primarily of adapted existing implementations. Nevertheless, I describe the architecture in detail. However, I make it explicit where the design or hyper-parameter decisions were made by myself (possibly in collaboration with Paul). In the rest of the cases, the reader should implicitly assume that the decisions were made by the authors of the original implementations and found to work well. Importantly, my work does not primarily focus on optimizing the architecture or hyperparameters -- only on the different ways in which various feature types can be used and combined to improve LID performance.
@@ -656,8 +654,8 @@
 
     \end{itemize}
     
-    % most time spent connecting with dataset, implementing early and late fusion of acoustic and prosodic features, and creating the code for running entire experiments end-to-end as well as step by step
-    Apart from the time spent on familiarising myself with Kaldi and understanding, adapting and integrating the enumerated recipes, I put the most effort into connecting the corpus with the x-vector architecture, implementing early and late fusion, computing the various feature types, and building a robust end-to-end pipeline (within the \texttt{run.sh} script) which could be run without any changes either as a whole or step by step, only changing a simple configuration file to switch between different experiments.
+    % most time spent connecting with dataset, implementing early and intermediate fusion of acoustic and prosodic features, and creating the code for running entire experiments end-to-end as well as step by step
+    Apart from the time spent on familiarising myself with Kaldi and understanding, adapting and integrating the enumerated recipes, I put the most effort into connecting the corpus with the x-vector architecture, implementing early and intermediate fusion, computing the various feature types, and building a robust end-to-end pipeline (within the \texttt{run.sh} script) which could be run without any changes either as a whole or step by step, only changing a simple configuration file to switch between different experiments.
   }
 
   \section{Choice of classifier}{
@@ -676,88 +674,230 @@
 
     \begin{figure}[h!]
       \centering
-      \includegraphics[width=15cm]{graphics/architecture.pdf}
+      \includegraphics[width=15cm]{graphics/architecture}
       \vspace*{-1em}
-      \caption{An end-to-end overview of my system. Red marks the fusion steps which can be skipped, yellow marks steps only performed at training time.}
+      \caption{An end-to-end overview of my system. Note that the segmenting step does not apply to the x-vector TDNN training data. The fusion steps which can be omitted are highlighted in red while yellow marks the steps only performed at training time.}
       \label{fig:architecture}
     \end{figure}
 
-    mention that implementing this end-to-end thing took the most time and running experiments was really fast
+    % TO-DO: mention that implementing this end-to-end thing took the most time and running experiments was really fast
 
-    pipeline overview (diagrams showing training and evaluation pipelines together as a whole)
-    - feature computation
-    - concatenating features (early fusion)
-    - removing silence (VAD)
-    - producing x-vector
-    - concatenating with another x-vector (late fusion)
-    - classifying
+    \autoref{fig:architecture} shows the entire system and what the main steps in running it are. In what follows, I elaborate on each step that has not been described yet.
 
-    data preparation
-      feature computation
-      - existing scripts re-used for computing MFCCs (make\_mfcc.sh), I adapted the code for adding SDCs and deltas to MFCCs
-      - existing scripts re-used for adding pitch
-      - energy feature computed simply as a special case of MFCC: taking only 0th coefficient and using raw log energy instead of it
+    \subsection{Feature computation}{
+      \label{sec:feature-computation}
+      % data preparation
+      %   feature computation
+      %   - existing scripts re-used for computing MFCCs (make\_mfcc.sh), I adapted the code for adding SDCs and deltas to MFCCs
+      %   - existing scripts re-used for adding pitch
+      %   - energy feature computed simply as a special case of MFCC: taking only 0th coefficient and using raw log energy instead of it
+      Throughout my experiments, the following feature types are used (as a refresher, see \autoref{sec:features}): MFCC, MFCC+$\Delta$+$\Delta\Delta$, SDC, energy, and Kaldi pitch. For more details, see (TO-DO: link the experiments section where the dimensionalities of these are explained).
+      While MFCC features were computed using the existing script \verb|steps/make_mfcc.sh|, I adapted the script in order to conveniently compute the SDCs, MFCCs with deltas, and the Kaldi pitch. The energy feature was computed as a special case of the MFCC feature -- by computing the raw log energy instead of the 0\textsuperscript{th} cepstral coefficient, and discarding all remaining cepstral coefficients.
+    }
 
-      early fusion
-      - I wrote script for frame-wise concatenation
-      - done for all data partitions alike
-      - 3s mean normalisation before x-vector extraction and also for tdnn training samples -- for all feature types
+    \subsection{Early fusion}{
+      \label{sec:early-fusion}
+      % TO-DO: Maybe introduce fusion earlier??
+      % early fusion
+      % - I wrote script for frame-wise concatenation
+      % - done for all data partitions alike
+      % - 3s mean normalisation before x-vector extraction and also for tdnn training samples -- for all feature types
+      By fusion I understand simply combining multiple sources of information -- be it early utterance representations (feature vectors of different feature types), intermediate representations (in this case x-vectors) or even scores from multiple classifiers (perhaps each trained on x-vectors based on a different feature type).
+      Early fusion here means combining the different feature types as early as possible in the whole pipeline: right after feature computation. For a simple example of early fusion see \citet{Martinez_et_al_2012} who concatenate for each short speech segment the information about the pitch contour, the energy contour, and the voiced region duration. In this case, I created a script for frame-wise concatenation (splicing) two or more feature vectors for a given utterance. Such precise alignment was possible because I configured all feature types to be computed with the same frame length and frame shift.
+    }
 
-    training the tdnn
-    - architecture as described in \autoref{sec:x-vectors}, no changes to the code from the recipe
-    - corresponds to that described in \citet{Snyder_et_al_2018}: ReLU non-linearities, 64-sample minibatches, NG-SGD training with EFFECTIVE lr exponentially decreasing from 0.001 to 0.0001, described in \citet{Povey_et_al_2014} (also:  Trained with 3 parallel jobs, parameter shrinking and with momentum with the momentum-term coefficient $\mu=0.5$ described therein), dropout scheme is 0 (at 0\%-20\%), 0.1 (at 50\%), 0 (at 100\%). batch normalisation. maximum parameter change: The maximum change in parameters allowed per minibatch, measured in Euclidean norm over the entire model (change will be clipped to this value): 2.0. Backstitch is NOT used.
-    - utts <5s (500 frames) removed from training data
-    - training data repeated 35 times, distributed into archives of roughly 50000000 frames each (around 140h). 70 training archives
-    - number of epochs translated into a number of iterations (each iteration = one archive)
-    - samples globally shuffled before training, then shuffled each iteration within batches of 1000
-    - training takes around 19 hours (see \autoref{sec:hyperparameters})
-    - uses the nnet3 Kaldi implementation
-    - 3 initial and 3 final jobs (i.e. simply 3 parallel jobs throughout training)
-    - number of parameters: 4.6M (MFCC+deltas+pitch+energy) to 4.4M (energy)
-    - optimising multi-class cross-entropy
+    \subsection{Feature vector post-processing}{
+      \label{sec:feature-postprocessing}
+      % removing silence with VAD from MFCCs
+      % mean normalisation
+      This comprises two steps unchanged from the SRE16 recipe and used in the x-vector LID paper \citep{Snyder_et_al_2018}:
+      \begin{enumerate}
+        \item {Removing frames containing silence, using the voice activity decision (VAD). The only difference with respect to the SRE16 recipe is that the VAD is computed only once -- using the MFCC features -- and used for these and all other feature types (see also \autoref{sec:preprocessing}).}
+        \item {Mean-normalisation is performed by subtracting from each frame the mean over the surrounding 3s window. This is a technique commonly used for processing acoustic features. It preserves relative temporal trends in feature values and discards information about the absolute values. I decided to use it for all prosodic features as well. However, it is possible that capturing tone properties for languages with register tonal systems -- i.e. those that mark tone using several flat tone \textit{levels} instead of characteristic tone \textit{shapes} -- would better be realised by preserving the absolute values (without mean normalisation).}
+      \end{enumerate}
+    }
 
-    extracting x-vectors
-    - done using the sre16 code without any changes
-    - ignoring utts <1s
-    - 512-D x-vectors
-    - takes around 1.5h for enroll, eval and test data combined (when using 32 parallel jobs)
-    - have: 17212 30s enrollment segments + 20349 10s eval segments + 18710 10s test segments => around 100ms per segment (to produce x-vector)
+    \subsection{The x-vector TDNN}{
+      \label{sec:x-vector-tdnn}
+      % - architecture as described in \autoref{sec:x-vectors}, no changes to the code from the recipe
+      Even though this part of the architecture was adapted from the SRE16 recipe without any major changes and is available as an open source, I still provide a description to help the reader appreciate the technical realisation of the core of an x-vector system. (Adding to what I wrote in \autoref{sec:d-vectors} and \autoref{sec:x-vectors}.)
 
-    late fusion
-    - I wrote script for concatenating 2 or 3 x-vectors together for each utterance, resulting in 1024-D or 1536-D x-vectors
+      % ARCHITECTURE
+      % - number of parameters: 4.6M (MFCC+deltas+pitch+energy) to 4.4M (energy)
+      The TDNN's layers are described in \autoref{tab:x-vectors}; the network had 4.4-4.6M parameters (depending on the dimensionality of the input feature vectors). Each layer used the rectified linear unit (ReLU) activation function.
 
-    training the classifier
-    - all vectors length-normalised before fed into classifier!
-    - whitening or dimensionality reduction is not performed
-    - rebalancing priors: $(count(lang-test) / count(lang-train) )^(prior-scale)$ where prior-scale=0.7 (same as in the original LRE07 recipe, and generally recommended values are between 0.5 and 1.0)
-    - add graph showing distribution of priors and eval utt counts
-    - optimising cross-entropy
-    - hyperparameters:
-      - max-steps: Maximum steps in L-BFGS (default: 20).
-      - normalizer: Coefficient for L2 regularization (default: 0.0025).
-      - power: Power rule for determining the number of mixtures to create (default: 0.15).
-      - mix-up: Target number of mixture components to create (default: 0).    
-    - first trained for max-steps with number of classes = K (19)
-    - then split each class into a number of "sub-classes" like a mixture model. done iteratively, in each iteration splitting the biggest cluster into two. what 'biggest' means is determined by the 'power' parameter: $(total-occ^power)/num-components$ is taken as the adjusted per-component occupancy of the cluster, thus using using power closer to 0 means that the number of components will be more equal across all classes, whereas for big power (close to 1) big classes will be split into many more components than smaller classes
-    - then trained for another max-steps but with number of classes corresponding to mix-up. the decision boundaries are initialised from the K decision boundaries with some added random noise so they would differ slightly. essentially, each class is modelled using multiple decision boundaries but all boundaries (mixture components) have the same weight
-    - takes around 3.5 minutes
-    - inference on test set, together with computing classification results, takes around 4s (single-threaded). 18663 10s test utts, hence around 0.2ms per utterance (very solid!) using one CPU
+      % TRAINING DATA: iterations, epochs, minibatches
+      % - utts <5s (500 frames) removed from training data
+      % - training data repeated 35 times, distributed into archives of roughly 50000000 frames each (around 140h). 70 training archives
+      % - number of epochs translated into a number of iterations (each iteration = one archive)
+      % - samples globally shuffled before training, then shuffled each iteration within batches of 1000
+      As for the handling of the training data, the first step was discarding utterances shorter than 5s. Looking back, this design decision of \citet{Snyder_et_al_2018} may have been challenged as it resulted in discarding 29\% of my total number of training utterances. However, the effects of using very short training segments might potentially have a negative impact on the TDNN. After discarding short utterances, the rest of the training data was replicated 35x, randomly shuffled and distributed and saved into 70 training Kaldi archives, each archive corresponding to a training iteration and containing roughly 50,000,000 frames (feature vectors) each -- around 140h of speech. This way, each training epoch consisted of processing 70 archives, which, however, translates to only 23 actual iterations as the training was using 3 parallel jobs, each processing one archive per iteration (see bellow for a description of the parallel training). The archives were processed in minibatches of 64 utterances, every minibatch shuffled in each iteration.
+
+      % TRAINING: objective function, learning algorithm
+      % - optimising multi-class cross-entropy     
+      In the training phase, the TDNN was trained to directly classify each utterance as one of the 19 languages, the training objective function being multi-class cross-entropy.
+      % batch normalisation. maximum parameter change: The maximum change in parameters allowed per minibatch, measured in Euclidean norm over the entire model (change will be clipped to this value): 2.0.
+      Each layer was using batch normalisation and, to prevent extreme parameter updates, the maximum parameter change per minibatch -- measured as the Euclidean norm over the entire parameter vector of the network -- was clipped to 2.0.
+      % - corresponds to that described in \citet{Snyder_et_al_2018}: NG-SGD training with EFFECTIVE lr exponentially decreasing from 0.001 to 0.0001, described in \citet{Povey_et_al_2014} (also:  Trained with 3 parallel jobs, parameter shrinking and with momentum with the momentum-term coefficient $\mu=0.5$ described therein), dropout scheme is 0 (at 0\%-20\%), 0.1 (at 50\%), 0 (at 100\%). Backstitch is NOT used.
+      The training uses several techniques developed or empirically found to be beneficial by the John Hopkins University team. (Most them are mentioned or summarised by \citet{Povey_et_al_2014}, even though the paper corresponds to the \verb|nnet1| neural network implementation in Kaldi, while the SRE16 recipe uses the newer \verb|nnet3| implementation (which contains some additional improvements).) The learning rule is the Natural gradient Stochastic gradient descent (NG-SGD) with momentum (using the coefficient of momentum value of 0.5), with the learning rate exponentially decaying across the training iterations from 0.001 to 0.0001. As a means of regularisation, weak dropout was used, with the dropout rate varying according to the following schedule: 0 for the first 20\% of training iterations, then increasing linearly to 0.1 for the following 30\% and finally decreasing linearly until the value of 0 in the last iteration.
+      Perhaps most importantly, the training was realised using 3 parallel jobs, hence speeding it up. The parallelisation translates into 3 model instances being run in parallel and their parameters synchronised (averaged) after each iteration (for mode details, see \citeauthor{Povey_et_al_2014}). Note that the SRE16 recipe varied the number of parallel jobs throughout training linearly from 3 to 8, but the constant 3 jobs better suited my computational environment, hence I made this change to the SRE16 implementation.
+
+      As a side note, even though the TDNN is presented as processing variable-length utterances, it still has an upper limit on the utterance length given by the implemented maximum temporal context over which the convolutional filters of its first layer slide: 1000 frames (roughly 10s when using the standard frame shift of 10ms). This means that utterances longer than 10 seconds were split and processed separately. When using the trained TDNN for extracting x-vectors, a long utterance could this way result in multiple x-vectors. This, however, did not apply to my evaluation and testing data as those were segmented into utterances of maximum length 10s.
+      
+      In terms of runtime, training the TDNN was the most time-consuming step: It took 19 hours (for details, see \autoref{sec:hyperparameters}).
+    }
+
+    \subsection{Extracting x-vectors}{
+      \label{sec:extracting-x-vectors}
+      % - 512-D x-vectors
+      In this step, 512-dimensional x-vectors were extracted for all enrollment utterances (to train the classifier), and for evaluation and testing utterances (to evaluate the system end-to-end).
+      % extracting x-vectors
+      % - done using the sre16 code without any changes
+      % - ignoring utts <1s
+      This step was adapted from the SRE16 recipe with only one change: I implemented discarding all utterances that were shorter than 100 frames (roughly 1s). I decided to implement this thresholding partly to not use segments that are unrealistically and unfairly short (compare with the typical length of 3s, 10s or even 30s), but also to address the issue of a small number of extremely short or corrupt audio files which were causing the Kaldi pitch-tracking binary to fail.
+
+      % - takes around 1.5h for enroll, eval and test data combined (when using 32 parallel jobs)
+      % - have: 17212 30s enrollment segments + 20349 10s eval segments + 18710 10s test segments => around 100ms per segment (to produce x-vector)
+      This step was relatively time-consuming: around 1.5h for the enrollment, evaluation and testing data combined when splitting the work into 32 jobs and running them 10 at any time (the limit of 10 given by the computing environment's limit on the number of Slurm jobs, see \autoref{sec:computing-environment}). Still, given the number of segments to be processed, the per-segment time is very low. With evaluation and testing segments being up to 10s long, I had 17212, 20349 and 18710 segments for enrollment, evaluation and testing, respectively, and the per-segment time was thus only around 100ms.
+    }
+
+    \subsection{Intermediate fusion}{
+      \label{sec:intermediate-fusion}
+      % intermediate fusion
+      % - I wrote script for concatenating 2 or 3 x-vectors together for each utterance, resulting in 1024-D or 1536-D x-vectors
+      Intermediate fusion, as opposed early fusion, combines utterance-level (not frame-level) representations (x-vectors) produced by multiple (up to 3) different x-vector TDNNs. The x-vectors are concatenated, creating a longer vector. In my case, the different networks would have been trained on different feature types, and the fused vectors would be 1024- or 1536-dimensional.
+
+      The script for this step was written by me as the intermediate fusion is both an easy to implement and a seldom used strategy -- typically, \textit{late} fusion is performed, i.e. combining the final scores from different classifiers (see, for example, \citet{Snyder_et_al_2018,Martinez_et_al_2012}).
+    }
+
+    \subsection{The classifier}{
+      \label{sec:classifier-description}
+
+      As mentioned earlier, the multi-class logistic regression classifier trained to optimise multi-class cross-entropy was chosen and adapted from the LRE07 recipe. I adapted the scripts such that training and scoring could be done separately. This way, both the TDNN and the classifier could be trained, then evaluated end-to-end on the evaluation set used in turn to optimise the hyperparameters of the classifier, and finally the system would be used to only score the testing set utterances.
+
+      % - whitening or dimensionality reduction is not performed
+      % - all vectors length-normalised before fed into classifier!
+      Importantly, the whitening and dimensionality reduction steps employed by \citet{Snyder_et_al_2018} were omitted as I deemed them important for their particular classifier set up, but not necessarily mine. I decided to only keep the one preprocessing step that was included in the LRE07 recipe: length-normalising the vectors before being processed by the classifier.
+
+      Perhaps the most interesting aspect of the classifier is the possibility to use it as a mixture model. Even though this functionality is open-sourced and built right into the \verb|logistic-regression-train| Kaldi binary, I explain it so that the reader can appreciate the capabilities of the classifier as well as my later hyperparameter tuning. 
+      %   - max-steps: Maximum steps in L-BFGS (default: 20).
+      %   - normalizer: Coefficient for L2 regularization (default: 0.0025).
+      %   - power: Power rule for determining the number of mixtures to create (default: 0.15).
+      %   - mix-up: Target number of mixture components to create (default: 0).    
+      In order to train the classifier, one provides the following parameters: \verb|max-steps| (the maximum number of iterations of the L-BFGS solver in training the model), \verb|normalizer| (the L2 regularisation coefficient), \verb|mix-up| (the desired number of decision boundaries used to model all classes), and \verb|power| (explained later). Then, training the model comprises the following steps:
+      \begin{enumerate}
+        % - first trained for max-steps with number of classes = K (19)
+        \item {Train the classifier normally with $L$ decision boundaries ($L=19$ being the number of classes) for \verb|max-steps| iterations.}
+        % - then split each class into a number of "sub-classes" like a mixture model. done iteratively, in each iteration splitting the biggest cluster into two. what 'biggest' means is determined by the 'power' parameter: $(total-occ^power)/num-components$ is taken as the adjusted per-component occupancy of the cluster, thus using using power closer to 0 means that the number of components will be more equal across all classes, whereas for big power (close to 1) big classes will be split into many more components than smaller classes
+        \item {Determine which classes will be modelled by how many decision boundaries -- attempting to end up with \verb|mix-up| or fewer boundaries. In general, no class is modelled by more decision boundaries than the number of corresponding training samples, and bigger classes are modelled by more boundaries. Starting with $L$ boundaries, iteratively, this number is incremented: In each iteration, the class currently with the biggest per-boundary occupancy is granted another boundary, where the per-boundary occupancy of class $l$ is:
+        $$\frac{
+                (\textrm{number\ of\ training\ samples\ for\ class }l)^{\mathtt{power}}
+               }{\textrm{number of boundaries for class }l}$$
+        Notice how the \verb|power| parameter (when set to a value closer to 0) can effectively bring the class sizes closer together, thus causing the number of boundaries to vary less with class sizes. Values closer to 1.0 (or bigger), on the other hand, cause bigger classes to be modelled by many more boundaries than small classes.
+        }
+        % - then trained for another max-steps but with number of classes corresponding to mix-up. the decision boundaries are initialised from the K decision boundaries with some added random noise so they would differ slightly. essentially, each class is modelled using multiple decision boundaries but all boundaries (mixture components) have the same weight
+        \item {Clone the trained boundary from step 1 to create as many boundaries for each class as determined in step 2; adding some random noise to each clone to ensure that the added boundaries are distinct but still roughly based on the original boundary.}
+        \item {Train the extended model (now with up to \verb|mix-up| boundaries) for additional \verb|max-steps| iterations.}
+      \end{enumerate}
+
+      The trained classifier is then used to compute the posterior probability for a given x-vector $x$ and a particular class $l$, by accumulating the contributions across the set of boundaries $B_l$ modelling the given class, and scaling by the class prior $p(l)$:
+      \begin{equation}
+        \label{eq:logit-posterior}
+        p(l|x) \approx p(l)\sum_{b \in B_l} p(x|b)
+      \end{equation}
+      Subsequently, $x$'s predicted class is taken to be the one with the maximum posterior.
+
+      % - rebalancing priors: $(count(lang-test) / count(lang-train) )^(prior-scale)$ where prior-scale=0.7 (same as in the original LRE07 recipe, and generally recommended values are between 0.5 and 1.0)
+      As mentioned in \autoref{sec:data-overview}, the enrollment set was imbalanced and some languages were over-represented while others were under-represented. The mechanism used in the LRE07 recipe to cope with such imbalance is computing scaling factors for the different languages and using these for re-balancing the classifier's priors after it has been trained. Given a value (typically between 0.5 and 1.0) of the parameter $s$, the prior for language $l$ will be scaled by coefficient $c$ computed as follows:
+      \begin{equation}
+        \label{eq:logit-prior}
+        c_L = \bigg( \frac{C_{l, evaluation}}{C_{l, enrollment}} \bigg)^s
+      \end{equation}
+      where $C$ are the counts of utterances in language $l$ in the respective data sets. In other words, if the distribution of languages in the enrollment set matches that in the evaluation set, all priors will be scaled by the same factor -- effectively not being scaled -- and the classifier's priors will reflect the distribution observed in the enrollment set. However, if the distributions do not match, the classifier's priors (driven by the enrollment set) will be corrected in the direction indicated by the distribution in the evaluation set. Of course, the evaluation set does not necessarily correctly reflect the language distribution in unseen data. Hence, by setting the $s$ parameter to a value smaller than 1.0, correcting the priors can be made less reliant on the evaluation set's distribution.
+      I keep the value of $s=0.7$ as used in the LRE07 recipe -- particularly because this is not a parameter that could be tuned given one's data, only set to an empirically trusted value. The scaling factors used for rebalancing the classifier (in the 10s condition) are shown in \autoref{fig:logit-priors}. Clearly, languages such as Arabic and Croatian were identified as under-represented and the classifier will be re-balanced to prefer them more. The opposite goes for Japanese or Vietnamese.
+      % - add graph showing distribution of priors and eval utt counts
+      \begin{figure}[h!]
+        \centering
+        \includegraphics[width=15cm]{../img/logit-priors.pdf}
+        \vspace*{-1em}
+        \caption{Scaling factors used for adjusting the classifier's priors based on the language distributions in the enrollment and evaluation set.}
+        \label{fig:logit-priors}
+      \end{figure}
+
+      Compared to training the TDNN, training the classifier (with the hyperparameter values found in \autoref{sec:hyperparameters}) takes only around 3.5 minutes (in the 10s condition). Producing posteriors and computing the final results for the entire test set takes only around 4 seconds (using a single CPU), corresponding to inference time of only $\sim$0.2ms/utterance.
+    }
   }
 
   \section{Computing environment}{
-    the School of Informatics student GPU cluster
-    NVIDIA GTX1060 6GB
-    CPUs were:  Intel(R) Xeon(R) CPU E5-2620 v4 @ 2.10GHz
-    Slurm job scheduler
-    using one GPU per parallel job (i.e. 3 GPUs in TDNN training)
+    \label{sec:computing-environment}
+    % the School of Informatics student GPU cluster
+    All experiments were carried out in the School of Informatics' Teaching cluster\footnote{\url{http://computing.help.inf.ed.ac.uk/teaching-cluster}}, using GPUs model GeForce GTX 1060 6GB, and CPUs model Intel Xeon E5-2620 v4 (2.10GHz). Note that the GPUs were only used in training the x-vector TDNN and in extracting x-vectors from the trained network -- the two most time-consuming stages.
+    
+    % - used for training and extracting x-vectors
+    % CPUs were:  Intel(R) Xeon(R) CPU E5-2620 v4 @ 2.10GHz
+    % Slurm job scheduler
+    % using one GPU per parallel job (i.e. 3 GPUs in TDNN training)
+    % talk about why changing 3..8 to 3..3 enabled me to train 3 experiments in parallel, etc. also, refer to kaldi-help where this was discussed
+    For running jobs requiring GPUs, the Slurm scheduler was used, configured such that a single user like me could only ever run at most 10 Slurm jobs at the same time. As a result of this restriction, in order to speed up my experiments, I set the number of parallel jobs used to train each x-vector TDNN to 3 -- so that I could train as many as three TDNN networks in parallel. While the SRE16 recipe uses more jobs, decreasing this number could only help the quality of the final model\footnote{as hinted by Dan Povey at \url{https://groups.google.com/forum/\#!topic/kaldi-help/_iyJP-lHkKM}}.
+    Note that each Slurm job was allocated a separate GPU. Thus, each TDNN can be considered to have been trained using three GPUs of the abovementioned model.
   }
 
   \section{Hyperparameters}{
     \label{sec:hyperparameters}
-    decided: TDNN layers, activation function, learning algorithm, ... decided for me mainly in the SRE16 recipe and in the X-vector paper
 
-    tuned (using the baseline setting, i.e. vanilla MFCCs, evaluation using 10s eval segments, optimising C-primary, see next chapter): number of TDNN training epochs E, logit hyperparameters
-    - E was tuned to provide a good tradeoff between training time and performance
+    The aim of this work is not to extensively tune the hyperparameters of the architectures; instead, I rely on values used in previous successful works of others (provided in the adapted recipes). However, there was a number of parameter which I decided to change or even fine-tune.
+
+    As discussed previously, I changed the number of parallel jobs used by the TDNN in its training, and imposed a minimum length on any utterances for which x-vectors would be extracted.
+
+    % LRE07 settings
+    % --max-steps=35
+    % --normalizer=0.001
+    % --verbose=3
+    % --power=0.15
+    % --mix-up=150
+    % DEFAULTS
+    %   - max-steps: Maximum steps in L-BFGS (default: 20).
+    %   - normalizer: Coefficient for L2 regularization (default: 0.0025).
+    %   - power: Power rule for determining the number of mixtures to create (default: 0.15).
+    %   - mix-up: Target number of mixture components to create (default: 0).   
+    After initially training the TDNN for 3 epochs and seeing that it took over 8 hours, I decided to first tune the classifier's hyperparameters. This way, the tuned classifier could be subsequently used for end-to-end evaluation of different TDNNs, enabling the tuning of the most important hyperparameter: $E$ -- the number of training epochs of the TDNN. As discussed previously, the classifier's hyperparameters were \verb|max-steps|, \verb|mix-up|, \verb|normalizer| and \verb|power|. The last mentioned parameter I fixed to be of the default value 0.15 (also used by the LRE07 recipe) -- meaning that the number of decision boundaries was only weakly dependent on the relative class size (in terms of the number of enrollment segments). The other three parameters were tuned using enrollment and evaluation x-vectors extracted from the baseline-case TDNN (i.e. using MFCC features and 10s enrollment segments) trained for 3 epochs. I carried out a 3-dimensional grid search, exploring the following value ranges: 
+    \begin{itemize}
+      \item{\verb|max-steps| $ \in \{20, 40, 60, 80, 100, 120, 140, 160, 180, 200\}$ (the default is 20, the LRE07 recipe uses 35)}
+      \item{\verb|mix-up| $ \in \{19, 50, 100, 150, 200, 250, 300\}$ (the default is 0, the LRE07 recipe uses 150 for 14 languages)}
+      \item{\verb|normalizer| $ \in \{0, 0.00001, 0.0001, 0.001, 0.01\}$ (the default is 0.0025, the LRE07 recipe uses 0.001)}
+    \end{itemize}
+    \begin{figure}[h!]
+      \centering
+      \includegraphics[width=11cm]{../img/normaliser_vs_mix-up_best.pdf}
+      \vspace*{-1em}
+      \caption{Evaluation set $C_{primary}$; the shown value is the best one across all explored values of the \texttt{max-steps} parameter.}
+      \label{fig:normaliser_vs_mix-up_best}
+    \end{figure}
+    \autoref{fig:normaliser_vs_mix-up_best} shows the best result across all numbers of training iterations for each combination of \verb|mix-up| and \verb|normalizer|, showing rather clearly that \verb|normalizer|=0.001 (also used by the LRE07 recipe) is the optimal value within the explored range.
+    \begin{figure}[h!]
+      \centering
+      \includegraphics[width=8cm]{../img/logit_mix-up.pdf}
+      \vspace*{-1em}
+      \caption{Evaluation set $C_{primary}$ varying with the number of mixture components of the classifier.}
+      \label{fig:logit_mix-up}
+    \end{figure}
+    \begin{figure}[h!]
+      \centering
+      \includegraphics[width=8cm]{../img/logit_max-steps_vs_mix-up.pdf}
+      \vspace*{-1em}
+      \caption{Evaluation set $C_{primary}$ varying with the number of mixture components for each explored number of training steps.}
+      \label{fig:logit_max-steps_vs_mix-up}
+    \end{figure}
+    Fixing this parameter and plotting just the performance against the number of mixture components \verb|mix-up| (see \autoref{fig:logit_mix-up}) led me to the conclusion that \verb|mix-up| should be chosen as 50 or 100. Further plotting the performance as varying with the number of mixture components for each number of training iterations separately (\autoref{fig:logit_max-steps_vs_mix-up}) shows how not just worse but also unstable the performance is for lower number of iterations. Thus, I decided to use \verb|max-steps|=200 and -- even though it seems to not make a big difference -- I fixed \verb|mix-up| at the best performing value of 100.
+
+    Then, I tuned $E$. In particular, I wanted to reach a reasonable compromise between too long training runtimes and too low evaluation set performance. $E$ was tuned in the baseline condition, i.e. using MFCC features and 10s evaluation segments. The system was evaluated end-to-end, using the optimal values of the classifier established above. The results are summarised in \autoref{fig:num-epochs}. Clearly, the early epochs are the most important, but the performance (in terms of $C_{primary}$) also plateaus fairly quickly: beyond 10 training epochs and, when measured by accuracy, it even starts becoming worse, indicating that the TDNN probably starts to overfit the training data. AS the compromise value of $E$, I decided to use the "elbow" point of the $C_{primary}$ plot in \autoref{fig:num-epochs}, where $E=7$. This implies the training runtime of around 19 hours to train a single x-vector TDNN.
+    \begin{figure}[h!]
+      \centering
+      \includegraphics[width=14.9cm]{../img/num-epochs.pdf}
+      \vspace*{-1em}
+      \caption{Evaluation set performance and training runtime for varying number of training epochs $E$ of the TDNN.}
+      \label{fig:num-epochs}
+    \end{figure}
   }
 }
 
@@ -788,24 +928,6 @@
     Stretch goal, likely to be delayed for Year 5 (or abandoned if there are more attractive ideas)
 
     Same as previous section, but scores computed separately (using two systems, one trained on acoustic features, the other one on prosodic) and fused using a logit fuser. Probably using evaluation set for training the fuser (although, ideally, a separate data portion would be reserved for that).
-  }
-
-  \section{Timeline for the experiments}{
-    \label{timeline}
-    \begin{enumerate}
-      \item {
-        Finished: System using MFCC and SDC.
-      }
-      \item {
-        By January 28th: Choose the TDNN and logit hyperparameters. TDNN using MFCCs has already been trained for, 2, 3, ... 10 epochs, now need to 1) establish reasonable logit parameters (driven by evaluation-set performance on x-vectors from TDNN trained for 3 epochs), 2) use that logit config to score the TDNNs with different number of training epochs, 3) choose a number of epochs that is a reasonable compromise between performance and training runtime
-      }
-      \item {
-        By February 4th: Have MFCC vs SDC comparison carried out (includes baseline results using MFCCs). Have KaldiPitch and raw energy features implemented (both are straightforward to compute with Kaldi -- the energy is just computing MFCCs with raw log energy instead of C0, and discarding all but the energy-corresponding resulting coefficient). Have splicing of MFCC/SDC features with prosodic features implemented.
-      }
-      \item {
-        By February 11th: Have results of KaldiPitch+Energy experiments and of the acoustic+prosodic experiment (MFCC/SDC + KaldiPitch+Energy)
-      }
-    \end{enumerate}
   }
 }
 
