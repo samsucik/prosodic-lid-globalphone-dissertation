@@ -14,6 +14,12 @@
 \newcommand{\algorithmautorefname}{Alg.}
 \renewcommand{\equationautorefname}{Eq.}
 
+% Change font family and size in captions
+\DeclareCaptionFont{captionfont}{\small\fontseries{n}\fontfamily{phv}\selectfont}
+\captionsetup[table]{labelsep=period,font=captionfont,justification=centering}
+\captionsetup[figure]{labelsep=period,font=captionfont,justification=centering}
+
+
 %
 % TABLES
 %
@@ -865,7 +871,7 @@
 }
 
 % TO-DO: mention and explain C-primary and why I use it!
-\chapter{Experiments}{
+\chapter{Experiments and discussed results}{
   \label{chap:Experiments}
 
   In this chapter, I describe the experiments that I carried out, in the order they were designed. I provide some immediate results and discussion -- especially where these directed my decisions in designing the next experiment.
@@ -930,6 +936,14 @@
     % context of MFCC: 15f, MFCC+deltas: 19f, SDC: 3x(7-1)+15=33
     % deltas improve performance by 14\% (7\%), sdcs by 18\% (worse by 7\%)
     Clearly, both simple deltas and SDCs improve on the performance achieved by simple MFCCs in the 10s condition -- in this case by 14\% and 18\%, respectively. The relative gain is smaller in the 3s condition. SDCs even make the performance worse, which, I hypothesise, can be attributed to the relatively big context of SDCs (in this case 33 frames), which makes a big portion of the SDC terms only partially computed: For a 3s segment with roughly 300 frames, the SDCs are incomplete for 32 frames -- more than 10\%! For the simple delta terms, only 4 terms would be incomplete (2 at either end of the segment). Thus, for shorter segments, features computed over shorter contexts may be favoured.
+
+
+    %%% comparing acoustic features in the context of x-vectors
+    one might think that dynamic feats won't help much
+    dynamic feats were designed to mitigate the limitations of frame-level systems
+    but widening the temporal context seems to still help
+    clearly, energy helps MFCCs (compare vanilla MFCC with MFCC+energy (early))
+    aggressive context widening needs to be careful for short segments
   }
 
   \section{Comparing prosodic features}{
@@ -960,6 +974,12 @@
 
     % conclude that. early fusion improves separate prosodic features by around 50\% (40\%) but still performs 183\% (128\%) worse than the best acoustic system
     In line with the results of \citet{Lin_et_al_2005} and \citet{Martinez_et_al_2012}, prosodic information on its own is enough for a relatively well performing LID system -- achieving accuracy of over 87\% on 10s segments and over 74\% on 3s segments (but the $C_{primary}$ score being worse by around 150\% compared to the best acoustic systems). Unsurprisingly, energy and pitch seem to be capturing different and complementary information, which results in big performance improvements when the two features are combined (relative improvement of roughly 50\% and 40\% for the 10s and 3s conditions, respectively, when compared to the use of energy or pitch in isolation). The fact of early fusion gaining consistently better results than intermediate fusion I relate to the inherently tied relationship between energy and pitch in the realisation of stress and intonation.
+
+
+    %%% prosodic features
+    naturally, architectures like x-vectors provide good opportunities for prosody, since they can aggregate temporal contexts (no longer the need for hacks like Legendre polynomials, duration numbers or other implicit time capturing)
+    prosodic accuracy is impressive: imagine a human trying to distinguish between languages without understanding any of the words (or without even being able to perceive the different phones produced!)
+    duration is modelled implicitly (whether with energy or with pitch) and cannot be isolated. but looks like even energy and pitch are best utilised when combined at the lowest level (feature vectors). this corresponds to their tight relationship in real prosody!
   }
 
   \section{Combining acoustic and prosodic features}{
@@ -1028,19 +1048,47 @@
     \end{table}
 
     \autoref{tab:results-combined-early} shows the results for systems in which an acoustic system and a prosodic one were combined using early fusion, while \autoref{tab:results-combined-intermediate} refers to the systems in which acoustic and prosodic information was combined at the intermediate (x-vector) level. Regardless of the fusion type, combining acoustic and prosodic information clearly improves the performance: Comparing the best acoustic system with the best combined system, the relative improvement in $C_{primary}$ is 37\% and 28\% for the 10s and 3s conditions, respectively. Moreover, intermediate fusion improves on early fusion by 14\% and 22\% in the 10s and 3s conditions, respectively, the best system using \textit{both} prosodic features combined as a pair at the feature level (early fusion) as expected, having observed the results of prosody-only system in \autoref{sec:exp-prosodic}.
+
+
+    %%% combined systems
+    huge improvement compared to acoustic systems
+    Martinez (2012) see improvement of 15.24\% (10.93\%) after fusion, we see 37\% (28\%)!
+    prosody and acoustic representations best combined at x-vector level: it may be that they are difficult for the TDNN to combine since they bear so different information
+    pitch+energy (early) by far the biggest improvement, choice of acoustic feature doesn't matter too much strictly speaking
   }
 }
 
-\chapter{Overall results and discussion}{
-  \label{chap:results-and-discussion}
+\chapter{Overall discussion and conclusions}{
+  \label{chap:discussion-and-conclusions}
 
-  clearly, energy helps MFCCs (compare vanilla MFCC with MFCC+energy (early))
+  %%% overall discussion and conclusions?
+  Martinez (2013) mention that in "Continuous Prosodic Features and Formant Modeling with Joint Factor Analysis for Speaker Verication" formants on top of acoustic system don't help (haha, surprise), but in their work they do help: with added formants (on top of prosody), the improvement is 17.79\% (14.92\%) compared to then SOTA acoustic i-vector system without prosody or formants
 
-  Reporting: overall $C_{primary}$, accuracy (for illustrative purposes), confusion matrix (to see which language pairs are confusing)
-  
   Focus on Slavic languages, since there is so many of them (Czech, Croatian, Polish, Russian, Bulgarian) and intonation can be very characteristic and important here (my own intuition, based on my knowledge of Slavic languages).
   
   I ignore BNFs (as used by Snyder and some others). In essence, they're computed from acoustic features. I just wanna know how much the prosodic information can help when combined with acoustic information.
+
+  %%% analysing the errors
+  languages with information on sex: AR, BG, WU, CR, CZ, FR, GE, JA, KO, CH, PL (only 1/3), PO, RU, SP, SW, TH, TU, VN 
+  without: TA, 
+
+  \begin{figure}[h!]
+    \centering
+    \includegraphics[width=\textwidth]{../img/cfmtrx_fusion_mfcc_deltas+pitch_energy.pdf}
+    \caption{Early fusion, 10s condition.}
+    \label{fig:summary-early-10s}
+  \end{figure}
+
+  \begin{figure}[h!]
+    \centering
+    \includegraphics[width=\textwidth]{../img/tsne-mfcc_deltas_pitch_energy.png}
+    \caption{Early fusion, 10s condition.}
+    \label{fig:summary-early-10s}
+  \end{figure}
+
+  where does prosody struggle the most? difference between best and prosodic only
+  where is prosody most helpful? difference between best and acoustic only
+
 
   \begin{figure}[h!]
     \centering

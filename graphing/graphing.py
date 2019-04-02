@@ -11,9 +11,12 @@ font_size = 15
 matplotlib.rc('axes', edgecolor='black')
 sns.set(font_scale=font_size/10)
 
-def save_fig(fig, name):
+def save_fig(fig, name, dpi=None):
     fig.savefig("../img/{}.pdf".format(name))
-    fig.savefig("../img/{}.png".format(name))
+    if dpi is not None:
+        fig.savefig("../img/{}.png".format(name), dpi=dpi)
+    else:
+        fig.savefig("../img/{}.png".format(name))
 
 def style_axis(ax):
     # Black border
@@ -175,14 +178,14 @@ def plot_heatmap(values, xs, ys, x_label, y_label, height=None, width=None, cmap
     
     return fig
 
-def plot_cat(x, y, hue, data, legend_descs=None, order=None, hue_order=None, palette=None,
+def plot_cat(x, y, hue, data, legend_descs=None, order=None, hue_order=None, palette=None, legend_loc=0,
              legend_title=None, title=None, ylabel=None, xlabel=None, xticks=None, figsize=(9,7)):
     plt.figure(figsize=figsize)
     ax = plt.gca()
     ax = style_axis(ax)
     f = sns.catplot(x=x, y=y, hue=hue, data=data, height=6, kind="bar", ax=ax, 
                     order=order, hue_order=hue_order, palette=palette)
-    leg = ax.legend()
+    leg = ax.legend(loc=legend_loc)
     for i, desc in enumerate(legend_descs):
         leg.get_texts()[i].set_text(desc)
     leg.set_title(legend_title)
