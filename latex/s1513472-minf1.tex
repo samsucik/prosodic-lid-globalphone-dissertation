@@ -1044,21 +1044,34 @@
 
   \begin{figure}[h!]
     \centering
-    \begin{minipage}{0.5\textwidth}
+    \begin{minipage}{0.49\textwidth}
       \centering
       \includegraphics[width=\textwidth]{../img/summary-early-10s.pdf}
-      \subcaption{...}
+      \subcaption{Early fusion, 10s condition.}
       \label{fig:summary-early-10s}
     \end{minipage}
     \begin{minipage}{0.49\textwidth}
       \centering
+      \includegraphics[width=\textwidth]{../img/summary-intermediate-10s.pdf}
+      \subcaption{Intermediate fusion, 10s condition.}
+      \label{fig:summary-intermediate-10s}
+    \end{minipage}
+    \begin{minipage}{0.49\textwidth}
+      \centering
+      \vspace*{1.5em}      
       \includegraphics[width=\textwidth]{../img/summary-early-3s.pdf}
-      \subcaption{...}
+      \subcaption{Early fusion, 3s condition.}
       \label{fig:summary-early-3s}
     \end{minipage}
-    % \vspace*{-1em}
-    \caption{Evaluation set performance and training runtime for varying number of training epochs $E$ of the TDNN.}
-    \label{fig:summary-early}
+    \begin{minipage}{0.49\textwidth}
+      \centering
+      \vspace*{1.5em} 
+      \includegraphics[width=\textwidth]{../img/summary-intermediate-3s.pdf}
+      \subcaption{Intermediate fusion, 3s condition.}
+      \label{fig:summary-intermediate-3s}
+    \end{minipage}
+    \caption{Final comparison of all acoustic+prosodic combinations in the 10s (top) and 3s (bottom) condition, where the acoustic and prosodic information is combined at the feature (early) level (left) and at the x-vector (intermediate) level (right).}
+    \label{fig:summary-barplots}
   \end{figure}
 }
 
