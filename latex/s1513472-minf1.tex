@@ -59,9 +59,9 @@
 
 \maketitle
 
-% Add acknowledgements if necessary.
 \section*{Acknowledgements}{
-  Thanks to Paul Moore for productive collaboration while building the baseline system, to Steve Renals for his supervision and optimism, and to David Snyder for his advice.
+  I would like to thank Paul Moore for productive collaboration while building the baseline system, Steve Renals for his supervision and optimism, and David Snyder for his advice. 
+  My thanks extends to Sl\'avka He\v{z}elyov\'a who supported me throughout the academic year, to Anna Colvile, and to Anita Klementiev.
 }
 
 \tableofcontents
@@ -874,7 +874,7 @@
 \chapter{Experiments and discussed results}{
   \label{chap:Experiments}
 
-  In this chapter, I describe the experiments that I carried out, in the order they were designed. I provide raw results followed by a discussion of the experiment. For overall discussion, focusing more on relating my work to past studies, see \autoref{chap:discussion-and-conclusions}. However, my ability to compare my results with those of others is limited: To the best of my knowledge, this is the first work using the GlobalPhone corpus for LID, and the commonly used NIST LRE corpora differ in many ways (as discussed in \autoref{chap:Data}).
+  In this chapter, I describe the experiments that I carried out, in the order they were designed. I provide raw results followed by a discussion of the experiment. For overall discussion, focusing more on relating my work to past studies and suggesting the directions for further research, see \autoref{chap:discussion-and-conclusions}. However, my ability to compare my results with those of others is limited: To the best of my knowledge, this is the first work using the GlobalPhone corpus for LID, and the commonly used NIST LRE corpora differ in many ways (as discussed in \autoref{chap:Data}).
 
   The aims of my experiments can be summarised into the following key points:
   \begin{enumerate}
@@ -887,7 +887,6 @@
     % - see how well prosodic+acoustic features work (early and intermediate fusion)
     \item {This is my ultimate aim: to evaluate the effect of using both acoustic and prosodic information -- combined in different ways.}
   \end{enumerate}
-
 
   % Evaluation metric: $C_{primary}$, consistent with NIST LREs (TO-DO: mentioned in an earlier section?). I also report confusion matrices and accuracy as these are easier to intuitively reason about and analyse.
   Throughout all experiments, I use $C_{primary}$ as the main metric -- staying consistent with the latest LRE 2017 challenge and the work of \citet{Snyder_et_al_2018}. In the tables with results, the best result in terms of the $C_{primary}$ value is always put in bold face. Additionally, I also report accuracy and later show confusion matrices as these are easier to intuitively grasp and reason about.
@@ -1082,41 +1081,7 @@
 \chapter{Overall discussion and conclusions}{
   \label{chap:discussion-and-conclusions}
 
-  %%% conclusions
-  prosody helps a lot (as much as 37 and 28\%)
-  prosody better modelled with x-vectors than with i-vectors, and the features are simpler
-  energy has a lot to offer on top of C0
-
-  pitch+energy (early) by far the biggest improvement, choice of acoustic feature doesn't matter too much strictly speaking
-  
-  %%% overall discussion and conclusions?
-  Martinez (2013) mention that in "Continuous Prosodic Features and Formant Modeling with Joint Factor Analysis for Speaker Verication" formants on top of acoustic system don't help (haha, surprise), but in their work they do help: with added formants (on top of prosody), the improvement is 17.79\% (14.92\%) compared to then SOTA acoustic i-vector system without prosody or formants
-
-  Focus on Slavic languages, since there is so many of them (Czech, Croatian, Polish, Russian, Bulgarian) and intonation can be very characteristic and important here (my own intuition, based on my knowledge of Slavic languages).
-  
-  I ignore BNFs (as used by Snyder and some others). In essence, they're computed from acoustic features. I just wanna know how much the prosodic information can help when combined with acoustic information.
-
-  %%% analysing the errors
-  languages with information on sex: AR, BG, WU, CR, CZ, FR, GE, JA, KO, CH, PL (only 1/3), PO, RU, SP, SW, TH, TU, VN 
-  without: TA, 
-
-  \begin{figure}[h!]
-    \centering
-    \includegraphics[width=\textwidth]{../img/cfmtrx_fusion_mfcc_deltas+pitch_energy.pdf}
-    \caption{Early fusion, 10s condition.}
-    \label{fig:summary-early-10s}
-  \end{figure}
-
-  \begin{figure}[h!]
-    \centering
-    \includegraphics[width=\textwidth]{../img/tsne-mfcc_deltas_pitch_energy.png}
-    \caption{Early fusion, 10s condition.}
-    \label{fig:summary-early-10s}
-  \end{figure}
-
-  where does prosody struggle the most? difference between best and prosodic only
-  where is prosody most helpful? difference between best and acoustic only
-
+  In this chapter, I provide an overall discussion of my results and findings in the context of past research, elaborate more on the limitations of my work, and draw conclusions.
 
   \begin{figure}[h!]
     \centering
@@ -1149,6 +1114,64 @@
     \caption{Final comparison of all acoustic+prosodic combinations in the 10s (top) and 3s (bottom) condition, where the acoustic and prosodic information is combined at the feature (early) level (left) and at the x-vector (intermediate) level (right).}
     \label{fig:summary-barplots}
   \end{figure}
+
+
+  %%% comment on the overall comparisons between combinations of features
+  pitch+energy (early) by far the biggest improvement (choice of acoustic feature doesn't matter too much strictly speaking). this is very good because prosodic tdnn can be trained spearately, the clssifier then retrained and here we go!
+  relative improvements smaller on short segments; usual thing observed in Snyder and Martinez as well...
+  tdnn unable to process pitch with acoustic info well (same or slightly worse performance in early fusion).
+  interestingly, sdc tdnn struggling with pitch and energy in intermediate fusion! (when isolated)
+
+
+  %%% comment on language-specific performance of the best model
+  % languages with information on sex: AR, BG, WU, CR, CZ, FR, GE, JA, KO, CH, PL (only 1/3), PO, RU, SP, SW, TH, TU, VN. without: TA, PL (partial),
+  confusing pairs:
+  PO-SP
+  CR-PO
+  PL-BG
+  CZ-PL
+  WU-CH
+  PO-RU
+  SW-SP
+  spanish preferred by the classifier (unfair!). but then simply romance, slavic and chinese pairs confused (good), and portuguese with slavic languages (fair, discussed earlier)
+  
+  F1
+  best languages: CH, FR, GE, TA, TH
+  worst languages: PO, CR, SP, PL
+  cannot be easily attributed to sex imbalance
+  
+  let's plot eval/test imbalance to see if adjusting the prior was unfair for some languages
+  - most heavy adjustments were made for: AR, CR, SP, TU, WU, vs JA, VN
+  - most of these languages have eval and test distribution similar, except WU and VN, but these were recognised fine! (95.7 and 99.5)
+  remarkable: just 1h of training data and 0.8h of enrollment was enough for the TDNN and classifier and we have 0.992 F1!
+
+  \begin{figure}[h!]
+    \centering
+    \includegraphics[width=\textwidth]{../img/tsne-mfcc_deltas_pitch_energy.png}
+    \caption{Early fusion, 10s condition.}
+    \label{fig:summary-early-10s}
+  \end{figure}
+
+  \begin{figure}[h!]
+    \centering
+    \includegraphics[width=\textwidth]{../img/cfmtrx_fusion_mfcc_deltas+pitch_energy.pdf}
+    \caption{Early fusion, 10s condition.}
+    \label{fig:summary-early-10s}
+  \end{figure}
+
+
+  %%% comment on language-specific trends w.r.t prosody
+  where does prosody struggle the most? difference between best and prosodic only
+  where is prosody most helpful? difference between best and acoustic only
+
+
+  %%% conclusions
+  prosody helps a lot (as much as 37 and 28\%)
+  pitch and energy are hugely complementary and should be used together. duration is captured for free when using x-vectors :-)
+  prosody better modelled with x-vectors than with i-vectors, and the features are simpler
+  energy has a lot to offer on top of C0
+  Martinez (2013) mention that in "Continuous Prosodic Features and Formant Modeling with Joint Factor Analysis for Speaker Verication" formants on top of acoustic system don't help (haha, surprise), but in their work they do help: with added formants (on top of prosody), the improvement is 17.79\% (14.92\%) compared to then SOTA acoustic i-vector system without prosody or formants
+  I ignore BNFs (as used by Snyder and some others). In essence, they're computed from acoustic features. I just wanna know how much the prosodic information can help when combined with acoustic information.
 }
 
 \chapter{Future work}{
