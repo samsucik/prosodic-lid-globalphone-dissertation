@@ -125,7 +125,7 @@
     \label{sec:i-vectors}
     This approach, with its numerous variations, has now been the state of the art for 8 years -- since first introduced by \cite{Dehak_et_al_2011} for speaker recognition and later applied by \cite{Martinez_et_al_2011} in language recognition.
     
-    \begin{figure}[h!]
+    \begin{figure}[h!t]
       \centering
       \includegraphics[width=14.5cm]{graphics/i-vectors}
       \vspace*{-1em}
@@ -166,7 +166,7 @@
     % describing TDNN: like 1D CNN. often made sparse. aggregates information along the time axis
     % TO-DO: Advantages of TDNN over a fully connected DNN?
     % TO-DO: Mention where was TDNN first introduced?
-    \begin{figure}[h!]
+    \begin{figure}[h!t]
       \centering
       \includegraphics[height=6cm]{graphics/tdnn-generic}
       \caption{Example of a time-delay neural network.}
@@ -208,7 +208,7 @@
       \item {an utterance-level part consisting of 2 fully connected bottleneck layers which extract more sophisticated features and compress the information into a lower-dimensional space, and an additional softmax output layer.}
     \end{enumerate}
     
-    \begin{figure}[h!]
+    \begin{figure}[h!t]
       \centering
       \includegraphics[height=8cm]{graphics/x-vectors-hl}
       \caption{A high-level sketch of the x-vector TDNN from \citeauthor{Snyder_et_al_2018}.}
@@ -279,7 +279,7 @@
       % - mel filterbank: quantifying the energy levels present in discrete, overlapping frequency bands (spaced unevenly to reflect the human perceptual scale), smoothing out pitch information
       % - logarithm: accounting for human non-linear perception of loudness
       % - inverse DFT: extracting coefficients characterising the shape of the spectral envelope
-      \begin{figure}[h!]
+      \begin{figure}[h!t]
         \centering
         \includegraphics[width=\textwidth]{graphics/mfcc}
         \vspace*{-1em}
@@ -379,7 +379,7 @@
     \subsection{The continuous Kaldi pitch as a prosodic feature}{
       \label{sec:kaldi-pitch}
       Even though the original paper \citep{Ghahremani_et_al_2014} contains a detailed description of the Kaldi pitch algorithm (along with a working implementation as part of the Kaldi ASR toolkit), I provide an additional, more holistic view to give the reader an intuitive understanding of the algorithm and the features it produces (see \autoref{fig:kaldi-pitch}).
-      \begin{figure}[h!]
+      \begin{figure}[h!t]
         \centering
         \includegraphics[width=\textwidth]{graphics/kaldi-pitch}
         \vspace*{-1em}
@@ -415,7 +415,7 @@
 
     \subsection{Illustrating the prosodic features used in this work}{
       Having familiarised the reader with the two prosodic features I will use (the energy and the Kaldi pitch), I now illustrate them on a realistic example. Because the multi-lingual corpus used for this project does not contain English, I used the freely accessible sample utterance from the CSR-I (WSJ0) Complete corpus\footnote{\url{https://catalog.ldc.upenn.edu/LDC93S6A}}, which has important characteristics such as the recording conditions and the speaking style the same as the corpus I later use (see \autoref{sec:GlobalPhone}).
-      \begin{figure}[h!]
+      \begin{figure}[h!t]
         \centering
         \vspace{-1.2em}
         \hspace*{-2.4cm}
@@ -445,7 +445,7 @@
     % started in 1995, presented in 2002 and 2013 (citations). I use the newest version from 2016 which contains 22 languages.
     The corpus I use is the GlobalPhone multilingual ASR corpus \citep{Schultz_et_al_2013}, more precisely its newest version -- updated in 2016 and covering 22 languages from around the world (see \autoref{fig:GlobalPhone-map}): Arabic (AR), Bulgarian (BG), Chinese-Mandarin (CH), Chinese-Shanghai (WU), Croatian (CR), Czech (CZ), French (FR), German (GE), Hausa (HA), Japanese (JA), Korean (KO), Brazilian Portuguese (PO), Polish, (PL), Russian, (RU), Spanish, (SP), Swahili (SWA), Swedish (SW), Tamil (TA), Thai (TH), Turkish (TU), Ukrainian (UA), and Vietnamese (VN). The corpus follows the style established for English by the Wall Street Journal-based corpora \citep{Paul_Baker_1992} such as the CSR-I (WSJ0) Complete corpus\footnote{\url{https://catalog.ldc.upenn.edu/LDC93S6A}}. It consists of newspaper articles read by native speakers (around 100 speakers per language, each speaker producing about 20 minutes of audio by reading 3-5 articles), recorded as wideband (16kHz) audio in a controlled environment, using a close-talking microphone (in the case of GlobalPhone the Sennheiser microphone HD-440-6).
 
-    \begin{figure}[h!]
+    \begin{figure}[h!t]
       \centering
       \includegraphics[width=7.7cm, angle=270]{graphics/GlobalPhone-map.pdf}
       \vspace*{-1em}
@@ -631,7 +631,7 @@
   \section{Final architecture}{
     \label{sec:architecture}
 
-    \begin{figure}[h!]
+    \begin{figure}[h!t]
       \centering
       \includegraphics[width=15cm]{graphics/architecture}
       \vspace*{-1em}
@@ -653,7 +653,7 @@
       Throughout my experiments, the following feature types are used (as a refresher, see \autoref{sec:features}): MFCC, MFCC+$\Delta$+$\Delta\Delta$, SDC, energy, and Kaldi pitch. For more details, see (TO-DO: link the experiments section where the dimensionalities of these are explained).
 
       To enable frame-wise feature concatenation, all feature types were computed with the same frame width of 25ms and frame shift of 10ms. Windowing was done using the Povey window\footnote{the default windowing function in Kaldi, defined and implemented here: \url{https://github.com/kaldi-asr/kaldi/blob/master/src/feat/feature-window.cc\#L109}}, a slight variation of the commonly used Hamming window \citep[p. 200]{Blackman_Tukey_1958}; see \autoref{fig:window-types} for a comparisons.
-      \begin{figure}[h!]
+      \begin{figure}[h!t]
         \centering
         \includegraphics[width=9cm]{../img/window-types.pdf}
         \vspace*{-1em}
@@ -785,7 +785,7 @@
       where $C$ are the counts of utterances in language $l$ in the respective data sets. In other words, if the distribution of languages in the enrollment set matches that in the evaluation set, all priors will be scaled by the same factor -- effectively not being scaled -- and the classifier's priors will reflect the distribution observed in the enrollment set. However, if the distributions do not match, the classifier's priors (driven by the enrollment set) will be corrected in the direction indicated by the distribution in the evaluation set. Of course, the evaluation set does not necessarily correctly reflect the language distribution in unseen data. Hence, by setting the $s$ parameter to a value smaller than 1.0, correcting the priors can be made less reliant on the evaluation set's distribution.
       I keep the value of $s=0.7$ as used in the LRE07 recipe -- particularly because this is not a parameter that could be tuned given one's data, only set to an empirically trusted value. The scaling factors used for rebalancing the classifier (in the 10s condition) are shown in \autoref{fig:logit-priors}. Clearly, languages such as Arabic and Croatian were identified as under-represented and the classifier will be re-balanced to prefer them more. The opposite goes for Japanese or Vietnamese.
       % - add graph showing distribution of priors and eval utt counts
-      \begin{figure}[h!]
+      \begin{figure}[h!t]
         \centering
         \includegraphics[width=15cm]{../img/logit-priors.pdf}
         \vspace*{-1em}
@@ -835,7 +835,7 @@
       \item{\verb|mix-up| $ \in \{19, 50, 100, 150, 200, 250, 300\}$ (the default is 0, the LRE07 recipe uses 150 for 14 languages)}
       \item{\verb|normalizer| $ \in \{0, 0.00001, 0.0001, 0.001, 0.01\}$ (the default is 0.0025, the LRE07 recipe uses 0.001)}
     \end{itemize}
-    \begin{figure}[h!]
+    \begin{figure}[h!t]
       \centering
       \includegraphics[width=11cm]{../img/normaliser_vs_mix-up_best.pdf}
       \vspace*{-1em}
@@ -843,14 +843,14 @@
       \label{fig:normaliser_vs_mix-up_best}
     \end{figure}
     \autoref{fig:normaliser_vs_mix-up_best} shows the best result across all numbers of training iterations for each combination of \verb|mix-up| and \verb|normalizer|, showing rather clearly that \verb|normalizer|=0.001 (also used by the LRE07 recipe) is the optimal value within the explored range.
-    \begin{figure}[h!]
+    \begin{figure}[h!t]
       \centering
       \includegraphics[width=8cm]{../img/logit_mix-up.pdf}
       \vspace*{-1em}
       \caption{Evaluation set $C_{primary}$ varying with the number of mixture components of the classifier.}
       \label{fig:logit_mix-up}
     \end{figure}
-    \begin{figure}[h!]
+    \begin{figure}[h!t]
       \centering
       \includegraphics[width=8cm]{../img/logit_max-steps_vs_mix-up.pdf}
       \vspace*{-1em}
@@ -860,7 +860,7 @@
     Fixing this parameter and plotting just the performance against the number of mixture components \verb|mix-up| (see \autoref{fig:logit_mix-up}) led me to the conclusion that \verb|mix-up| should be chosen as 50 or 100. Further plotting the performance as varying with the number of mixture components for each number of training iterations separately (\autoref{fig:logit_max-steps_vs_mix-up}) shows how not just worse but also unstable the performance is for lower number of iterations. Thus, I decided to use \verb|max-steps|=200 and -- even though it seems to not make a big difference -- I fixed \verb|mix-up| at the best performing value of 100.
 
     Then, I tuned $E$. In particular, I wanted to reach a reasonable compromise between too long training runtimes and too low evaluation set performance. $E$ was tuned in the baseline condition, i.e. using MFCC features and 10s evaluation segments. The system was evaluated end-to-end, using the optimal values of the classifier established above. The results are summarised in \autoref{fig:num-epochs}. Clearly, the early epochs are the most important, but the performance (in terms of $C_{primary}$) also plateaus fairly quickly: beyond 10 training epochs and, when measured by accuracy, it even starts becoming worse, indicating that the TDNN probably starts to overfit the training data. AS the compromise value of $E$, I decided to use the "elbow" point of the $C_{primary}$ plot in \autoref{fig:num-epochs}, where $E=7$. This implies the training runtime of around 19 hours to train a single x-vector TDNN.
-    \begin{figure}[h!]
+    \begin{figure}[h!t]
       \centering
       \includegraphics[width=14.9cm]{../img/num-epochs.pdf}
       \vspace*{-1em}
@@ -978,7 +978,7 @@
     % duration is modelled implicitly (whether with energy or with pitch) and cannot be isolated. but looks like even energy and pitch are best utilised when combined at the lowest level (feature vectors). this corresponds to their tight relationship in real prosody!
     The early fusion gains consistently better results than intermediate fusion. I relate this observation to the fact that pitch and energy are inherently tied in the realisation of prosodic variables like stress and intonation. As a result of this tight relationship, extracting x-vectors from pitch and energy information separately (in the case of the intermediate fusion) can be compared to doing extraction from two incomplete contours: Naturally, both of the resulting two x-vector kinds will be of poor quality, and fusing them will change little about this. Extracting x-vectors from the pitch and energy information combined, on the other hand, can be thought of as extracting more abstract information from one complete contour (complete in that it contains both the pitch and the energy component of the intonation and stress patterns), thus resulting in good quality x-vectors.
 
-    \begin{figure}[h!]
+    \begin{figure}[h!t]
       \centering
       \includegraphics[width=\textwidth]{../img/cfmtrx_pitch_energy.pdf}
       \caption{The confusion matrix for the best prosodic system (energy + pitch combined using early fusion) in the 10s condition. Each cell shows the fraction of all segments labelled as the true language which were classified as the predicted language. Values under 1\% are not shown and logarithmic colour scale is used for better readability.}
@@ -987,7 +987,7 @@
 
     To analyse the prosodic features in more detail, I visualise the confusion matrix for the best-performing prosodic system in the 10s condition (see \autoref{fig:cfmtrx_pitch_energy-10s}). Among the most easily confused language pairs (with the matrix entries above 5\%), most can be explained by their shared language genus\footnote{Genus denotes a language grouping more fine-grained than language families; for instance, the Slavic genus is part of the Indo-European language family.}: pairs of Slavic languages (Polish-Bulgarian, Bulgarian-Polish, Russian-Croatian, Czech-Polish, Croatian-Russian), Chinese languages (Mandarin-Wu), and Romance languages (Portuguese-Spanish). An interesting example is Portuguese being confused with Slavic languages like Polish, Russian or Croatian -- corresponding to the known phenomenon of Portuguese "sounding like" Slavic languages. This can be related to the similar characteristic use of sibilant sounds, vowel reduction (resulting in clusters of consonants) and stress-timed rhythm in Portugal as well as the Slavic languages\footnote{To a curious reader I recommend this video focusing on phonological similarities between Portuguese and Russian/Polish: \url{https://www.youtube.com/watch?v=Pik2R46xobA}}. Still, a good number of confused pairs is difficult to explain phonologically, mainly Arabic-Turkish, Swedish-Spanish, and Tamil being confused for Spanish and Turkish. For these cases, I go back to \autoref{fig:logit-priors} and hypothesise that the reason is the high scaling of priors for Turkish and Spanish (along with other languages such as Croatian, Arabic, and Wu), which can surface in the classifier being biased in favour of these languages.
 
-    \begin{figure}[h!]
+    \begin{figure}[h!t]
       \centering
       \includegraphics[width=\textwidth]{../img/tsne-pitch_energy.png}
       \caption{Visualisation of the space of the testing set x-vectors extracted from the best prosodic TDNN. Languages from the same genus use the same shape: circle -- Slavic, star -- Romance, cross -- Chinese, pentagon -- Germanic.}
@@ -1085,7 +1085,7 @@
 
   \section{Overall comparison of different systems}{
     \label{sec:discussion-overall-comparison}
-    \begin{figure}[h!]
+    \begin{figure}[h!t]
       \centering
       \begin{minipage}{0.49\textwidth}
         \centering
@@ -1134,7 +1134,7 @@
     \label{sec:discussion-language-specific}
     %%% comment on language-specific performance of the best model
     % languages with information on sex: AR, BG, WU, CR, CZ, FR, GE, JA, KO, CH, PL (only 1/3), PO, RU, SP, SW, TH, TU, VN. without: TA, PL (partial),
-    \begin{figure}[h!]
+    \begin{figure}[h!t]
       \centering
       \includegraphics[width=\textwidth]{../img/cfmtrx_fusion_mfcc_deltas+pitch_energy.pdf}
       \caption{The confusion matrix for the best overall system in the 10s condition. Each cell shows the fraction of all segments labelled as the true language which were classified as the predicted language. Values under 1\% are not shown and logarithmic colour scale is used for better readability.}
@@ -1147,7 +1147,7 @@
       \item {Swedish-Spanish, as discussed previously and attributed to the classifier biased towards Spanish.}
     \end{itemize}
     
-    \begin{figure}[h!]
+    \begin{figure}[h!t]
       \centering
       \includegraphics[width=11cm]{../img/f1-best.pdf}
       \vspace*{-1.2em}
@@ -1156,7 +1156,7 @@
     \end{figure} 
 
     In order to compare the performance of the best system on single languages, I compute and plot the (multi-class) F1 score based on the raw confusion matrix whose thresholded version was presented in \autoref{fig:cfmtrx_best-10s}. The scores are shown in \autoref{fig:f1-best-10s}. Even though all scores are above 0.91, there are still significant differences between some languages. In particular, the best performance in terms of F1 is observed for Mandarin, French, German, Tamil and Thai, while the worst performance is on Portuguese, Croatian, Spanish and Polish. I hypothesise that these differences may be linked to a mismatch between the genders in the enrollment set (which the classifier was trained on) and in the testing set, and plot this information\footnote{The information about speakers' gender was taken from the speaker metadata files, same as the dialect information in \autoref{sec:exp-prosodic}. The information was unavailable for speakers of Tamil and Polish.} in \autoref{fig:gender-balance-enroll-test}.
-    \begin{figure}[h!]
+    \begin{figure}[h!t]
       \centering
       \includegraphics[width=13cm]{../img/sex-balance.pdf}
       \vspace*{-1.2em}
@@ -1171,7 +1171,7 @@
 
     In my next attempt at explaining the performance differences, I turn to the unbalanced data amounts as discussed previously in the context of adjusting the classifier's prior beliefs. If a language was -- \textit{relative to its presence in the unseen test data} -- under-represented in the enrollment set and then over-represented in the evaluation set, the classifier's prior would have been scaled down for that language, making the classifier biased against it -- and resulting in that language's test-set samples being unfairly classified as other languages (false negatives). On the other hand, if a language's relative presence was the same in the evaluation and testing sets, then adjusting the prior based on the evaluation set's statistics would not result in any unfair behaviour on the test.
 
-    \begin{figure}[h!]
+    \begin{figure}[h!t]
       \centering
       \includegraphics[width=10cm]{../img/eval-test-balance.pdf}
       \vspace*{-1.2em}
@@ -1184,7 +1184,7 @@
     % - most of these languages have eval and test distribution similar, except WU and VN, but these were recognised fine! (95.7 and 99.5)
     \autoref{fig:gender-balance-enroll-test} shows the data amount imbalances between the evaluation and testing set for each language. Going back to the scaling factors presented in \autoref{fig:logit-priors}, these were making the classifier most positively biased for Arabic, Croatian, Spanish, Turkish and Wu, and the most negatively biased for Japanese and Vietnamese. However, based on \autoref{fig:eval-test-balance}, all but two of the mentioned languages actually have their relative presence very similar in the evaluation and testing sets and therefore the prior belief adjustment does not explain the possible performance drops of the final system on the testing set samples of these languages. The only two languages which have both strongly scaled priors \textit{and} large differences between their presence in the evaluation and testing data, are Wu and Vietnamese. However, the F1 scores for these two languages are very good (0.992 and 0.978, respectively), leading me to the conclusion that the classifier's possible unfairness did not have a strong effect. Thus, my conclusion is I was not able to attribute the differences in performance to the gender or data amount imbalances present in the data. Perhaps, some languages are simply harder to identify than others by their very nature.
 
-    % \begin{figure}[h!]
+    % \begin{figure}[h!t]
     %   \centering
     %   \includegraphics[width=\textwidth]{../img/tsne-mfcc_deltas_pitch_energy.png}
     %   \caption{Early fusion, 10s condition.}
@@ -1198,13 +1198,13 @@
     % where does prosody struggle the most? difference between best and prosodic only
     % where is prosody most helpful? difference between best and acoustic only
     Finally, let me analyse the strengths and weaknesses of the prosodic information in the context of its use in combination with acoustic information. First, I ask: Which languages (or language pairs) are the most challenging ones for a prosody-only system, compared to the best system? To provide an answer, I visualise the differences between the best combined system and the best prosodic system in \autoref{fig:cfmtrx-diff-best-vs-prosody-10s}. It is a difference between the two system's full confusion matrices, thresholded to highlight the most important cells, and with the diagonal entries multiplied by -1 such that negative cells would in all cases mean that the prosody-only system performed words. Further, I ask: In which cases does prosody help the most? To answer this question, I present in \autoref{fig:cfmtrx-diff-best-vs-acoustic-10s} the difference between the best overall system and the best acoustic system.
-    \begin{figure}[h!]
+    \begin{figure}[h!t]
       \centering
       \includegraphics[width=\textwidth]{../img/diff_best_vs_pitch_energy.pdf}
       \caption{Difference of the confusion matrices for the best overall system and the best prosodic system (10s condition). The main diagonal was multiplied by -1. Negative numbers show where the best overall system performed better. Values between -1\% and 1\% are not shown for better readability.}
       \label{fig:cfmtrx-diff-best-vs-prosody-10s}
     \end{figure}
-    \begin{figure}[h!]
+    \begin{figure}[h!t]
       \centering
       \includegraphics[width=\textwidth]{../img/diff_best_vs_mfcc_deltas.pdf}
       \caption{Difference of the confusion matrices for the best overall system and the best acoustic system (10s condition). The main diagonal was multiplied by -1. Negative numbers show where the best overall system performed better. Values between -1\% and 1\% are not shown for better readability.}
@@ -1257,30 +1257,35 @@
     I found that such prosodic combination works the best when further combined with acoustic information at the abstract representation level of x-vectors. This observation leads me to believe that existing acoustic language identification systems could benefit from considering prosodic information, without the need to re-train the most computationally expensive back end components responsible for producing utterance-level embeddings. Instead, an additional TDNN can be trained on the prosodic features, and a new classifier would then be re-trained on combined acoustic and prosodic embeddings.
 
     While my results are very promising, it should be noted that even with the addition of prosodic features, certain language pairs are still confusing; especially Slavic languages, which are also sometimes confused with Portuguese -- due to their phonological similarities.
+
+    Another important limitation of prosodic features goes back to the nature of prosody itself: It captures a lot of speaker-, dialect- and accent-dependent information. Thus, systems trained using prosodic information are arguably more prone to discriminating against speakers under-represented in the training data. In particular, such systems might be particularly discriminatory when applied to the speech of non-native speakers or speakers of rare dialects. On the other hand, this makes prosody particularly well suited for speaker recognition.
   }
 }
-
-    % remarkable: just 1h of training data and 0.8h of enrollment was enough for the TDNN and classifier and we have 0.992 F1 (Wu)
 
 \chapter{Future work}{
   \label{chap:future-work}
 
   \section{Possible directions}{
-    I ignore BNFs (as used by Snyder and some others). In essence, they're computed from acoustic features. I just wanna know how much the prosodic information can help when combined with acoustic information. but Snyder et al show improvement of 32\% over MFCCs. might be worth a try. but need a more challenging dataset.
+    \label{sec:future-directions}
 
-    compute VAD correctly
+    I acknowledge that my work has by no means exhausted the potential of exploring prosody in the context of LID.
+    % do more thorough comparison
+    % - try late (score) fusion
+    A natural continuation of this project would see the use of \textit{late} fusion -- the popular method which combines the final scores from multiple classifiers \citep{Martinez_et_al_2012,Gelly_et_al_2016,Plchot_et_al_2016}.
+    % - try bottleneck features instead of acoustic ones and see how much prosody can help there
+    Perhaps even more importantly, in order for the research to be fully relevant given the recent research, the potential of prosody should be examined not in the context of standard acoustic features and their variations invented with i-vector systems in mind; instead, the bottleneck features -- a more abstract feature type extracted from ASR DNNs and reported to outperform MFCCs in LID by over 30\% \citep{Snyder_et_al_2018} -- should be tried.
 
-    explore segment boundary effects (but note that uniform segmentation shown to work well: Steve mentioned speaker diarization, I have \citet{Martinez_et_al_2013} that show the same...)
+    An important limitation of this work -- and one that naturally leads to a direction for my future research -- is the choice of dataset. The GlobalPhone corpus is well suited for an initial work like this. The low channel variation and clean recording conditions make it easier to analyse the potential and nature of prosody, without having to worry about observed effects being in fact caused primarily by the variation in the corpus. For more relevant and realistic research, however, a more realistic corpus is desirable -- and certainly a more challenging one. Looking at the almost perfect confusion matrix produced by my best system (\autoref{fig:cfmtrx_best-10s}), there is little room for improvement using this data -- the corpus is simply too easy for language identification. By using for example the NIST LRE corpora which -- as of LRE 2017 -- feature not just telephone and broadcast speech, but also speech from a great variety of videos from the internet (the VAST corpus, see \citet{Tracey_Strassel_2018}), this research would gain more value and relevance.
 
-    try late (score) fusion
-
-    try bottleneck features instead of acoustic ones and see how much prosody can help
-
-    use more noisy data or narrowband to see how well the energy and Kaldi pitch can be extracted there
+    Last but not least, as the performance on longer segments improves, the more challenging LID from \textit{short segments} is becoming more and more relevant: In online settings such as emergency call routing or voice assistants, in scenarios with frequent code switching, or in large-scale ASR where identifying the language faster can make a big difference in terms of resources (for example in transcribing videos for a portal like YouTube).
+    While my results are rather clear for $\leq$10s speech segments, short segments might render certain feature types unfavourable (see the observed performance fall observed for the SDC features), and the effects caused by unnatural segment boundaries become more important.
+    % - thus, segment boundaries are becoming important. explore segment boundary effects (but note that uniform segmentation shown to work well: Steve mentioned speaker diarization, I have \citet{Martinez_et_al_2013} that show the same...)
+    Therefore, exploring prosody specifically in the context of very short, arbitrarily cut speech segments is another possible direction for research.
   }
 
   \section{Plan for Part 2 of the MInf project}{
-
+    \label{sec:future-plan}
+    TO-DO
   }
 }
 
