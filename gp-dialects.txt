@@ -1,0 +1,195 @@
+Arabic
+      1 Jordanian 
+     17 Palestinian 
+      1 Palestinian
+     60 Tunisian 
+Bulgarian
+      3 
+     74 no
+Chinese-Shanghai/Wu
+     36  
+      5 SH 
+Croatian
+     51 Bosnian 
+      5 Kajkav 
+      1 Northern Bosnian 
+      1 Purgerian, street slang
+      1 Shtokav 
+     11 Standard Croatian 
+     24 Zagreb dialect 
+Czech
+    102 common Czech
+French
+    100 
+German
+     77  
+Japanese
+      3  
+      2 CHIBA-ben 
+      1 FUKUI-ben 
+      2 Fukushima-ben 
+      2 Hakata-ben 
+      1 Hakodate-ben 
+      1 HANAGAWA-ben 
+      3 Hiroshima-ben 
+      1 HIROSHIMA-ben  
+      1 Hokaido-ben 
+      1 HOKKAIDO-ben 
+      1 HUKUOKA-ben 
+      3 Ibaragi-ben 
+      1 Imaji-ben 
+      2 KAGOSHIMA-ben 
+      5 Kansai-ben 
+      1 Kyusyu-ben 
+      1 Matsuyamaben,Fukuoka-ben 
+      1 Matsuyamaben,Osaka-ben 
+      1 Miyazaki-ben 
+      1 Nagaoka-ben 
+      1 Niigata-ben 
+      1 no dialect 
+      1 OKAUYAMA-ben 
+      2 Okayama-ben 
+      1 Okinawa-ben 
+      1 OOITA-ben 
+      4 Osaka-ben 
+      1 Saga-ben 
+      1 Saitama-ben 
+      3 SAITAMA-ben 
+      1 Sanin-ben 
+      1 some Kansai-ben 
+      1 some Toyama-ben 
+      1 Sozo-ben 
+     74 Standard Japanese 
+      1 Standard Japanese (Kurumeben)  
+      1 Standard Japanese (Sanukiben) 
+      2 Tochigi-ben 
+      2 Tohoku-ben 
+      1 TOHOKU-ben 
+      6 TOKYO-ben 
+      2 Tosa-ben 
+      1 Totigi-ben 
+      1 TOTTORI-ben 
+      1 Tounou-ben 
+      1 Yamagata-ben 
+      1 Yokohama-ben 
+Korean
+      9  
+      1 Chonbuk 
+     27 Chonnam 
+      1 Chunbuk 
+      1 Chungbuk 
+      3 Chungchung 
+      4 Chunnam 
+      1 Kangwon 
+      1 Kyongbu 
+      1 Kyungki 
+     10 Kyungsang 
+     41 Seoul 
+Mandarin
+      2  
+      1 Anhui 
+      3 Anhui
+      3 Chaozhou 
+      1 Dongbei 
+      1 Fujian 
+      2 Guizhou 
+      1 Hanzhong 
+      6 Henan
+      7 Hubei 
+     10 Hubei
+      4 Hunan 
+      4 Hunan
+      3 Jiangsu
+      1 Jiangzhe 
+      1 Jianxi
+      1 Jolin
+     20 Kentong 
+      3 Ketong 
+      1 Ketong
+      2 Nanjing 
+      1 Peiking 
+      3 Schanghai 
+      2 Shandong 
+      3 Shandong
+      1 Shanxi
+      2 Sichuan 
+     30 Standard Chinese 
+      1 Standard Chinese
+      1 Tianjin 
+      5 Wuhan 
+      3 Wuhan
+      1 Xinjiang
+      1 Yangjiang 
+      1 Zhejiang
+Polish
+     99 
+Portuguese
+     15  
+      1 Amazonense 
+      1 Brasiliense 
+      3 Carioca 
+      4 Gaucho 
+      1 Goiano 
+      2 Maranhaense 
+      1 Mato Grossense 
+      9 Mineiro 
+      7 Nordestino 
+      1 Paraibense 
+      2 Paranaense 
+     50 Paulista 
+      5 Sulista 
+Russian
+    102  
+      1 -? 
+      1 ? ?,aber man kann es merken 
+      1 bestimmt aber welchen.... 
+      1 ja 
+      1 kaum zu merken  
+      1 kaum zu spueren 
+      1 Minsk 
+      1 rein Russisch 
+      1 unbetonter "o" liest man immer als "o" 
+      4 weissrussisch 
+Spanish
+      1 Argentinean 
+      1 Canario 
+      2 Castellano 
+      2 Chilean 
+      1 Colombiano 
+      2 Ecuadorian 
+      3 Guanacasteco 
+      1 Guatemalteco 
+      1 Limonense 
+      1 Mexican 
+      1 Nicaraguense 
+      1 Peruano 
+     82 Tico 
+      1 Uruguayo 
+Swedish
+      1 Blekingska 
+      1 Bohusmaal 
+     17 Goeteborgska 
+      1 Gotlaendska 
+      1 Hallaendska 
+      2 Norrlaendska 
+     14 Oelaendska 
+      1 Oestgoetska 
+      2 Skaanska 
+     40 Smaalaendska 
+      2 Soermlaendska 
+      6 Stockholmska 
+      2 Uppsvenska 
+      4 Vaermlaendska 
+      4 Vaestgoetska 
+Thai
+     56 middle
+     42 Middle
+Turkish
+      7 Anatolian 
+      1 Anatolian
+      5 Standard Turkish  
+     86 Standard Turkish 
+      1 Standard Turkish
+Vietnamese
+     62 Northern Vietnam
+     67 Southern Vietnam

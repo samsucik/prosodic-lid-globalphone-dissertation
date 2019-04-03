@@ -46,7 +46,7 @@
 
 \title{\vspace{-5.0cm} \centering{\includeshield} \vspace{1cm} \\ Prosodic features \\in spoken language identification}
 
-\author{Sam Sucik}
+\author{Sam Su\v{c}\'ik}
 
 \course{Master of Informatics}
 \project{\vspace{3cm}{\bf MInf Project (Part 1) Report}}
@@ -874,9 +874,9 @@
 \chapter{Experiments and discussed results}{
   \label{chap:Experiments}
 
-  In this chapter, I describe the experiments that I carried out, in the order they were designed. I provide some immediate results and discussion -- especially where these directed my decisions in designing the next experiment.
+  In this chapter, I describe the experiments that I carried out, in the order they were designed. I provide raw results followed by a discussion of the experiment. For overall discussion, focusing more on relating my work to past studies, see \autoref{chap:discussion-and-conclusions}. However, my ability to compare my results with those of others is limited: To the best of my knowledge, this is the first work using the GlobalPhone corpus for LID, and the commonly used NIST LRE corpora differ in many ways (as discussed in \autoref{chap:Data}).
 
-  My aims can be summarised into the following key points:
+  The aims of my experiments can be summarised into the following key points:
   \begin{enumerate}
     % - compare acoustic feats, see if deltas or context aggregation with SDCs can help (TDNN should be able to do it on its own)
     \item {Compare the different types of acoustic features in the context of the x-vector system. Dynamic features -- be it simple delta terms or the more sophisticated SDCs -- were designed primarily to help frame-level models to capture temporal contexts. The x-vector TDNN, on the other hand, does capture such contexts explicitly. Therefore, a question I ask is whether the more sophisticated acoustic features can still improve performance compared to simple MFCCs.}
@@ -889,22 +889,22 @@
   \end{enumerate}
 
 
-  % Evaluation metric: $C_{primary}$, consistent with NIST LREs (mentioned in an earlier section?). I also report confusion matrices and accuracy as these are easier to intuitively reason about and analyse.
+  % Evaluation metric: $C_{primary}$, consistent with NIST LREs (TO-DO: mentioned in an earlier section?). I also report confusion matrices and accuracy as these are easier to intuitively reason about and analyse.
   Throughout all experiments, I use $C_{primary}$ as the main metric -- staying consistent with the latest LRE 2017 challenge and the work of \citet{Snyder_et_al_2018}. In the tables with results, the best result in terms of the $C_{primary}$ value is always put in bold face. Additionally, I also report accuracy and later show confusion matrices as these are easier to intuitively grasp and reason about.
 
   \section{The setup}{
     \label{sec:exp-setup}
-    definitions of features (dimensionalities)
-    The default condition was to use 10s evaluation and testing segments. As for the feature type, the default was the MFCC features of 23 dimensions without energy (same as \citet{Snyder_et_al_2018}). The other two acoustic features were derived from the computed MFCCs and designed such that their dimensionalities would be roughly the same (for a fairer comparison):
+    % definitions of features (dimensionalities)
+    As for the feature type, the default was the MFCC features of 23 dimensions without energy (same as \citet{Snyder_et_al_2018}). The other two acoustic features were derived from the computed MFCCs and designed such that their dimensionalities would be roughly the same (for a fairer comparison):
     \begin{itemize}
       \item {the MFCC+$\Delta$+$\Delta\Delta$ features were 69-dimensional, using 23 first-order and 23 second-order delta terms,}
       \item {the SDC features were 72-dimensional, using the 9-1-3-7 configuration, i.e. computed at 7 locations using the first 9 cepstral coefficients and discarding the rest of the coefficients.}
     \end{itemize}
-    I made the decision to compute the MFCC features using the default of 23 Mel filters, and on the frequency range of 20-7800Hz inspired by the Kaldi manual\footnote{\url{http://kaldi-asr.org/doc/feat.html\#feat_mfcc}}.
+    I made the decision to compute the MFCC features using the Kaldi default of 23 Mel filters, and on the frequency range of 20-7800Hz inspired by the Kaldi manual\footnote{\url{http://kaldi-asr.org/doc/feat.html\#feat_mfcc}}.
 
-    As for the prosodic features, the energy was computed from the MFCCs and was simply a 1-dimensional feature vector per frame.The Kaldi pitch was 5-dimensional, computed using the default parameter values of the Kaldi \verb|compute-kaldi-pitch-feats| binary, in particular using $B=7000$ (see \autoref{eq:nccf}), the penalty factor for frequency jumps of 0.1, and \verb|min-f0|$=50$Hz. I changed the \verb|max-f0| from the default of 400Hz to 500Hz, same as the upper $F_0$ limit used by \citet{Lin_et_al_2005}.
+    As for the prosodic features, the energy was computed from the MFCCs and was simply a 1-dimensional feature vector per frame. The Kaldi pitch was 5-dimensional, computed using the default parameter values of the Kaldi \verb|compute-kaldi-pitch-feats| binary, in particular using $B=7000$ (see \autoref{eq:nccf}), the penalty factor for frequency jumps of 0.1, and \verb|min-f0|$=50$Hz. I changed the \verb|max-f0| from the default of 400Hz to 500Hz, same as the upper $F_0$ limit used by \citet{Lin_et_al_2005}.
 
-    In addition to the default 10s condition (i.e. evaluation and testing segments being of length $\leq10\textrm{s}$), I also evaluate the systems on $\leq3$s testing segments (the 3s condition). On these shorter segments, the systems will perform worse, but the results are important because optimising LID performance on short segments is valuable and important for: on-line settings, low-resource settings, settings with frequent code switching, and similar scenarios where the segment to process is very short.
+    In addition to the default 10s condition (i.e. testing segments being of length $\leq10\textrm{s}$), I also evaluate the systems on $\leq3$s testing segments (the 3s condition). On these shorter segments, the systems will certainly perform worse, but the results are important because optimising LID performance on short segments is valuable and important for: online processing (where we want to identify the language as soon as possible), low-resource settings, settings with frequent code switching, and similar scenarios where the segment to be processed is very short.
   }
 
   \section{Comparing acoustic features}{
@@ -932,21 +932,19 @@
       \label{tab:results-acoustic}
     \end{table}
 
-    The results are presented in \autoref{tab:results-acoustic}.
+    The results are presented in \autoref{tab:results-acoustic}. Just looking at the accuracy values (all above 85\%), all systems perform very well (remember that naive majority class guessing would yield accuracy of only roughly $1/19=5.3\%$).
     % context of MFCC: 15f, MFCC+deltas: 19f, SDC: 3x(7-1)+15=33
     % deltas improve performance by 14\% (7\%), sdcs by 18\% (worse by 7\%)
-    Clearly, both simple deltas and SDCs improve on the performance achieved by simple MFCCs in the 10s condition -- in this case by 14\% and 18\%, respectively. The relative gain is smaller in the 3s condition. SDCs even make the performance worse, which, I hypothesise, can be attributed to the relatively big context of SDCs (in this case 33 frames), which makes a big portion of the SDC terms only partially computed: For a 3s segment with roughly 300 frames, the SDCs are incomplete for 32 frames -- more than 10\%! For the simple delta terms, only 4 terms would be incomplete (2 at either end of the segment). Thus, for shorter segments, features computed over shorter contexts may be favoured.
+    Clearly, both simple deltas and SDCs improve on the performance achieved by simple MFCCs in the 10s condition -- in this case by 14\% and 18\%, respectively. The relative gain is smaller in the 3s condition. 
+    % one might think that dynamic feats won't help much
+    % dynamic feats were designed to mitigate the limitations of frame-level systems
+    % but widening the temporal context seems to still help
+    The observed improvement answers my earlier question about the usefulness of dynamic features in the era of models which process sequences of frames: Clearly, these features still have something to offer. If nothing else, extending the temporal context by the means of dynamic features may remain a computationally cheaper alternative to increasing the context by changing the TDNN architecture.
 
-
-    %%% comparing acoustic features in the context of x-vectors
-    one might think that dynamic feats won't help much
-    dynamic feats were designed to mitigate the limitations of frame-level systems
-    but widening the temporal context seems to still help
-    clearly, energy helps MFCCs (compare vanilla MFCC with MFCC+energy (early))
-    aggressive context widening needs to be careful for short segments
+    Interestingly, SDCs make the performance worse in the 3s condition. I hypothesise that this can be attributed to the relatively big temporal context of SDCs. To compute the SDC feature vector for a frame, a context of -1 and +19 frames\footnote{for a $N$-$d$-$p$-$k$ SDC configuration, the context is -$d$ and +$(p\times(k-1)+d)$} is required, while computing the simple deltas only requires a context of $\pm$2 frames. This means that -- for a $\leq$3s segment -- a big portion of the SDC vectors will be only partially computed: For a 200-frame segment (roughly 2s), the SDCs are incomplete for 20 frames (10\%) while MFCC+$\Delta$+$\Delta\Delta$ will be incomplete only for 4 frames (2\%). Although this hypothesis would require further research, for now I conclude that, for very short segments, dynamic features computed over long contexts should be used with care. Ideally, features requiring shorter contexts -- such as simple deltas or even MFCCs without deltas -- would be used.    
   }
 
-  \section{Comparing prosodic features}{
+  \section{Comparing and combining prosodic features}{
     \label{sec:exp-prosodic}
 
     This experiment focuses on comparing systems trained on the two prosodic features, as well as systems where the Kaldi pitch and energy was combined via early and intermediate fusion.
@@ -973,13 +971,35 @@
     \end{table}
 
     % conclude that. early fusion improves separate prosodic features by around 50\% (40\%) but still performs 183\% (128\%) worse than the best acoustic system
-    In line with the results of \citet{Lin_et_al_2005} and \citet{Martinez_et_al_2012}, prosodic information on its own is enough for a relatively well performing LID system -- achieving accuracy of over 87\% on 10s segments and over 74\% on 3s segments (but the $C_{primary}$ score being worse by around 150\% compared to the best acoustic systems). Unsurprisingly, energy and pitch seem to be capturing different and complementary information, which results in big performance improvements when the two features are combined (relative improvement of roughly 50\% and 40\% for the 10s and 3s conditions, respectively, when compared to the use of energy or pitch in isolation). The fact of early fusion gaining consistently better results than intermediate fusion I relate to the inherently tied relationship between energy and pitch in the realisation of stress and intonation.
+    In line with the results of \citet{Lin_et_al_2005} and \citet{Martinez_et_al_2012}, prosodic information on its own is enough for a relatively well performing LID system -- in this case, achieving accuracy of over 87\% on 10s segments and over 74\% on 3s segments.
+    % prosodic accuracy is impressive: imagine a human trying to distinguish between languages without understanding any of the words (or without even being able to perceive the different phones produced!)
+    Even though the $C_{primary}$ score is worse by around 150\% compared to the best acoustic system, it is still impressive: Imagine a human trying to distinguish between languages just from "how they sound" -- without being able to comprehend any of the words or even phones produced.
+    Unsurprisingly, energy and pitch seem to be capturing different and complementary information, which results in big performance improvements when the two features are combined (relative improvement of roughly 50\% and 40\% for the 10s and 3s conditions, respectively, when compared to the use of energy or pitch in isolation).
+    
+    % duration is modelled implicitly (whether with energy or with pitch) and cannot be isolated. but looks like even energy and pitch are best utilised when combined at the lowest level (feature vectors). this corresponds to their tight relationship in real prosody!
+    The early fusion gains consistently better results than intermediate fusion. I relate this observation to the fact that pitch and energy are inherently tied in the realisation of prosodic variables like stress and intonation. As a result of this tight relationship, extracting x-vectors from pitch and energy information separately (in the case of the intermediate fusion) can be compared to doing extraction from two incomplete contours: Naturally, both of the resulting two x-vector kinds will be of poor quality, and fusing them will change little about this. Extracting x-vectors from the pitch and energy information combined, on the other hand, can be thought of as extracting more abstract information from one complete contour (complete in that it contains both the pitch and the energy component of the intonation and stress patterns), thus resulting in good quality x-vectors.
 
 
     %%% prosodic features
     naturally, architectures like x-vectors provide good opportunities for prosody, since they can aggregate temporal contexts (no longer the need for hacks like Legendre polynomials, duration numbers or other implicit time capturing)
-    prosodic accuracy is impressive: imagine a human trying to distinguish between languages without understanding any of the words (or without even being able to perceive the different phones produced!)
-    duration is modelled implicitly (whether with energy or with pitch) and cannot be isolated. but looks like even energy and pitch are best utilised when combined at the lowest level (feature vectors). this corresponds to their tight relationship in real prosody!
+
+    \begin{figure}[h!]
+      \centering
+      \includegraphics[width=\textwidth]{../img/cfmtrx_pitch_energy.pdf}
+      \caption{The confusion matrix for the best prosodic system (energy + pitch combined using early fusion) in the 10s condition. Each cell shows the fraction of all segments labelled as the true language which were classified as the predicted language. Values under 1\% are not shown and logarithmic colour scale is used for better readability.}
+      \label{fig:cfmtrx_pitch_energy-10s}
+    \end{figure}
+
+    To analyse the prosodic features in more detail, I visualise the confusion matrix for the best-performing prosodic system in the 10s condition (see \autoref{fig:cfmtrx_pitch_energy-10s}). Among the most easily confused language pairs (with the matrix entries above 5\%), most can be explained by their shared language genus\footnote{Genus denotes a language grouping more fine-grained than language families; for instance, the Slavic genus is part of the Indo-European language family.}: pairs of Slavic languages (Polish-Bulgarian, Bulgarian-Polish, Russian-Croatian, Czech-Polish, Croatian-Russian), Chinese languages (Mandarin-Wu), and Romance languages (Portuguese-Spanish). An interesting example is Portuguese being confused with Slavic languages like Polish, Russian or Croatian -- corresponding to the known phenomenon of Portuguese "sounding like" Slavic languages. This can be related to the similar characteristic use of sibilant sounds, vowel reduction (resulting in clusters of consonants) and stress-timed rhythm in Portugal as well as the Slavic languages\footnote{To a curious reader I recommend this video focusing on phonological similarities between Portuguese and Russian/Polish: \url{https://www.youtube.com/watch?v=Pik2R46xobA}}. Still, a good number of confused pairs is difficult to explain phonologically, mainly Arabic-Turkish, Swedish-Spanish, and Tamil being confused for Spanish and Turkish. For these cases, I go back to \autoref{fig:logit-priors} and hypothesise that the reason is the high scaling of priors for Turkish and Spanish (along with other languages such as Croatian, Arabic, and Wu), which can surface in the classifier being biased in favour of these languages.
+
+    \begin{figure}[h!]
+      \centering
+      \includegraphics[width=\textwidth]{../img/tsne-pitch_energy.png}
+      \caption{Visualisation of the space of the testing set x-vectors extracted from the best prosodic TDNN. Languages from the same genus use the same shape: circle -- Slavic, star -- Romance, cross -- Chinese, pentagon -- Germanic.}
+      \label{fig:tsne-pitch_energy}
+    \end{figure}
+    For added insights into the nature of the prosodic systems, I use the t-Distributed Stochastic Neighbour Embedding (t-SNE) technique \citep{Maaten_Hinton_2008} to visualise the testing set x-vectors (in the 10s condition) extracted from the best prosodic TDNN, see \autoref{fig:tsne-pitch_energy}. In particular, the way the language clusters are split into visible sub-clusters very strongly correlates with the number of different dominant dialects present in the GlobalPhone data for the given language\footnote{I gathered the dialect information from the speaker metadata files of the GlobalPhone corpus. Note that no dialect details were present for Bulgarian, Wu, Czech, French, German, Polish, Russian, Tamil and Thai}: The Northern and Southern Vietnamese dialects; the Smaalaendska, Goeteborgska and Oelaendska Swedish dialects; the Anatolian and Standard Turkish dialects; the Seoul and Chonnam Korean dialects; the Bosnian, Standard Croatian, and Zagreb Croatian; and the numerous Mandarin and Japanese dialects. This observation suggests that the prosodic features could be used for \textit{dialect identification}. After all, it comes as no surprise: As I mentioned earlier, intonation -- among other prosodic variables -- often characterises the different dialects of a language.
+
   }
 
   \section{Combining acoustic and prosodic features}{
@@ -1055,6 +1075,8 @@
     Martinez (2012) see improvement of 15.24\% (10.93\%) after fusion, we see 37\% (28\%)!
     prosody and acoustic representations best combined at x-vector level: it may be that they are difficult for the TDNN to combine since they bear so different information
     pitch+energy (early) by far the biggest improvement, choice of acoustic feature doesn't matter too much strictly speaking
+
+    clearly, energy helps MFCCs (compare vanilla MFCC with MFCC+energy (early))
   }
 }
 
