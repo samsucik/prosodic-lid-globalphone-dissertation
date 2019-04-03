@@ -69,10 +69,17 @@
 %TO-DO: re-think and re-write
 \chapter{Introduction}{
   \label{chap:Introduction}
+  
   \section{Motivation}{
-    LID is useful in ASR, in voice assistants, emergency call routing, etc.
-    Traditionally, acoustic features are used (influence of ASR on LID and SID). Prosodic LID is much rarer, although results show that prosodic information can help identify language \citep{Lin_et_al_2005}, and that both LID and ASR can benefit from using acoustic \textit{and} prosodic features \citep{Martinez_et_al_2013,Ghahremani_et_al_2014}.
-    Just last year, a novel architecture for LID utilising \textit{x-vectors} was proposed by \cite{Snyder_et_al_2018}, dramatically improving the state-of-the-art results. Although the authors find that using bottleneck features from an ASR DNN yields better results than using the standard acoustic MFCC features, even the ASR DNN was trained just using MFCCs. Thus the work ignores the potential of speech information other than that captured by MFCCs.
+    lid is identifying the language of a spoken utterance or a speech segment
+    used mostly in asr -- for example, language of video is determined before generating subtitles
+    traditionally, continuous speech is split into short frames of 25ms, each characterised by a feature vector
+    traditionally, it has been using feature types tailored for ASR: capturing information about the spoken phones
+    however, speech contains much more than that: intonation, rhythm, stress... called prosody. which is different for different languages and even dialects
+    not much attention for prosody, but when it was tried, it improved performance (martinez, 2012)
+    since martinez, lid systems have improved and are better capable of modelling temporal variations such as those present in prosody (x-vectors)
+    also, since martinez, a new algorithm for pitch extraction was presented
+    this is an opportunity to try prosody again and see how well it performs
   }
   \section{Aims}{
     In this work, I aim to reproduce the state-of-the-art x-vector LID system and explore the use of prosodic features in addition to acoustic ones. Because the system uses a relatively novel architecture, in which a TDNN aggregates information across a speech segment, I also compare two types of acoustic features, one which has such aggregation over time encoded (SDC) and one that only contains information about single frames (vanilla MFCC).
