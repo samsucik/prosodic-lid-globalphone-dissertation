@@ -82,34 +82,18 @@
     this is an opportunity to try prosody again and see how well it performs
   }
   \section{Aims}{
-    In this work, I aim to reproduce the state-of-the-art x-vector LID system and explore the use of prosodic features in addition to acoustic ones. Because the system uses a relatively novel architecture, in which a TDNN aggregates information across a speech segment, I also compare two types of acoustic features, one which has such aggregation over time encoded (SDC) and one that only contains information about single frames (vanilla MFCC).
+    asking how can the prosody best be utilised in the context of the novel x-vector approach
+    - reproduce the x-vector lid system
+    - explore acoustic and prosodic features in isolation and in combination, 
+    - analyse prosody to better understand its strengths and limitations
   }
   \section{Contributions}{
     \begin{enumerate}
-      \item {
-        Adapted an existing x-vector speaker verification implementation (based on \cite{Snyder_et_al_2018b}) for language identification
-      }
-      \item {
-        Explored the choice of classifiers and chose a different one than \cite{Snyder_et_al_2018}
-      }
-      \item {
-        Prepared the Global Phone corpus for LID with the x-vector system, extending the original partitioning of the corpus into datasets and analysing invalid data
-      }
-      \item {
-        Built and evaluated a baseline, end-to-end x-vector LID system using 19 languages of the Global Phone corpus
-      }
-      \item {
-        Explored, set and tuned important hyperparameters of the system, mainly the number of training epochs of the x-vector TDNN
-      }
-      \item {
-        Researched literature concerning the use of acoustic and prosodic features in language identification, speaker verification and ASR
-      }
-      \item {
-        Designed, run and evaluated experiments comparing two types of acoustic features (MFCC and SDC) and two prosodic features (pitch, energy), and their combinations
-      }
-      \item {
-        Built a system which has the potential to be open-sourced as part of the Kaldi ASR toolkit, to be used by a wider community
-      }
+      discuss prosody and its potential in the context of LID and ASR, providing a brief review of the most relevant recent work on prosodic LID
+      discuss in much more detail the novel x-vector architecture, making it more accessible for others
+      reproduce the x-vector lid system by adapting its variant for SRE (Snyder); easy to use by anyone familiar with the Kaldi toolkit; will be open sourced
+      designed, executed and evaluated experiments focused on 3 types of acoustic features and 2 prosodic features, and their combinations
+      analysed the results, focusing on advantages and limitations of prosodic information, recommending a computationally attractive way of adding prosody to existing acoustic lid systems
     \end{enumerate}
   }
 }
