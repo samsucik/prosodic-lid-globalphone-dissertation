@@ -1083,95 +1083,168 @@
 
   In this chapter, I provide an overall discussion of my results and findings in the context of past research, elaborate more on the limitations of my work, and draw conclusions.
 
-  \begin{figure}[h!]
-    \centering
-    \begin{minipage}{0.49\textwidth}
+  \section{Overall comparison of different systems}{
+    \label{sec:discussion-overall-comparison}
+    \begin{figure}[h!]
       \centering
-      \includegraphics[width=\textwidth]{../img/summary-early-10s.pdf}
-      \subcaption{Early fusion, 10s condition.}
-      \label{fig:summary-early-10s}
-    \end{minipage}
-    \begin{minipage}{0.49\textwidth}
+      \begin{minipage}{0.49\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{../img/summary-early-10s.pdf}
+        \subcaption{Early fusion, 10s condition.}
+        \label{fig:summary-early-10s}
+      \end{minipage}
+      \begin{minipage}{0.49\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{../img/summary-intermediate-10s.pdf}
+        \subcaption{Intermediate fusion, 10s condition.}
+        \label{fig:summary-intermediate-10s}
+      \end{minipage}
+      \begin{minipage}{0.49\textwidth}
+        \centering
+        \vspace*{1.5em}      
+        \includegraphics[width=\textwidth]{../img/summary-early-3s.pdf}
+        \subcaption{Early fusion, 3s condition.}
+        \label{fig:summary-early-3s}
+      \end{minipage}
+      \begin{minipage}{0.49\textwidth}
+        \centering
+        \vspace*{1.5em} 
+        \includegraphics[width=\textwidth]{../img/summary-intermediate-3s.pdf}
+        \subcaption{Intermediate fusion, 3s condition.}
+        \label{fig:summary-intermediate-3s}
+      \end{minipage}
+      \caption{Final comparison of all acoustic+prosodic combinations in the 10s (top) and 3s (bottom) condition, where the acoustic and prosodic information is combined at the feature (early) level (left) and at the x-vector (intermediate) level (right).}
+      \label{fig:summary-barplots}
+    \end{figure}
+
+
+    %%% comment on the overall comparisons between combinations of features
+    First, let me summarise the overall comparison of prosodic and acoustic systems and their combinations with the help of \autoref{fig:summary-barplots}.
+    % pitch+energy (early) by far the biggest improvement (choice of acoustic feature doesn't matter too much strictly speaking). this is very good because prosodic tdnn can be trained spearately, the clssifier then retrained and here we go!
+    The combination of pitch and energy combined at feature level provides the best performance in combines acoustic+prosodic systems across both conditions, and is also the best prosodic feature in prosody-only systems.
+    % relative improvements smaller on short segments; usual thing observed in Snyder and Martinez as well...
+    The relative improvements are bigger in the 10s condition than in the 3s condition -- in line with the observations of \citet{Martinez_et_al_2012}.
+    % tdnn unable to process pitch with acoustic info well (same or slightly worse performance in early fusion).
+    Interestingly, the TDNN is unable to combine the pitch and acoustic information well, resulting in unchanged or slightly worse performance when acoustic features are combined with pitch at the feature level.
+    % this is very good because prosodic tdnn can be trained spearately, the clssifier then retrained and here we go!
+    All in all, the results make me believe that prosody can be easily utilised to improve the performance of existing state-of-the-art LID systems. By training a separate additional TDNN on pitch and energy information, one does not have to re-train any of the acoustic deep models. It is enough to re-train the classifier to consider the acoustic and prosodic embeddings together.
+  }
+
+  \section{Analysis of language-specific performance of the best system}{
+    \label{sec:discussion-language-specific}
+    %%% comment on language-specific performance of the best model
+    % languages with information on sex: AR, BG, WU, CR, CZ, FR, GE, JA, KO, CH, PL (only 1/3), PO, RU, SP, SW, TH, TU, VN. without: TA, PL (partial),
+    \begin{figure}[h!]
       \centering
-      \includegraphics[width=\textwidth]{../img/summary-intermediate-10s.pdf}
-      \subcaption{Intermediate fusion, 10s condition.}
-      \label{fig:summary-intermediate-10s}
-    \end{minipage}
-    \begin{minipage}{0.49\textwidth}
+      \includegraphics[width=\textwidth]{../img/cfmtrx_fusion_mfcc_deltas+pitch_energy.pdf}
+      \caption{The confusion matrix for the best overall system in the 10s condition. Each cell shows the fraction of all segments labelled as the true language which were classified as the predicted language. Values under 1\% are not shown and logarithmic colour scale is used for better readability.}
+      \label{fig:cfmtrx_best-10s}
+    \end{figure}
+    Now, let me analyse the performance of the best model (on the 10s condition) considering the previously discussed phonological similarities between language pairs, but also the gender and data amount imbalances in the data partitions I use. The confusion matrix in \autoref{fig:cfmtrx_best-10s} shows that the most confusing language pair types were very similar to those observed and discussed previously in \autoref{sec:exp-prosodic}:
+    \begin{itemize}
+      \item {pairs from the same language genus: Portuguese-Spanish, Polish-Bulgarian, Czech-Polish, Wu-Mandarin,}
+      \item {Portuguese with Slavic languages: Portuguese-Russian, Croatian-Portuguese,}
+      \item {Swedish-Spanish, as discussed previously and attributed to the classifier biased towards Spanish.}
+    \end{itemize}
+    
+    \begin{figure}[h!]
       \centering
-      \vspace*{1.5em}      
-      \includegraphics[width=\textwidth]{../img/summary-early-3s.pdf}
-      \subcaption{Early fusion, 3s condition.}
-      \label{fig:summary-early-3s}
-    \end{minipage}
-    \begin{minipage}{0.49\textwidth}
+      \includegraphics[width=11cm]{../img/f1-best.pdf}
+      \vspace*{-1.2em}
+      \caption{The F1 scores for each language computed from the results of the best system (10s condition).}
+      \label{fig:f1-best-10s}
+    \end{figure} 
+
+    In order to compare the performance of the best system on single languages, I compute and plot the (multi-class) F1 score based on the raw confusion matrix whose thresholded version was presented in \autoref{fig:cfmtrx_best-10s}. The scores are shown in \autoref{fig:f1-best-10s}. Even though all scores are above 0.91, there are still significant differences between some languages. In particular, the best performance in terms of F1 is observed for Mandarin, French, German, Tamil and Thai, while the worst performance is on Portuguese, Croatian, Spanish and Polish. I hypothesise that these differences may be linked to a mismatch between the genders in the enrollment set (which the classifier was trained on) and in the testing set, and plot this information\footnote{The information about speakers' gender was taken from the speaker metadata files, same as the dialect information in \autoref{sec:exp-prosodic}. The information was unavailable for speakers of Tamil and Polish.} in \autoref{fig:gender-balance-enroll-test}.
+    \begin{figure}[h!]
       \centering
-      \vspace*{1.5em} 
-      \includegraphics[width=\textwidth]{../img/summary-intermediate-3s.pdf}
-      \subcaption{Intermediate fusion, 3s condition.}
-      \label{fig:summary-intermediate-3s}
-    \end{minipage}
-    \caption{Final comparison of all acoustic+prosodic combinations in the 10s (top) and 3s (bottom) condition, where the acoustic and prosodic information is combined at the feature (early) level (left) and at the x-vector (intermediate) level (right).}
-    \label{fig:summary-barplots}
-  \end{figure}
+      \includegraphics[width=13cm]{../img/sex-balance.pdf}
+      \vspace*{-1.2em}
+      \caption{The gender balance (shown in terms of the percentage of speakers being female) for each language, compared for the enrollment and testing set speakers.}
+      \label{fig:gender-balance-enroll-test}
+    \end{figure}
+    % F1
+    % best languages: CH, FR, GE, TA, TH
+    % worst languages: PO, CR, SP, PL
+    % cannot be easily attributed to sex imbalance
+    Just by observing the plotted trends, I conclude that I cannot clearly relate and attribute the performance differences to the gender ratio mismatch between the enrollment and testing data. For example, the mismatch is large for Mandarin and German, but effectively negligible for French and Thai -- and yet their F1 scores are the highest. The mismatch is also not distinctively higher (relative to other languages) for Portuguese, Croatian or Spanish.
 
+    In my next attempt at explaining the performance differences, I turn to the unbalanced data amounts as discussed previously in the context of adjusting the classifier's prior beliefs. If a language was -- \textit{relative to its presence in the unseen test data} -- under-represented in the enrollment set and then over-represented in the evaluation set, the classifier's prior would have been scaled down for that language, making the classifier biased against it -- and resulting in that language's test-set samples being unfairly classified as other languages (false negatives). On the other hand, if a language's relative presence was the same in the evaluation and testing sets, then adjusting the prior based on the evaluation set's statistics would not result in any unfair behaviour on the test.
 
-  %%% comment on the overall comparisons between combinations of features
-  pitch+energy (early) by far the biggest improvement (choice of acoustic feature doesn't matter too much strictly speaking). this is very good because prosodic tdnn can be trained spearately, the clssifier then retrained and here we go!
-  relative improvements smaller on short segments; usual thing observed in Snyder and Martinez as well...
-  tdnn unable to process pitch with acoustic info well (same or slightly worse performance in early fusion).
-  interestingly, sdc tdnn struggling with pitch and energy in intermediate fusion! (when isolated)
+    \begin{figure}[h!]
+      \centering
+      \includegraphics[width=10cm]{../img/eval-test-balance.pdf}
+      \vspace*{-1.2em}
+      \caption{The data amount balance between the evaluation and testing set (based on numbers from \autoref{tab:data-amounts}): Each column presents the relative change in a language's relative presence between the evaluation and testing data, i.e. a positive value of 25\% means that the language's relative presence increased by 25\% when going from the evaluation to the testing set. Note: The relative presence of a language in a set is the amount of the language's data (in hours) expressed as a percentage of the set's total data.}
+      \label{fig:eval-test-balance}
+    \end{figure}
 
+    % let's plot eval/test imbalance to see if adjusting the prior was unfair for some languages
+    % - most heavy adjustments were made for: AR, CR, SP, TU, WU, vs JA, VN
+    % - most of these languages have eval and test distribution similar, except WU and VN, but these were recognised fine! (95.7 and 99.5)
+    \autoref{fig:gender-balance-enroll-test} shows the data amount imbalances between the evaluation and testing set for each language. Going back to the scaling factors presented in \autoref{fig:logit-priors}, these were making the classifier most positively biased for Arabic, Croatian, Spanish, Turkish and Wu, and the most negatively biased for Japanese and Vietnamese. However, based on \autoref{fig:eval-test-balance}, all but two of the mentioned languages actually have their relative presence very similar in the evaluation and testing sets and therefore the prior belief adjustment does not explain the possible performance drops of the final system on the testing set samples of these languages. The only two languages which have both strongly scaled priors \textit{and} large differences between their presence in the evaluation and testing data, are Wu and Vietnamese. However, the F1 scores for these two languages are very good (0.992 and 0.978, respectively), leading me to the conclusion that the classifier's possible unfairness did not have a strong effect. Thus, my conclusion is I was not able to attribute the differences in performance to the gender or data amount imbalances present in the data. Perhaps, some languages are simply harder to identify than others by their very nature.
 
-  %%% comment on language-specific performance of the best model
-  % languages with information on sex: AR, BG, WU, CR, CZ, FR, GE, JA, KO, CH, PL (only 1/3), PO, RU, SP, SW, TH, TU, VN. without: TA, PL (partial),
-  confusing pairs:
-  PO-SP
-  CR-PO
-  PL-BG
-  CZ-PL
-  WU-CH
-  PO-RU
-  SW-SP
-  spanish preferred by the classifier (unfair!). but then simply romance, slavic and chinese pairs confused (good), and portuguese with slavic languages (fair, discussed earlier)
-  
-  F1
-  best languages: CH, FR, GE, TA, TH
-  worst languages: PO, CR, SP, PL
-  cannot be easily attributed to sex imbalance
-  
-  let's plot eval/test imbalance to see if adjusting the prior was unfair for some languages
-  - most heavy adjustments were made for: AR, CR, SP, TU, WU, vs JA, VN
-  - most of these languages have eval and test distribution similar, except WU and VN, but these were recognised fine! (95.7 and 99.5)
-  remarkable: just 1h of training data and 0.8h of enrollment was enough for the TDNN and classifier and we have 0.992 F1!
+    % \begin{figure}[h!]
+    %   \centering
+    %   \includegraphics[width=\textwidth]{../img/tsne-mfcc_deltas_pitch_energy.png}
+    %   \caption{Early fusion, 10s condition.}
+    %   \label{fig:summary-early-10s}
+    % \end{figure}
+  }
 
-  \begin{figure}[h!]
-    \centering
-    \includegraphics[width=\textwidth]{../img/tsne-mfcc_deltas_pitch_energy.png}
-    \caption{Early fusion, 10s condition.}
-    \label{fig:summary-early-10s}
-  \end{figure}
+  \section{Analysis of the potential of prosody}{
+    \label{sec:discussion-prosody}
+    %%% comment on language-specific trends w.r.t prosody
+    % where does prosody struggle the most? difference between best and prosodic only
+    % where is prosody most helpful? difference between best and acoustic only
+    Finally, let me analyse the strengths and weaknesses of the prosodic information in the context of its use in combination with acoustic information. First, I ask: Which languages (or language pairs) are the most challenging ones for a prosody-only system, compared to the best system? To provide an answer, I visualise the differences between the best combined system and the best prosodic system in \autoref{fig:cfmtrx-diff-best-vs-prosody-10s}. It is a difference between the two system's full confusion matrices, thresholded to highlight the most important cells, and with the diagonal entries multiplied by -1 such that negative cells would in all cases mean that the prosody-only system performed words. Further, I ask: In which cases does prosody help the most? To answer this question, I present in \autoref{fig:cfmtrx-diff-best-vs-acoustic-10s} the difference between the best overall system and the best acoustic system.
+    \begin{figure}[h!]
+      \centering
+      \includegraphics[width=\textwidth]{../img/diff_best_vs_pitch_energy.pdf}
+      \caption{Difference of the confusion matrices for the best overall system and the best prosodic system (10s condition). The main diagonal was multiplied by -1. Negative numbers show where the best overall system performed better. Values between -1\% and 1\% are not shown for better readability.}
+      \label{fig:cfmtrx-diff-best-vs-prosody-10s}
+    \end{figure}
+    \begin{figure}[h!]
+      \centering
+      \includegraphics[width=\textwidth]{../img/diff_best_vs_mfcc_deltas.pdf}
+      \caption{Difference of the confusion matrices for the best overall system and the best acoustic system (10s condition). The main diagonal was multiplied by -1. Negative numbers show where the best overall system performed better. Values between -1\% and 1\% are not shown for better readability.}
+      \label{fig:cfmtrx-diff-best-vs-acoustic-10s}
+    \end{figure}
+    % most struggles with:
+    % Polish, Tamil, Russian, Bulgarian, Arabic, Swedish, Portuguese
+    % confusing pairs:
+    % BG-PL
+    % PL-BG
+    % RU-CR
+    % AR-TU
+    % PL-PO
+    % TA-SP
+    I observe that prosody alone struggles the most with Polish, Tamil, Russian, Bulgarian, Arabic, Swedish, and Portuguese, with most confusing pairs being the Slavic languages. In all cases, adding acoustic information helps the performance.
+    % most helps with: Bulgarian, Korean, Czech, Croatian, Turkish
+    % confusing pairs that prosody helps with:
+    % BG-PO
+    % CR-RU
+    % CZ-RU
+    % PL-RU
+    % pairs where prosody degrades performance:
+    % PO-RU
+    % SW-SP
+    % BG-PL
+    % Swedish
+    On the other hand, prosody is the most helpful for improving LID performance on Bulgarian, Korean, Czech, Croatian and Turkish, helping to distinguish better between Bulgarian and Portuguese, and between Croatian, Czech, Polish vs Russian. Interestingly, adding prosodic information can -- in a very small number of cases -- lead to slightly worse performance: In particular for the Portuguese-Russian pair and for Swedish in general. However, the positive effects largely outweigh the negative ones.
+  }
 
-  \begin{figure}[h!]
-    \centering
-    \includegraphics[width=\textwidth]{../img/cfmtrx_fusion_mfcc_deltas+pitch_energy.pdf}
-    \caption{Early fusion, 10s condition.}
-    \label{fig:summary-early-10s}
-  \end{figure}
-
-
-  %%% comment on language-specific trends w.r.t prosody
-  where does prosody struggle the most? difference between best and prosodic only
-  where is prosody most helpful? difference between best and acoustic only
-
-
-  %%% conclusions
-  prosody helps a lot (as much as 37 and 28\%)
-  pitch and energy are hugely complementary and should be used together. duration is captured for free when using x-vectors :-)
-  prosody better modelled with x-vectors than with i-vectors, and the features are simpler
-  energy has a lot to offer on top of C0
-  Martinez (2013) mention that in "Continuous Prosodic Features and Formant Modeling with Joint Factor Analysis for Speaker Verication" formants on top of acoustic system don't help (haha, surprise), but in their work they do help: with added formants (on top of prosody), the improvement is 17.79\% (14.92\%) compared to then SOTA acoustic i-vector system without prosody or formants
-  I ignore BNFs (as used by Snyder and some others). In essence, they're computed from acoustic features. I just wanna know how much the prosodic information can help when combined with acoustic information.
+  \section{Conclusions}{
+    \label{sec:conclusions}
+    %%% conclusions
+    remarkable: just 1h of training data and 0.8h of enrollment was enough for the TDNN and classifier and we have 0.992 F1!
+    prosody helps a lot (as much as 37 and 28\%)
+    pitch and energy are hugely complementary and should be used together. duration is captured for free when using x-vectors :-)
+    prosody better modelled with x-vectors than with i-vectors, and the features are simpler
+    energy has a lot to offer on top of C0
+    Martinez (2013) mention that in "Continuous Prosodic Features and Formant Modeling with Joint Factor Analysis for Speaker Verication" formants on top of acoustic system don't help (haha, surprise), but in their work they do help: with added formants (on top of prosody), the improvement is 17.79\% (14.92\%) compared to then SOTA acoustic i-vector system without prosody or formants
+    I ignore BNFs (as used by Snyder and some others). In essence, they're computed from acoustic features. I just wanna know how much the prosodic information can help when combined with acoustic information.
+  }
 }
 
 \chapter{Future work}{
@@ -1194,11 +1267,6 @@
   \section{Plan for Part 2 of the MInf project}{
 
   }
-}
-
-\chapter{Conclusions}{
-  \label{chap:conclusions}
-  ...
 }
 
 \bibliographystyle{apalike}
