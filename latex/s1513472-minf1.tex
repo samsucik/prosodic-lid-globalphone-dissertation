@@ -979,10 +979,6 @@
     % duration is modelled implicitly (whether with energy or with pitch) and cannot be isolated. but looks like even energy and pitch are best utilised when combined at the lowest level (feature vectors). this corresponds to their tight relationship in real prosody!
     The early fusion gains consistently better results than intermediate fusion. I relate this observation to the fact that pitch and energy are inherently tied in the realisation of prosodic variables like stress and intonation. As a result of this tight relationship, extracting x-vectors from pitch and energy information separately (in the case of the intermediate fusion) can be compared to doing extraction from two incomplete contours: Naturally, both of the resulting two x-vector kinds will be of poor quality, and fusing them will change little about this. Extracting x-vectors from the pitch and energy information combined, on the other hand, can be thought of as extracting more abstract information from one complete contour (complete in that it contains both the pitch and the energy component of the intonation and stress patterns), thus resulting in good quality x-vectors.
 
-
-    %%% prosodic features
-    naturally, architectures like x-vectors provide good opportunities for prosody, since they can aggregate temporal contexts (no longer the need for hacks like Legendre polynomials, duration numbers or other implicit time capturing)
-
     \begin{figure}[h!]
       \centering
       \includegraphics[width=\textwidth]{../img/cfmtrx_pitch_energy.pdf}
@@ -998,14 +994,14 @@
       \caption{Visualisation of the space of the testing set x-vectors extracted from the best prosodic TDNN. Languages from the same genus use the same shape: circle -- Slavic, star -- Romance, cross -- Chinese, pentagon -- Germanic.}
       \label{fig:tsne-pitch_energy}
     \end{figure}
-    For added insights into the nature of the prosodic systems, I use the t-Distributed Stochastic Neighbour Embedding (t-SNE) technique \citep{Maaten_Hinton_2008} to visualise the testing set x-vectors (in the 10s condition) extracted from the best prosodic TDNN, see \autoref{fig:tsne-pitch_energy}. In particular, the way the language clusters are split into visible sub-clusters very strongly correlates with the number of different dominant dialects present in the GlobalPhone data for the given language\footnote{I gathered the dialect information from the speaker metadata files of the GlobalPhone corpus. Note that no dialect details were present for Bulgarian, Wu, Czech, French, German, Polish, Russian, Tamil and Thai}: The Northern and Southern Vietnamese dialects; the Smaalaendska, Goeteborgska and Oelaendska Swedish dialects; the Anatolian and Standard Turkish dialects; the Seoul and Chonnam Korean dialects; the Bosnian, Standard Croatian, and Zagreb Croatian; and the numerous Mandarin and Japanese dialects. This observation suggests that the prosodic features could be used for \textit{dialect identification}. After all, it comes as no surprise: As I mentioned earlier, intonation -- among other prosodic variables -- often characterises the different dialects of a language.
+    For added insights into the nature of the prosodic x-vector representation space, I use the t-Distributed Stochastic Neighbour Embedding (t-SNE) technique\footnote{Originally proposed by \citet{Maaten_Hinton_2008}, but I use the implementation from the scikit-learn toolkit: \url{https://scikit-learn.org/stable/modules/generated/sklearn.manifold.TSNE.html}.} to visualise the testing set x-vectors (in the 10s condition) extracted from the best prosodic TDNN, see \autoref{fig:tsne-pitch_energy}. In particular, the way the language clusters are split into visible sub-clusters very strongly correlates with the number of different dominant dialects present in the GlobalPhone data for the given language\footnote{I gathered the dialect information from the speaker metadata files of the GlobalPhone corpus. Note that no dialect details were present for Bulgarian, Wu, Czech, French, German, Polish, Russian, Tamil and Thai}: The Northern and Southern Vietnamese dialects; the Smaalaendska, Goeteborgska and Oelaendska Swedish dialects; the Anatolian and Standard Turkish dialects; the Seoul and Chonnam Korean dialects; the Bosnian, Standard Croatian, and Zagreb Croatian; and the numerous Mandarin and Japanese dialects. This observation suggests that the prosodic features are useful for \textit{dialect identification}. After all, it comes as no surprise: As I mentioned earlier, intonation -- among other prosodic variables -- often characterises the different dialects of a language.
 
   }
 
   \section{Combining acoustic and prosodic features}{
     \label{sec:exp-acoustic+prosodic}
 
-    Having shown the individual performances of acoustic and prosodic systems, this experiment finds out whether (and to what extent) the acoustic and prosodic information is complementary, i.e. leading to improved performance when combined. For each acoustic feature type, I combined it with (one or both) prosodic features using either early or intermediate fusion. Notice that -- for obvious reasons -- the pipeline does not allow the two prosodic features to be fused at the intermediate (x-vector) level and then combined with an acoustic system at the early level. However, three feature types can be combined all at the feature level (early fusion), or the two prosodic features (combined at any of the two levels) can be combined with an acoustic system at the intermediate level.
+    Having shown the individual performances of acoustic and prosodic systems, this experiment finds out whether -- and to what extent -- the acoustic and prosodic information is complementary, i.e. leading to improved performance when combined. For each acoustic feature type, I combined it with (one or both) prosodic features using either early or intermediate fusion. Notice that -- for obvious reasons -- the pipeline does not allow the two prosodic features to be fused at the intermediate (x-vector) level and then combined with an acoustic system at the early level. However, three feature types can be combined all at the feature level (early fusion), or the two prosodic features (combined at any of the two levels) can be combined with an acoustic system at the intermediate level.
 
     \begin{table}[h!tb]
       \centering
@@ -1067,22 +1063,32 @@
       \label{tab:results-combined-intermediate}
     \end{table}
 
-    \autoref{tab:results-combined-early} shows the results for systems in which an acoustic system and a prosodic one were combined using early fusion, while \autoref{tab:results-combined-intermediate} refers to the systems in which acoustic and prosodic information was combined at the intermediate (x-vector) level. Regardless of the fusion type, combining acoustic and prosodic information clearly improves the performance: Comparing the best acoustic system with the best combined system, the relative improvement in $C_{primary}$ is 37\% and 28\% for the 10s and 3s conditions, respectively. Moreover, intermediate fusion improves on early fusion by 14\% and 22\% in the 10s and 3s conditions, respectively, the best system using \textit{both} prosodic features combined as a pair at the feature level (early fusion) as expected, having observed the results of prosody-only system in \autoref{sec:exp-prosodic}.
+    \autoref{tab:results-combined-early} shows the results for systems in which an acoustic system and a prosodic one were combined using early fusion, while \autoref{tab:results-combined-intermediate} refers to the systems in which acoustic and prosodic information was combined at the intermediate (x-vector) level. Regardless of the fusion type, combining acoustic and prosodic information clearly improves the performance. The best system uses \textit{both} prosodic features combined as a pair at the feature level (early fusion), which is not surprising, having compared the prosody-only systems in \autoref{sec:exp-prosodic}.
+    % prosody and acoustic representations best combined at x-vector level: it may be that they are difficult for the TDNN to combine since they bear so different information
+    For combining acoustic information with prosody, however, intermediate fusion improves on early fusion by 14\% and 22\% in the 10s and 3s conditions, respectively.
+    While this phenomenon needs to be investigated further, I hypothesise that the TDNN was not able to combine acoustic and prosodic features well because of their different nature: Besides representing very different properties of speech, the features also differ in their level of abstraction. While the pitch and energy features are very close to the raw values capturing the corresponding prosodic contours, MFCCs (and derived features) have gone through many sophisticated transforms in order to be low-dimensional and decorrelated. To investigate this hypothesis, an acoustic feature much closer to the original power spectrum could be used, such as the Mel filter bank features (in essence, these are an intermediate stage features in the MFCC pipeline, see \autoref{fig:mfcc}).
+    
+    % huge improvement compared to acoustic systems
+    Most importantly, the best acoustic system is largely outperformed by the best combined system: the relative improvement in terms of $C_{primary}$ is 37\% and 28\% for the 10s and 3s conditions, respectively. This is more than twice the improvement reported by \citet{Martinez_et_al_2012} after fusing a prosodic i-vector system modelling pitch, energy and duration with a then state-of-the-art acoustic i-vector system (they report the relative improvement of 15.24\% and 10.93\% for the 10s and 3s conditions).
+    % naturally, architectures like x-vectors provide good opportunities for prosody, since they can aggregate temporal contexts (no longer the need for hacks like Legendre polynomials, duration numbers or other implicit time capturing)
+    I attribute this big difference in improvements primarily to the better suitability and power of a temporal context aggregating model like TDNN. Remember that the i-vector system applies the bag-of-frames approach, which has to be compensated for by more sophisticated feature engineering: In this case, \citeauthor{Martinez_et_al_2012} for each frame approximated the local pitch and energy contours by Legendre polynomials, whose coefficients served as the feature values for the given frame.
 
+    I hypothesise that another possible reason why prosody improved performance much more in my case is the channel difference between the NIST LRE 2009 dataset\footnote{\url{https://catalog.ldc.upenn.edu/LDC2014S06}} used by \citeauthor{Martinez_et_al_2012} and the GlobalPhone corpus I used. The lower sampling rate (8kHz) of the LRE data should not make a big difference -- the usual pitch range is $\leq$500Hz. The varied and noisy recording environment (the LRE 2009 data consists of telephone speech and radio broadcast conversations), on the other hand, can in my opinion pose a challenge for extracting good-quality prosodic information, and I plan to explore this phenomenon in my future work.
 
-    %%% combined systems
-    huge improvement compared to acoustic systems
-    Martinez (2012) see improvement of 15.24\% (10.93\%) after fusion, we see 37\% (28\%)!
-    prosody and acoustic representations best combined at x-vector level: it may be that they are difficult for the TDNN to combine since they bear so different information
-    pitch+energy (early) by far the biggest improvement, choice of acoustic feature doesn't matter too much strictly speaking
-
-    clearly, energy helps MFCCs (compare vanilla MFCC with MFCC+energy (early))
+    My last point relates to the decision to not use energy as part of the MFCC features (in line with the work of \citet{Snyder_et_al_2018}). One could object that energy is often used with MFCCs and excluding it makes the prosodic systems perform worse. My results confirm this: When comparing the MFCC results from \autoref{tab:results-acoustic} and the corresponding results of MFCCs with energy added at feature level (\autoref{tab:results-combined-early}), the energy brings a relative improvement of 12\% (7.4\% in the 3s condition). This improvement suggests significant usefulness of energy on top of the information captured by the 0\textsuperscript{th} cepstral coefficient. I believe, however, that my decision to use MFCC features without energy was justified as I wanted to analyse how much useful information the different prosodic features capture when compared to acoustic features.
   }
 }
 
 \chapter{Overall discussion and conclusions}{
   \label{chap:discussion-and-conclusions}
 
+  %%% conclusions
+  prosody helps a lot (as much as 37 and 28\%)
+  prosody better modelled with x-vectors than with i-vectors, and the features are simpler
+  energy has a lot to offer on top of C0
+
+  pitch+energy (early) by far the biggest improvement, choice of acoustic feature doesn't matter too much strictly speaking
+  
   %%% overall discussion and conclusions?
   Martinez (2013) mention that in "Continuous Prosodic Features and Formant Modeling with Joint Factor Analysis for Speaker Verication" formants on top of acoustic system don't help (haha, surprise), but in their work they do help: with added formants (on top of prosody), the improvement is 17.79\% (14.92\%) compared to then SOTA acoustic i-vector system without prosody or formants
 
