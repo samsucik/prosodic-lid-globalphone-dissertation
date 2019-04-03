@@ -1237,21 +1237,36 @@
   \section{Conclusions}{
     \label{sec:conclusions}
     %%% conclusions
-    remarkable: just 1h of training data and 0.8h of enrollment was enough for the TDNN and classifier and we have 0.992 F1!
-    prosody helps a lot (as much as 37 and 28\%)
-    pitch and energy are hugely complementary and should be used together. duration is captured for free when using x-vectors :-)
-    prosody better modelled with x-vectors than with i-vectors, and the features are simpler
-    energy has a lot to offer on top of C0
-    Martinez (2013) mention that in "Continuous Prosodic Features and Formant Modeling with Joint Factor Analysis for Speaker Verication" formants on top of acoustic system don't help (haha, surprise), but in their work they do help: with added formants (on top of prosody), the improvement is 17.79\% (14.92\%) compared to then SOTA acoustic i-vector system without prosody or formants
-    I ignore BNFs (as used by Snyder and some others). In essence, they're computed from acoustic features. I just wanna know how much the prosodic information can help when combined with acoustic information.
+    % successfully applied x-vectors to GP
+    In this work, I have successfully applied the recently proposed x-vector approach of extracting utterance-level embeddings \citep{Snyder_et_al_2018} to 19 languages from the GlobalPhone corpus. Traditionally, \textit{acoustic} features -- be it MFCCs, SDCs or even bottleneck features extracted from an ASR DNN (see \citet{Snyder_et_al_2018}) -- are used in language identification systems.
+    % explored two types of prosodic features, hoping to capture intonation, tone, stress and rhythm
+    In an attempt to explore the potential of \textit{prosodic} information in the context of the novel x-vector approach, I used two types of prosodic features to capture intonation, tone, stress and rhythm of speech: energy (extracted in the process of computing the MFCC features) and a continuous pitch feature extracted using the algorithm from \citet{Ghahremani_et_al_2014}. (To the best of my knowledge, I am the first to apply this pitch-tracking approach in the context of language identification.) 
+    % combined prosody  with  acoustic information at the feature level and at the utterance-level-embedding level
+    In addition to training systems on just one acoustic or prosodic feature type, I used two ways of combining the features: at the raw feature level and at the level of the utterance embeddings (x-vectors).
+    
+    % best system utilises both prosodic features. prosody helps as much as 37 and 28\% compared to the best acoustic system
+    I found that the best performance is achieved when acoustic information is combined with both types of prosodic information: In terms of the $C_{primary}$ metric, I observed relative improvements of 37\% on $\leq$10s segments (absolute value: $C_{primary}=0.0343$) and 28\% on $\leq$3s (short) segments (absolute value: $C_{primary}=0.0993$), compared to the best system that used only acoustic features.
+    % best c-primary of 0.0343 for 10s and 0.0993 for 3s (for a better idea, in the 10s condition averaged F1 was 0.973 and accuracy 97.1\%)
+    While the absolute results are much better than those reported by \citet{Snyder_et_al_2018}, they are not comparable -- because I used a dataset with much less channel variation, recorded in much more controlled and clean conditions.
+    % - prosody better modelled with x-vectors than with i-vectors, and the features are simpler
+    Comparing mine with the results of a similar past study carried out using i-vector systems \citep{Martinez_et_al_2012}, I find that the relative improvement in my work is more than twice bigger. This difference I explain in terms of the x-vector approach's much better ability to capture temporal trends (which are crucial in modelling prosody), compared to i-vector architectures.
+
+    % pitch and energy are hugely complementary and should be used together. duration is captured for free when using x-vectors :-)
+    I also conclude that the energy and pitch information are highly complementary and should be used together. Ideally combined as early as possible -- at the raw feature level.
+    % i propose training an additional prosodic system
+    I found that such prosodic combination works the best when further combined with acoustic information at the abstract representation level of x-vectors. This observation leads me to believe that existing acoustic language identification systems could benefit from considering prosodic information, without the need to re-train the most computationally expensive back end components responsible for producing utterance-level embeddings. Instead, an additional TDNN can be trained on the prosodic features, and a new classifier would then be re-trained on combined acoustic and prosodic embeddings.
+
+    While my results are very promising, it should be noted that even with the addition of prosodic features, certain language pairs are still confusing; especially Slavic languages, which are also sometimes confused with Portuguese -- due to their phonological similarities.
   }
 }
+
+    % remarkable: just 1h of training data and 0.8h of enrollment was enough for the TDNN and classifier and we have 0.992 F1 (Wu)
 
 \chapter{Future work}{
   \label{chap:future-work}
 
   \section{Possible directions}{
-    Everything that is sensible but unlikely in Year 5.
+    I ignore BNFs (as used by Snyder and some others). In essence, they're computed from acoustic features. I just wanna know how much the prosodic information can help when combined with acoustic information. but Snyder et al show improvement of 32\% over MFCCs. might be worth a try. but need a more challenging dataset.
 
     compute VAD correctly
 
