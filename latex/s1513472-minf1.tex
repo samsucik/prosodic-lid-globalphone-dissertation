@@ -66,7 +66,6 @@
 
 \tableofcontents
 
-%TO-DO: re-think and re-write
 \chapter{Introduction}{
   \label{chap:Introduction}
   
@@ -1289,14 +1288,22 @@
     An important limitation of this work -- and one that naturally leads to a direction for my future research -- is the choice of dataset. The GlobalPhone corpus is well suited for an initial work like this. The low channel variation and clean recording conditions make it easier to analyse the potential and nature of prosody, without having to worry about observed effects being in fact caused primarily by the variation in the corpus. For more relevant and realistic research, however, a more realistic corpus is desirable -- and certainly a more challenging one. Looking at the almost perfect confusion matrix produced by my best system (\autoref{fig:cfmtrx_best-10s}), there is little room for improvement using this data -- the corpus is simply too easy for language identification. By using for example the NIST LRE corpora which -- as of LRE 2017 -- feature not just telephone and broadcast speech, but also speech from a great variety of videos from the internet (the VAST corpus, see \citet{Tracey_Strassel_2018}), this research would gain more value and relevance.
 
     Last but not least, as the performance on longer segments improves, the more challenging LID from \textit{short segments} is becoming more and more relevant: In online settings such as emergency call routing or voice assistants, in scenarios with frequent code switching, or in large-scale ASR where identifying the language faster can make a big difference in terms of resources (for example in transcribing videos for a portal like YouTube).
-    While my results are rather clear for $\leq$10s speech segments, short segments might render certain feature types unfavourable (see the observed performance fall observed for the SDC features), and the effects caused by unnatural segment boundaries become more important.
+    While my results are rather clear for $\leq$10s speech segments, short segments might render certain feature types less favourable (see the observed performance fall observed for the SDC features), and the effects caused by unnatural segment boundaries become more important.
     % - thus, segment boundaries are becoming important. explore segment boundary effects (but note that uniform segmentation shown to work well: Steve mentioned speaker diarization, I have \citet{Martinez_et_al_2013} that show the same...)
     Therefore, exploring prosody specifically in the context of very short, arbitrarily cut speech segments is another possible direction for research.
   }
 
   \section{Plan for Part 2 of the MInf project}{
     \label{sec:future-plan}
-    TO-DO
+    My plan for the second year of this project has as its main objective bringing the work closer to a realistic setting. In particular, this will include:
+    \begin{enumerate}
+      % the use of more realistic data. In order to 
+      % more realistic dataset. focusing on short segments.
+      \item {The use of more realistic (varied) data for evaluating the potential of prosodic information: the VAST corpus and possibly other NIST LRE corpora; and data containing non-native speakers of English as well as a variety of dialects (the AMI \citep{Mccowan_et_al_2005} and Fischer \citep{Cieri_at_al_2004} corpora).}
+      % different segmentation strategies for short segments: \citet{Martinez_et_al_2013} show that uniform segmentation works well as an alternative to energy-based extraction of syllable-like units, but there is certainly room for more exploration
+      \item {Focusing on short segments ($\leq$3s) and comparing different segmentation strategies: in particular uniform segmentation and energy-based segmentation (i.e. segmenting on pauses). \citet{Martinez_et_al_2013} report better results when extracting prosody from very short fixed-length syllable-like segments (uniform segmentation) compared to segments extracted based on energy valleys. However, I want to explore segments which are much longer than the typical syllable length of 100-200ms.}
+    \end{enumerate}
+    % AMI or Fischer for non-native speakers of English
   }
 }
 
