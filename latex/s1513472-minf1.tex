@@ -71,15 +71,26 @@
   \label{chap:Introduction}
   
   \section{Motivation}{
-    lid is identifying the language of a spoken utterance or a speech segment
-    used mostly in asr -- for example, language of video is determined before generating subtitles
-    traditionally, continuous speech is split into short frames of 25ms, each characterised by a feature vector
-    traditionally, it has been using feature types tailored for ASR: capturing information about the spoken phones
-    however, speech contains much more than that: intonation, rhythm, stress... called prosody. which is different for different languages and even dialects
-    not much attention for prosody, but when it was tried, it improved performance (martinez, 2012)
-    since martinez, lid systems have improved and are better capable of modelling temporal variations such as those present in prosody (x-vectors)
-    also, since martinez, a new algorithm for pitch extraction was presented
-    this is an opportunity to try prosody again and see how well it performs
+    % lid is identifying the language of a spoken utterance or a speech segment
+    Spoken language identification (LID) is the task of classifying spoken utterances based on their language.
+    % used mostly in asr -- for example, language of video is determined before generating subtitles
+    Even though its applications range from voice assistants to automatic call routing, the primary use of language identification is in automatic speech recognition (ASR) systems: For example, a system generating video subtitles first needs to know which language the video contains in order to choose and apply the appropriate language-specific speech-to-text model.
+
+    % traditionally, continuous speech is split into short frames of 25ms, each characterised by a feature vector
+    The way typical LID or ASR systems process continuous speech is by cutting it into a sequence of short (only 20-40ms long) \textit{frames} and computing from each frame a feature vector, thus turning a piece of speech into a number of numerical vectors which are then further processed.
+    % traditionally, it has been using feature types tailored for ASR: capturing information about the spoken phones
+    Most commonly, LID systems use the types of feature vectors tailored for speech-to-text use, the so-called \textit{acoustic} features, capturing primarily the aspects of speech needed to reconstruct the phonemes or letters of the uttered words.
+    % however, speech contains much more than that: intonation, rhythm, stress... called prosody. which is different for different languages and even dialects
+    While these acoustic features work well, they disregard a lot of additional information that goes beyond just the phonemic content: intonation, rhythm of the speech, stress patterns and a number of other properties -- collectively called \textit{prosody}. It is well known that prosody carries a lot of information not just about the speaker, their accent and dialect, but also about various characteristic phonological properties of the language they are speaking -- making prosody-based features very attractive for LID.
+    
+    % not much attention for prosody, but when it was tried, it improved performance (martinez, 2012)
+    Not much research in the area of language identification or automatic speech recognition has been done on the use of prosodic features, but most of the few studies report improved performance when -- on top of using acoustic features -- they additionally used prosodic information as well \citep{Martinez_et_al_2012,Martinez_et_al_2013,Metze_et_al_2013}.
+    % since martinez, lid systems have improved and are better capable of modelling temporal variations such as those present in prosody (x-vectors)
+    One reason why prosodic information has been mostly ignored is that the state-of-the-art LID systems were unable to model it well. Unlike the acoustic information about a phoneme produced at a particular moment, prosody surfaces mostly as \textit{temporal variation} spanning the context of many frames (think of the pitch variation and how it creates the intonation of one's speaking). Recently, however, LID architectures that can process frame sequences and capture such temporal trends have been proposed, perhaps the most attractive one being the \textit{x-vector} approach \citet{Snyder_et_al_2018}.
+    % also, since martinez, a new algorithm for pitch extraction was presented
+    Additionally, since the successful works of \citeauthor{Martinez_et_al_2012}, a novel algorithm for capturing pitch information has been proposed by \citet{Ghahremani_et_al_2014} and successfully applied in ASR, but not in LID.
+    % this is an opportunity to try prosody again and see how well it performs
+    I view this as a great opportunity for reviving the idea of using additional prosodic features to improve language identification performance.
   }
   \section{Aims}{
     asking how can the prosody best be utilised in the context of the novel x-vector approach
@@ -89,11 +100,12 @@
   }
   \section{Contributions}{
     \begin{enumerate}
-      discuss prosody and its potential in the context of LID and ASR, providing a brief review of the most relevant recent work on prosodic LID
-      discuss in much more detail the novel x-vector architecture, making it more accessible for others
-      reproduce the x-vector lid system by adapting its variant for SRE (Snyder); easy to use by anyone familiar with the Kaldi toolkit; will be open sourced
-      designed, executed and evaluated experiments focused on 3 types of acoustic features and 2 prosodic features, and their combinations
-      analysed the results, focusing on advantages and limitations of prosodic information, recommending a computationally attractive way of adding prosody to existing acoustic lid systems
+      % discuss prosody and its potential in the context of LID and ASR, providing a brief review of the most relevant recent work on prosodic LID
+      % discuss in much more detail the novel x-vector architecture, making it more accessible for others
+      % reproduce the x-vector lid system by adapting its variant for SRE (Snyder); easy to use by anyone familiar with the Kaldi toolkit; will be open sourced
+      % designed, executed and evaluated experiments focused on 3 types of acoustic features and 2 prosodic features, and their combinations
+      % analysed the results, focusing on advantages and limitations of prosodic information, recommending a computationally attractive way of adding prosody to existing acoustic lid systems
+      \item{}
     \end{enumerate}
   }
 }
