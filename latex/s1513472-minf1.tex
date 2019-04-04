@@ -54,7 +54,10 @@
 \date{2019}
 
 \abstract{
-  TO-DO
+  This report presents my work on the use of prosodic features for language identification using the recently proposed x-vector architecture. I discuss the differences between acoustic information and prosody and refer to past work that showed the usefulness of prosodic information when distinguishing between languages. For my experiments, I use the x-vector approach proposed by \citet{Snyder_et_al_2018}, which uses a time-delay neural network (TDNN) to compute utterance-level embeddings that are subsequently processed by a light-weight classifier. While using 19 languages from the GlobalPhone corpus, I explore the use of popular acoustic features and two prosodic features: log energy and a continuous pitch curve extracted even for unvoiced speech using the algorithm proposed by \citet{Ghahremani_et_al_2014}.
+  The acoustic and prosodic information is used in isolation as well as in combination -- fusing the two types at the feature level and at the utterance-embedding level.
+  I observe that the addition of prosodic information to standard acoustic features improve the performance -- measured by the $C_{primary}$ metric from NIST LRE 2017 -- by as much as 37\% and 28\% for standard ($\leq$10s) and short ($\leq$3s) segments, respectively. My results also show that the energy and pitch information is very complementary and is best used in combination, concatenated frame-wise at the feature level. In particular, the prosodic information helps the system perform better for Slavic languages such as Bulgarian and Croatian, but also distinguish better between Asian languages like Korean and Japanese.
+  I conclude that existing acoustic LID systems could benefit from the addition of a prosodic component which can be trained separately and fused at the utterance embedding level.
 }
 
 \maketitle
@@ -276,8 +279,6 @@
     % Since this work focuses on using prosodic information to improve LID, it is useful to understand both acoustic and prosodic features, how they differ and how prosody can be utilised by systems that process frame sequences rather than individual frames.
     As this work focuses on exploiting prosodic information to improve LID, it is desirable to understand both acoustic and prosodic features: how they differ, why is prosody useful and how can prosodic information be modelled in systems that process frame sequences rather than isolated speech frames.
 
-    % TO-DO: Mention that acoustic are more accent-independent while prosodic may be misleading e.g. for non-native speakers.
-    
     \subsection{Acoustic features}{
       \label{sec:acoustic-feats}
       % Most common acoustic feats: MFCCs. Their aim is literally to describe the shape of the vocal tract (which maps to the shape of the spectral envelope, which maps to the phone produced).
@@ -328,11 +329,11 @@
       \label{sec:prosodic-feats}
       % OLD MATERIAL TO BE RE-USED
         % compared to well-established acoustic feats, there is no good definition of prosodic feats and they are not commonly used
-        % for the purposes of this work, I narrow down the prosodic variables to four: intonation+tone, stress and rhythm. TO-DO: these should be the main ones, cite some paper?
+        % for the purposes of this work, I narrow down the prosodic variables to four: intonation+tone, stress and rhythm.
         
         % both intonation and tone are perceived qualities, typically associated with the variation of the physical quality called pitch, i.e. the fundamental frequency of vibration of the vocal folds (also denoted as F_0). 
         % while the term 'tone' is used where pitch variation is contrastive (i.e. changes to it discriminate between different words) in the so-called tonal languages (such as Chinese, Vietnamese, Thai), intonation denotes the non-contrastive pitch variation mostly associated with speaker's emotions, dialect, social background, speaking style, and other factors (see, for example, this study by \citet{Grabe_2004} on the intonation differences across British English dialects).
-        % note: some recent results show what other physical variables can influence perceived intonation, but these are disregarded for now. TO-DO: find those works?
+        % note: some recent results show what other physical variables can influence perceived intonation, but these are disregarded for now.
         % \citet{Lin_et_al_2005} do LID just from the segmented pitch contour, each short pitch segment (around 100-200ms) parametrised by a few Legendre polynomials -- not too much success
         % \citet{Metze_et_al_2013} show improvements in ASR on tonal (and partly on non-tonal) languages when including F0 variation feats.
         % \citet{Song_et_al_2013} achieve LID improvements when using bottleneck features trained on MFCC+pitch vectors
@@ -515,11 +516,10 @@
 
     % cutting into short segments: leave training data as it is (the TDNN chops it up into 1000-frame chunks anyway), split enrollment data into <30s segments, eval and test data into 3s or 10s (depending on the experiment)
     % TO-DO: mention that utterances were rather short on average, and show the length distribution (particularly for the enrollment set because many utts will be under 30s).
-    \textbf{Splitting longer utterances into shorter segments} was done to match the set-up used by \citet{Snyder_et_al_2018}: Training set utterances were not split in this step because the x-vector TDNN splits them into chunks of at most 1000 frames (10s) at training time (TO-DO: reference the appropriate implementation section for details). Enrollment set utterances were split uniformly into segments of length 30s, and evaluation and testing set utterances were split into 10s segments (and later also into 3s segments because the trained system in each experiment was additionally tested on 3s segments). Note that I did not discard the cut-offs from the utterance ends (even though they were shorter than the desired lengths). Another downside of the uniform cutting is that utterances were split unnaturally -- not necessarily on breaks, hence creating arbitrary edge boundaries not naturally found in speech. The reason why I chose to implement this way of splitting the utterances was its simplicity; in the future, this would be one of the design decisions I would change.
+    \textbf{Splitting longer utterances into shorter segments} was done to match the set-up used by \citet{Snyder_et_al_2018}: Training set utterances were not split in this step because the x-vector TDNN splits them into chunks of at most 1000 frames (10s) at training time (see \autoref{sec:x-vector-tdnn}). Enrollment set utterances were split uniformly into segments of length 30s, and evaluation and testing set utterances were split into 10s segments (and later also into 3s segments because the trained system in each experiment was additionally tested on 3s segments). Note that I did not discard the cut-offs from the utterance ends (even though they were shorter than the desired lengths). Another downside of the uniform cutting is that utterances were split unnaturally -- not necessarily on breaks, hence creating arbitrary edge boundaries not naturally found in speech. The reason why I chose to implement this way of splitting the utterances was its simplicity; in the future, this would be one of the design decisions I would change.
     
     % compute VAD (used across all experiments) from MFCC feats (based on C0) 
-    % TO-DO: this was a mistake; VAD should've been computed based on energy, not on C0
-    \textbf{Computing voice activity decision} (VAD) for all segments to identify and later discard the frames containing silence. This was computed using the VAD implementation found in Kaldi, using the parameter values from the speaker recognition x-vector recipe\footnote{\url{https://github.com/kaldi-asr/kaldi/tree/master/egs/sre16/v2}, this is the recipe I adapted for LID in my implementation of the x-vector system.}, in particular the log-energy threshold of 5.5. Because in my experiments I wanted to frame-wise concatenate feature vectors of different feature types, I needed to make sure I would always discard the very same set of frames for all feature types. Hence, I computed VAD only once -- on the MFCC feature vectors -- and re-used it to discard silence frames throughout all experiments.
+    \textbf{Computing voice activity decision} (VAD) for all segments to identify and later discard the frames containing silence. This was computed using the VAD implementation found in Kaldi, using the parameter values from the speaker recognition x-vector recipe SRE16\footnote{\url{https://github.com/kaldi-asr/kaldi/tree/master/egs/sre16/v2}, this is the recipe I adapted for LID in my implementation of the x-vector system.}, in particular the log-energy threshold of 5.5. Because in my experiments I wanted to frame-wise concatenate feature vectors of different feature types, I needed to make sure I would always discard the very same set of frames for all feature types. Hence, I computed VAD only once -- on the MFCC feature vectors -- and re-used it to discard silence frames throughout all experiments.
   }
 
   \section{Dealing with invalid data}{
@@ -538,7 +538,7 @@
     \label{sec:data-overview}
     I present an overview of the data I ultimately used in my experiments -- after discarding the invalid data. \autoref{tab:data-amounts} shows the total data amounts for each language and partition. A detailed list of speakers contained in each partition (so that my partitioning can be replicated by other future works) is in \autoref{tab:partitioning} in the appendix.
 
-    Notice that the data amount varies across languages for a given partition (i.e. languages are represented unequally in the corpus -- compare Wu and Japanese), and even the declared 80\%-10\%-10\% split from the original GlobalPhone partitioning is not too reliable in some cases -- for instance Thai, German, Mandarin and Spanish -- although, in other cases, it does result in a split close to the declared one (such as for Korean, Swedish and Turkish). Further, the per-speaker amounts of data are clearly not equal, see Wu where there are 6 training-set speakers vs 4 testing-set speakers, yet the testing set has a greater total amount of data than the training set. While attempting at a perfect split is possible, instead, I appreciate the realisticity of certain languages being under-represented, and account for this in training the x-vector classifier (see [TO-DO: add reference once the section is written] for details of how this is implemented).
+    Notice that the data amount varies across languages for a given partition (i.e. languages are represented unequally in the corpus -- compare Wu and Japanese), and even the declared 80\%-10\%-10\% split from the original GlobalPhone partitioning is not too reliable in some cases -- for instance Thai, German, Mandarin and Spanish -- although, in other cases, it does result in a split close to the declared one (such as for Korean, Swedish and Turkish). Further, the per-speaker amounts of data are clearly not equal, see Wu where there are 6 training-set speakers vs 4 testing-set speakers, yet the testing set has a greater total amount of data than the training set. While attempting at a perfect split is possible, instead, I appreciate the realisticity of certain languages being under-represented, and account for this in training the x-vector classifier (see \autoref{sec:classifier} for details of how this is implemented).
 
     \begin{table}[h!tb]
       \centering
@@ -577,8 +577,6 @@
 \chapter{Implementation}{
   \label{chap:Implementation}
   
-  % TO-DO: Can I just mention Paul like this?
-
   % I describe the entire implementation as a whole
   In this chapter, I describe the entire architecture and computing environment.
   % but two of us worked on this and we were building on existing implementations. I naturally put focus on parts which I myself implemented or adapted.
@@ -649,8 +647,6 @@
       \label{fig:architecture}
     \end{figure}
 
-    % TO-DO: mention that implementing this end-to-end thing took the most time and running experiments was really fast
-
     \autoref{fig:architecture} shows the entire system and what the main steps in running it are. In what follows, I elaborate on each step that has not been described yet.
 
     \subsection{Feature computation}{
@@ -660,7 +656,7 @@
       %   - existing scripts re-used for computing MFCCs (make\_mfcc.sh), I adapted the code for adding SDCs and deltas to MFCCs
       %   - existing scripts re-used for adding pitch
       %   - energy feature computed simply as a special case of MFCC: taking only 0th coefficient and using raw log energy instead of it
-      Throughout my experiments, the following feature types are used (as a refresher, see \autoref{sec:features}): MFCC, MFCC+$\Delta$+$\Delta\Delta$, SDC, energy, and Kaldi pitch. For more details, see (TO-DO: link the experiments section where the dimensionalities of these are explained).
+      Throughout my experiments, the following feature types are used (as a refresher, see \autoref{sec:features}): MFCC, MFCC+$\Delta$+$\Delta\Delta$, SDC, energy, and Kaldi pitch. For more details, see \autoref{sec:exp-setup}.
 
       To enable frame-wise feature concatenation, all feature types were computed with the same frame width of 25ms and frame shift of 10ms. Windowing was done using the Povey window\footnote{the default windowing function in Kaldi, defined and implemented here: \url{https://github.com/kaldi-asr/kaldi/blob/master/src/feat/feature-window.cc\#L109}}, a slight variation of the commonly used Hamming window \citep[p. 200]{Blackman_Tukey_1958}; see \autoref{fig:window-types} for a comparisons.
       \begin{figure}[h!t]
@@ -676,7 +672,6 @@
 
     \subsection{Early fusion}{
       \label{sec:early-fusion}
-      % TO-DO: Maybe introduce fusion earlier??
       % early fusion
       % - I wrote script for frame-wise concatenation
       % - done for all data partitions alike
@@ -898,7 +893,7 @@
     \item {This is my ultimate aim: to evaluate the effect of using both acoustic and prosodic information -- combined in different ways.}
   \end{enumerate}
 
-  % Evaluation metric: $C_{primary}$, consistent with NIST LREs (TO-DO: mentioned in an earlier section?). I also report confusion matrices and accuracy as these are easier to intuitively reason about and analyse.
+  % Evaluation metric: $C_{primary}$, consistent with NIST LREs. I also report confusion matrices and accuracy as these are easier to intuitively reason about and analyse.
   Throughout all experiments, I use $C_{primary}$ as the main metric -- staying consistent with the latest LRE 2017 challenge and the work of \citet{Snyder_et_al_2018}. In the tables with results, the best result in terms of the $C_{primary}$ value is always put in bold face. Additionally, I also report accuracy and later show confusion matrices as these are easier to intuitively grasp and reason about.
 
   \section{The setup}{
