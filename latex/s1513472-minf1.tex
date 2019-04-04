@@ -174,11 +174,9 @@
     
 
     % context aggregation done using standard DNN but Tkachenko used TDNN, more familiar from ASR acoustic models and better suited for processing sequences (translation-invariant)
-    The biggest change introduced in d-vector systems compared to i-vectors is the notion of frame-level processing while considering each frame's temporal context, i.e. the sequence of a few preceding and following frames. While \citeauthor{Variani_et_al_2014} achieve this by simply feeding the feature vectors of the neighbouring frames together with the frame of interest into a standard deep neural network, \citeauthor{dvectors_lid} use a more suited architecture commonly used for processing temporal sequences in automatic speech recognition: the \textit{time-delay neural network} (TDNN).
+    The biggest change introduced in d-vector systems compared to i-vectors is the notion of frame-level processing while considering each frame's temporal context, i.e. the sequence of a few preceding and following frames. While \citeauthor{Variani_et_al_2014} achieve this by simply feeding the feature vectors of the neighbouring frames together with the frame of interest into a standard deep neural network, \citeauthor{dvectors_lid} use a more suited architecture commonly used for processing temporal sequences in automatic speech recognition: the \textit{time-delay neural network} (TDNN), first proposed by \citet{waibel1995phoneme} and later presented by \citet{peddinti2015time} as a very suitable model for capturing long temporal context in ASR.
 
     % describing TDNN: like 1D CNN. often made sparse. aggregates information along the time axis
-    % TO-DO: Advantages of TDNN over a fully connected DNN?
-    % TO-DO: Mention where was TDNN first introduced?
     \begin{figure}[h!t]
       \centering
       \includegraphics[height=6cm]{graphics/tdnn-generic}
@@ -263,7 +261,6 @@
     Because of being an utterance-level classifier, the x-vector TDNN can be used directly as an end-to-end system, although \citeauthor{Snyder_et_al_2018} found that extracting x-vectors and training a separate classifier to classify them yielded lightly better results. Perhaps an even stronger argument in favour of the two-stage process is that, by using an external light-weight classifier, one can easily change the set of supported languages without having to expensively re-train the TDNN. \citeauthor{Snyder_et_al_2018} showed that simply re-training the classifier is enough to gain very good results for languages the TDNN has not observed during training (although the results are indeed worse than those for observed languages).
 
     % outperforming various optimized variations of i-vectors
-    % TO-DO: Define somewhere the metric used to compare the systems and provide concrete numbers?
     The x-vector system consistently beat several state-of-the-art i-vector architectures, which is a particularly interesting finding because i-vector systems have for long been dominant despite the nowadays so "fashionable" and successful deep learning approaches. Even so, the 2-stage x-vector system using a simple classifier still dominates the end-to-end neural network alternative.
   }
 
@@ -496,7 +493,7 @@
     The ASR GlobalPhone Kaldi recipe\footnote{\url{https://github.com/kaldi-asr/kaldi/tree/master/egs/gp/s5}} extends the original GlobalPhone partitioning to also cover Czech, French, Japanese, Polish, Russian, Swahili and Vietnamese. I utilise this partitioning in order to stay consistent with previous work using the recipe. For the rest of the languages with incomplete or missing partitioning (Arabic, Tamil, Ukrainian and Wu), I partitioned the data myself, following the same approach as the GlobalPhone authors -- the only imposed constraint being: "no speaker appears in more than one group [partition] and no article is read by two speakers from different groups" \citep[p. 348]{Schultz_2002}. This constraint, however, could only be satisfied for languages which contained speaker metadata information (i.e. which articles were read by the particular speaker). Because this metadata was missing for Bulgarian, French, German, Polish, Tamil, Thai and Vietnamese, the splitting of the original training set into training and enrollment portions (and, in the case of Tamil, the entire 4-way partitioning) for these languages was done solely on a random basis.
 
     I automated the entire partitioning process such that it would never allow one speaker to appear in multiple sets. Further, the way I understand the declared 80\%-10\%-10\% splitting is that it is the \textit{numbers of speakers} for each languages that are split following this ratio (since there is roughly constant amount of data per speaker). Therefore, the way I realise the desired 4-way partitioning is based on distributing speakers in the desired 70\%-10\%-10\%-10\% ratio. Unfortunately, I had to somewhat relax the constraint that the same article cannot appear in multiple sets. My implementation attempts to construct such ideal partitioning, but -- if it cannot be constructed -- the allowed number of article overlaps is iteratively increased (from 0, incrementing by 1) until a satisfying partitioning is found.
-    From all the languages for which the partitioning was generated non-randomly, the following languages had non-zero article overlaps: Arabic (385), Turkish (16), and Wu (49). % TO-DO: comment on what this overlap could mean?
+    From all the languages for which the partitioning was generated non-randomly, the following languages had non-zero article overlaps: Arabic (385), Turkish (16), and Wu (49).
 
     For the final partitioning (after excluding languages and speakers with corrupt data, see the next section) is shown in \autoref{tab:partitioning}.  
   }
@@ -515,8 +512,20 @@
     \textbf{Organising the data into partitions} was done symbolically (without re-organising the .wav files), hence taking very short. This made it possible for the step to be a part of the pipeline repeated separately for each experiment -- or each time an utterance or a speaker was found to be unusable due to corrupt data and had to be excluded from the partitioning. Because the previous step did not create any data partitioning (i.e. all .wav files were only grouped by languages), in this step, for each partition, a list referring to the .wav files for that partition's speakers across all languages was compiled (based on the files storing the partitioning described in \autoref{sec:partitioning}). In addition to this list (named conventionally \texttt{vaw.scp}), a number of accompanying lists was generated as required by the conventions of Kaldi: \texttt{utt2spk} (mapping utterances to speakers), \texttt{utt2lang} (mapping utterances to languages), \texttt{utt2len} (mapping utterances to their lengths), and a number of further lists derived from these essential ones.
 
     % cutting into short segments: leave training data as it is (the TDNN chops it up into 1000-frame chunks anyway), split enrollment data into <30s segments, eval and test data into 3s or 10s (depending on the experiment)
-    % TO-DO: mention that utterances were rather short on average, and show the length distribution (particularly for the enrollment set because many utts will be under 30s).
-    \textbf{Splitting longer utterances into shorter segments} was done to match the set-up used by \citet{Snyder_et_al_2018}: Training set utterances were not split in this step because the x-vector TDNN splits them into chunks of at most 1000 frames (10s) at training time (see \autoref{sec:x-vector-tdnn}). Enrollment set utterances were split uniformly into segments of length 30s, and evaluation and testing set utterances were split into 10s segments (and later also into 3s segments because the trained system in each experiment was additionally tested on 3s segments). Note that I did not discard the cut-offs from the utterance ends (even though they were shorter than the desired lengths). Another downside of the uniform cutting is that utterances were split unnaturally -- not necessarily on breaks, hence creating arbitrary edge boundaries not naturally found in speech. The reason why I chose to implement this way of splitting the utterances was its simplicity; in the future, this would be one of the design decisions I would change.
+    \textbf{Splitting longer utterances into shorter segments} was done to match the set-up used by \citet{Snyder_et_al_2018}: Training set utterances were not split in this step because the x-vector TDNN splits them into chunks of at most 1000 frames (10s) at training time (see \autoref{sec:x-vector-tdnn}). Long enrollment set utterances were split uniformly into segments of length 30s, and evaluation and testing set utterances were split into 10s segments (and later also into 3s segments because the trained system in each experiment was additionally tested on 3s segments). \autoref{fig:lengths-train} shows the length distribution in the training set (not affected by segmenting) while \autoref{fig:lengths-segments} shows the lengths distribution in other data partitions. Notice that many utterances were naturally shorter than 30s (or even 10s) and were therefore not affected by the splitting step. Additionally, I also did not discard the cut-offs from the utterance ends (even though they were shorter than the desired lengths). A possible downside of the uniform cutting is that utterances were split unnaturally -- not necessarily on breaks, hence creating arbitrary edge boundaries not naturally found in speech. The reason why I chose to implement this way of splitting the utterances was its simplicity; in the future, this would be one of the design decisions I would challenge.
+    \begin{figure}[h!t]
+      \centering
+      \includegraphics[width=13cm]{../img/lengths-train.pdf}
+      \caption{The length distribution in the training dataset whose utterances were not split in the preprocessing step.}
+      \label{fig:lengths-train}
+    \end{figure}
+    \begin{figure}[h!t]
+      \centering
+      \hspace*{-0.3cm}
+      \includegraphics[width=15cm]{../img/lengths-segments.pdf}
+      \caption{The lengths distribution in the enrollment set (where utterances were cut into segments of max. 30s, the evaluation set used for tuning the hyperparameters of the implementation (\autoref{sec:hyperparameters}), and the testing sets for both the 10s and the 3s condition.}
+      \label{fig:lengths-segments}
+    \end{figure}
     
     % compute VAD (used across all experiments) from MFCC feats (based on C0) 
     \textbf{Computing voice activity decision} (VAD) for all segments to identify and later discard the frames containing silence. This was computed using the VAD implementation found in Kaldi, using the parameter values from the speaker recognition x-vector recipe SRE16\footnote{\url{https://github.com/kaldi-asr/kaldi/tree/master/egs/sre16/v2}, this is the recipe I adapted for LID in my implementation of the x-vector system.}, in particular the log-energy threshold of 5.5. Because in my experiments I wanted to frame-wise concatenate feature vectors of different feature types, I needed to make sure I would always discard the very same set of frames for all feature types. Hence, I computed VAD only once -- on the MFCC feature vectors -- and re-used it to discard silence frames throughout all experiments.
@@ -571,6 +580,29 @@
       \caption{Amount of data (in hours) for each language and partition after excluding invalid data}
       \label{tab:data-amounts}
     \end{table}
+  }
+
+  \section{Main evaluation metric: $C_{primary}$}{
+    \label{sec:c-primary}
+    The performance of a language identification model can be measured using various metrics: ranging from accuracy to multi-class cross-entropy to multi-class F1 score. I decided to use the primary metric of the 2017 NIST LRE: $C_{primary}$, which is also used by \citet{Snyder_et_al_2018} and in a slightly different version also by \citet{Martinez_et_al_2012}. The metric is defined in \citet{LRE_2017} and I limit myself to highlighting its main characteristics.
+
+    First of all, similar to the F1 score, the metric takes into account not raw accuracy, but the number of misses (false negatives) and false alarms (false positives) for each language pair $L_T, L_N$ separately ($L_T$ being the true target language and $L_N$ being a different (non-target) language). Additionally, the metric provides means of penalising misses or false alarms more, by setting their respective costs $C_{miss}$ and $C_{FA}$.
+
+    As for the actual computation of $C_{primary}$, first, an average metric is computed across all languages, for each target language combining the miss rate and the false alarm rate with respect to all non-target languages:
+    \begin{equation}
+      \label{eq:c-avg}
+      C_{avg}(\beta) = \frac{1}{N_L} \bigg\{ \sum_{L_T \in L} P_{miss}(L_T) + \frac{1}{N_L - 1}\Big[ \beta \times \sum_{L_T \in L} \ \ \sum_{L_N \in L \setminus L_T} P_{FA}(L_T, L_N) \Big] \bigg\}
+    \end{equation}
+    where $\beta$ combines the costs and the a priori probability of the target language $P_{target}$ (set to take the values of 0.5 and 0.1):
+    \begin{equation}
+      \label{eq:beta}
+      \beta = \frac{C_{FA}\ (1 - P_{target})}{C_{miss}\ P_{target}}
+    \end{equation}
+    In the NIST LRE 2017 plan, the costs of misses and false alarms are both set to 1. Then, as a result of the values of $P_{target}$ (0.5 and 0.1), the two $\beta$ values are $\beta_1 = 1$ and $\beta_2=9$. Then, $C_{primary}$ is computed as follows:
+    \begin{equation}
+      \label{eq:c-prim-final}
+      C_{primary} = \frac{C_{avg}(\beta_1) + C_{avg}(\beta_1)}{2}
+    \end{equation}
   }
 }
 
@@ -705,7 +737,7 @@
       % - training data repeated 35 times, distributed into archives of roughly 50000000 frames each (around 140h). 70 training archives
       % - number of epochs translated into a number of iterations (each iteration = one archive)
       % - samples globally shuffled before training, then shuffled each iteration within batches of 1000
-      As for the handling of the training data, the first step was discarding utterances shorter than 5s. Looking back, this design decision of \citet{Snyder_et_al_2018} may have been challenged as it resulted in discarding 29\% of my total number of training utterances. However, the effects of using very short training segments might potentially have a negative impact on the TDNN. After discarding short utterances, the rest of the training data was replicated 35x, randomly shuffled and distributed and saved into 70 training Kaldi archives, each archive corresponding to a training iteration and containing roughly 50,000,000 frames (feature vectors) each -- around 140h of speech. This way, each training epoch consisted of processing 70 archives, which, however, translates to only 23 actual iterations as the training was using 3 parallel jobs, each processing one archive per iteration (see bellow for a description of the parallel training). The archives were processed in minibatches of 64 utterances, every minibatch shuffled in each iteration.
+      As for the handling of the training data, the first step was discarding utterances shorter than 5s. Looking back, this design decision of \citet{Snyder_et_al_2018} may have been challenged as it resulted in discarding 29\% of my total number of training utterances (see the length distribution in \autoref{fig:lengths-train}). However, the effects of using very short training segments might potentially have a negative impact on the TDNN. After discarding short utterances, the rest of the training data was replicated 35x, randomly shuffled and distributed and saved into 70 training Kaldi archives, each archive corresponding to a training iteration and containing roughly 50,000,000 frames (feature vectors) each -- around 140h of speech. This way, each training epoch consisted of processing 70 archives, which, however, translates to only 23 actual iterations as the training was using 3 parallel jobs, each processing one archive per iteration (see bellow for a description of the parallel training). The archives were processed in minibatches of 64 utterances, every minibatch shuffled in each iteration.
 
       % TRAINING: objective function, learning algorithm
       % - optimising multi-class cross-entropy     
@@ -875,7 +907,6 @@
   }
 }
 
-% TO-DO: mention and explain C-primary and why I use it!
 \chapter{Experiments and discussed results}{
   \label{chap:Experiments}
 
