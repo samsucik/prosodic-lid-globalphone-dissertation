@@ -93,19 +93,27 @@
     I view this as a great opportunity for reviving the idea of using additional prosodic features to improve language identification performance.
   }
   \section{Aims}{
-    asking how can the prosody best be utilised in the context of the novel x-vector approach
-    - reproduce the x-vector lid system
-    - explore acoustic and prosodic features in isolation and in combination, 
-    - analyse prosody to better understand its strengths and limitations
+    \label{sec:aims}
+    % asking how can the prosody best be utilised in the context of the novel x-vector approach
+    The main aim of this work is to empirically analyse and evaluate the usefulness of prosodic features for language identification in the context of the novel x-vector approach to LID.
+    % - reproduce the x-vector lid system
+    To turn this abstract aim into concrete steps, I want to reproduce the x-vector architecture presented by \citet{Snyder_et_al_2018}; research past use of prosody in LID and decide which prosodic aspects I want to capture using which feature types; decide how different feature types will be compared and combined; run experiments and analyse the results with main focus on the contributions of prosodic features -- hopefully, providing explanations grounded in my knowledge of the phonology of languages as well as of the nature and limitations of both the architecture and the particular feature types used to capture prosody.
+    % - explore acoustic and prosodic features in isolation and in combination, 
+    % - analyse prosody to better understand its strengths and limitations
   }
   \section{Contributions}{
+    The main contributions of my work are:
     \begin{enumerate}
       % discuss prosody and its potential in the context of LID and ASR, providing a brief review of the most relevant recent work on prosodic LID
+      \item {Discussing prosody and its potential in the context of LID and ASR -- as well as the limitations of acoustic information; providing a brief overview of the most relevant recent work, including the Kaldi pitch-tracking algorithm \citep{Ghahremani_et_al_2014}. (\autoref{sec:features})}
       % discuss in much more detail the novel x-vector architecture, making it more accessible for others
+      \item {Discussing the x-vector approach, comparing and contrasting with more established state-of-the-art approaches. (\autoref{chap:Background}, in particular \autoref{sec:x-vectors})}
       % reproduce the x-vector lid system by adapting its variant for SRE (Snyder); easy to use by anyone familiar with the Kaldi toolkit; will be open sourced
+      \item {Reproducing (with some variations) the LID x-vector architecture of \citet{Snyder_et_al_2018} by adapting a similar speaker verification implementation \citep{Snyder_et_al_2018b}; creating a convenient implementation that will be open sourced and is very accessible for the research community due to being developed in the popular Kaldi toolkit. (\autoref{chap:Implementation})}
       % designed, executed and evaluated experiments focused on 3 types of acoustic features and 2 prosodic features, and their combinations
+      \item {Designing, executing and evaluating experiments that use 3 types of popular acoustic features and 2 justified prosodic features; including the fusion of acoustic and prosodic information at the early frame level as well as the abstract representation (x-vector) level. The system is easy to adapt for more feature types and additional means of combining them. (\autoref{chap:Experiments})}
       % analysed the results, focusing on advantages and limitations of prosodic information, recommending a computationally attractive way of adding prosody to existing acoustic lid systems
-      \item{}
+      \item {Analysis of the results, focusing on advantages and limitations of prosodic information overall and for particular languages, recommending a computationally attractive way of augmenting existing acoustic LID systems with a prosodic component. (\autoref{chap:Experiments}, \autoref{chap:discussion-and-conclusions})}
     \end{enumerate}
   }
 }
